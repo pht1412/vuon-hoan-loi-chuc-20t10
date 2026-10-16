@@ -1,6 +1,5 @@
 import React from 'react';
 import { PrivateJourneyData } from '../../../types/journey';
-import { Sparkles } from 'lucide-react';
 import '../JourneyScenes.css';
 
 interface WelcomeSceneProps {
@@ -9,25 +8,28 @@ interface WelcomeSceneProps {
 
 export const WelcomeScene: React.FC<WelcomeSceneProps> = ({ data }) => {
   return (
-    <div className="scene-container" id="scene-welcome">
-      <header className="scene-header">
-        <span className="scene-tag">
-          <Sparkles size={13} aria-hidden="true" />
-          <span>Chặng 1 / 5</span>
-        </span>
-        <h2 className="scene-title">Một cánh cửa nhỏ</h2>
-        <p className="scene-subtitle">{data.subtitle}</p>
+    <div className="scene-container welcome-scene-root" id="scene-welcome">
+      {/* Background chính của Chặng 1: Bức ảnh /Congchao.jpg hòa trộn mượt mà vào bầu trời */}
+      <div className="welcome-hero-backdrop" aria-hidden="true">
+        <div className="welcome-hero-image" />
+        <div className="welcome-hero-sunlight-vignette" />
+        <div className="welcome-hero-sunburst" />
+        <span className="welcome-gate-sparkle sp-1">✦</span>
+        <span className="welcome-gate-sparkle sp-2">✦</span>
+        <span className="welcome-gate-sparkle sp-3">✦</span>
+      </div>
+
+      {/* Tiêu đề thanh thoát phía trên vòm cổng hoa (Không có badge Chặng 1/5 bị lặp) */}
+      <header className="welcome-scene-header">
+        <h2 className="welcome-scene-title">Một cánh cửa nhỏ</h2>
+        <p className="welcome-scene-subtitle">{data.subtitle}</p>
       </header>
 
-      <div className="welcome-card">
-        <div className="welcome-icon-glow" aria-hidden="true">
-          <Sparkles size={30} />
-        </div>
-        <p className="welcome-paragraph" style={{ fontWeight: 600, fontSize: '1.15rem' }}>
-          {data.greeting}
-        </p>
-        <p className="welcome-paragraph">{data.message}</p>
-        <p className="welcome-invitation">{data.invitation}</p>
+      {/* Tấm thẻ lời chào kính mờ trong trẻo đặt cân đối trước bậc thang hoa */}
+      <div className="welcome-crystal-card">
+        <h3 className="welcome-crystal-greeting">{data.greeting}</h3>
+        <p className="welcome-crystal-text">{data.message}</p>
+        <p className="welcome-crystal-invitation">{data.invitation}</p>
       </div>
     </div>
   );

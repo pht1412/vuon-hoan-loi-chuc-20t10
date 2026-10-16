@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { verifyPasscodeAndLoadJourney, getRemainingLockSeconds } from '../../services/privateJourneyApi';
 import { PrivateJourneyData } from '../../types/journey';
-import { X, Mail, Eye, EyeOff, AlertCircle, ArrowRight } from 'lucide-react';
+import { X, Mail, Eye, EyeOff, AlertCircle, ArrowRight, Sparkles } from 'lucide-react';
 import './PasscodeDialog.css';
 
 interface PasscodeDialogProps {
@@ -21,13 +21,14 @@ export const PasscodeDialog: React.FC<PasscodeDialogProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
+  const [isUnlocking, setIsUnlocking] = useState(false);
   const [remainingLock, setRemainingLock] = useState(0);
 
   const modalRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
 
-  // Check rate limit timer
+  // Kiểm tra thời gian khóa giới hạn thử lại
   useEffect(() => {
     if (!isOpen) return;
 
@@ -41,7 +42,7 @@ export const PasscodeDialog: React.FC<PasscodeDialogProps> = ({
     return () => clearInterval(interval);
   }, [isOpen]);
 
-  // Focus management & Escape key handling
+  // Quản lý tiêu điểm (Focus trap) & phím Escape
   useEffect(() => {
     if (!isOpen) return;
 
@@ -53,7 +54,7 @@ export const PasscodeDialog: React.FC<PasscodeDialogProps> = ({
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        if (isVerifying) return;
+        if (isVerifying || isUnlocking) return;
         e.preventDefault();
         handleClose();
       }
@@ -91,28 +92,33 @@ export const PasscodeDialog: React.FC<PasscodeDialogProps> = ({
         }, 15);
       }
     };
-  }, [isOpen, isVerifying, triggerElement]);
+  }, [isOpen, isVerifying, isUnlocking, triggerElement]);
 
   if (!isOpen) return null;
 
   const handleClose = () => {
-    if (isVerifying) return;
+    if (isVerifying || isUnlocking) return;
     setPasscode('');
     setErrorMessage('');
     onClose();
   };
 
   const handleVerify = async () => {
-    if (!passcode.trim() || isVerifying || remainingLock > 0) return;
+    if (!passcode.trim() || isVerifying || isUnlocking || remainingLock > 0) return;
 
     setIsVerifying(true);
     setErrorMessage('');
 
     try {
       const data = await verifyPasscodeAndLoadJourney(passcode);
-      setPasscode('');
       setIsVerifying(false);
-      onSuccess(data);
+      // Hiệu ứng mở niêm phong: Con dấu tỏa sáng quầng #FFF6E0 và bung hạt sao trong 600ms
+      setIsUnlocking(true);
+      setTimeout(() => {
+        setPasscode('');
+        setIsUnlocking(false);
+        onSuccess(data);
+      }, 600);
     } catch (err: unknown) {
       setIsVerifying(false);
       const msg = err instanceof Error ? err.message : 'Mật khẩu chưa chính xác.';
@@ -123,18 +129,18 @@ export const PasscodeDialog: React.FC<PasscodeDialogProps> = ({
 
   return (
     <div
-      className="passcode-dialog-overlay"
+      className={`passcode-dialog-overlay ${isUnlocking ? 'dialog-unlocking' : ''}`}
       id="passcode-dialog-overlay"
       role="presentation"
       onClick={(e) => {
-        if (e.target === e.currentTarget && !isVerifying) {
+        if (e.target === e.currentTarget && !isVerifying && !isUnlocking) {
           handleClose();
         }
       }}
     >
       <div
         ref={modalRef}
-        className="passcode-dialog-card"
+        className={`passcode-dialog-card ${isUnlocking ? 'card-unlock-glow' : ''}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="passcode-dialog-title"
@@ -146,14 +152,24 @@ export const PasscodeDialog: React.FC<PasscodeDialogProps> = ({
           className="modal-close-btn"
           id="passcode-dialog-close-btn"
           onClick={handleClose}
-          disabled={isVerifying}
+          disabled={isVerifying || isUnlocking}
           aria-label="Đóng hộp thoại mở phong bì"
         >
           <X size={18} />
         </button>
 
-        <div className="passcode-wax-seal" aria-hidden="true">
+        <div className={`passcode-wax-seal ${isUnlocking ? 'seal-burst-active' : ''}`} aria-hidden="true">
           <Mail size={26} />
+          {isUnlocking && (
+            <div className="seal-sparkles-burst">
+              <span className="burst-sparkle s-1">✦</span>
+              <span className="burst-sparkle s-2">✦</span>
+              <span className="burst-sparkle s-3">✦</span>
+              <span className="burst-sparkle s-4">✦</span>
+              <span className="burst-sparkle s-5">✦</span>
+              <span className="burst-sparkle s-6">✦</span>
+            </div>
+          )}
         </div>
 
         <h2 className="passcode-title" id="passcode-dialog-title">
@@ -171,7 +187,7 @@ export const PasscodeDialog: React.FC<PasscodeDialogProps> = ({
             className={`passcode-input ${errorMessage ? 'input-error' : ''}`}
             placeholder="Nhập mã mở thư..."
             value={passcode}
-            disabled={isVerifying || remainingLock > 0}
+            disabled={isVerifying || isUnlocking || remainingLock > 0}
             onChange={(e) => {
               setPasscode(e.target.value);
               if (errorMessage) setErrorMessage('');
@@ -191,6 +207,7 @@ export const PasscodeDialog: React.FC<PasscodeDialogProps> = ({
             id="btn-toggle-passcode-visibility"
             onClick={() => setShowPassword((prev) => !prev)}
             aria-label={showPassword ? 'Ẩn mật mã' : 'Hiện mật mã'}
+            disabled={isVerifying || isUnlocking}
           >
             {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
           </button>
@@ -211,12 +228,17 @@ export const PasscodeDialog: React.FC<PasscodeDialogProps> = ({
         <div className="passcode-actions">
           <button
             type="button"
-            className="passcode-submit-btn"
+            className={`passcode-submit-btn ${isUnlocking ? 'btn-unlocked' : ''}`}
             id="btn-submit-passcode"
             onClick={handleVerify}
-            disabled={!passcode.trim() || isVerifying || remainingLock > 0}
+            disabled={!passcode.trim() || isVerifying || isUnlocking || remainingLock > 0}
           >
-            {isVerifying ? (
+            {isUnlocking ? (
+              <>
+                <Sparkles size={16} />
+                <span>Đang mở cánh cửa…</span>
+              </>
+            ) : isVerifying ? (
               <>
                 <span className="passcode-spinner" aria-hidden="true" />
                 <span>Đang kiểm tra…</span>
@@ -234,7 +256,7 @@ export const PasscodeDialog: React.FC<PasscodeDialogProps> = ({
             className="passcode-back-btn"
             id="btn-cancel-passcode"
             onClick={handleClose}
-            disabled={isVerifying}
+            disabled={isVerifying || isUnlocking}
           >
             Quay về khu vườn
           </button>

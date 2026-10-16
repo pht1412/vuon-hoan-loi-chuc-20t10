@@ -1,21 +1,64 @@
+/* ==========================================================================
+   NOSTALGIC WATERCOLOR SUNSET PALETTE & JOURNEY SHELL STYLES
+   ========================================================================== */
+
+:root {
+  /* 1. Nostalgic Watercolor Sunset Palette */
+  --journey-sky-top: #BCCCE0;       /* Dusty Sky Blue */
+  --journey-sky-mid: #D5DFEB;       /* Pale Mist Blue */
+  --journey-sky-peach: #F5DFD3;     /* Pastel Peach */
+  --journey-sky-apricot: #F7D8B5;   /* Apricot Glow */
+  --journey-sky-peri: #B6C2D4;      /* Hazy Periwinkle */
+  --journey-sky-sage: #C7BEAC;      /* Dry Sage Ochre */
+
+  /* Highlight & Sunburst Glow */
+  --journey-sunburst-glow: #FFF6E0; /* Soft Sunburst Glow */
+  --journey-sunburst-edge: #F7D8B5; /* Apricot Glow */
+
+  /* Card Surfaces & Glassmorphism */
+  --journey-card-bg: rgba(250, 247, 242, 0.84); /* Warm Cream with soft glass */
+  --journey-card-solid: #FAF7F2;                 /* Solid Warm Cream */
+  --journey-card-border: rgba(255, 246, 224, 0.9);
+  --journey-card-border-subtle: rgba(245, 223, 211, 0.65);
+  --journey-card-shadow: 0 12px 36px rgba(126, 143, 159, 0.16), 0 2px 8px rgba(199, 190, 172, 0.12);
+
+  /* Typography & Accents - ABSOLUTELY NO PURE BLACK #000000 */
+  --journey-text-title: #7E8F9F;    /* Slate Blue-Grey (Headers, Icons, Accents) */
+  --journey-text-body: #6B6D70;     /* Muted Charcoal (Body & Letter Ink) */
+  --journey-text-muted: #8C8C8C;    /* Warm Taupe Grey (Subtitles, Notes) */
+  --journey-accent-sage: #C7BEAC;   /* Dry Sage Ochre (Decorative border, leaves) */
+  --journey-accent-peri: #B6C2D4;   /* Hazy Periwinkle */
+  --journey-accent-peach: #F5DFD3;  /* Pastel Peach */
+  --journey-accent-apricot: #F7D8B5;/* Apricot Glow */
+}
+
+/* Root Fullscreen Container */
 .journey-shell-root {
   position: fixed;
   inset: 0;
   z-index: 120;
-  background-color: var(--color-bg-base);
-  background-image: 
-    radial-gradient(circle at 50% 10%, rgba(255, 253, 249, 0.96) 0%, rgba(250, 247, 242, 0.92) 50%, rgba(242, 214, 224, 0.45) 100%),
-    linear-gradient(135deg, rgba(242, 214, 224, 0.3) 0%, rgba(250, 240, 228, 0.4) 50%, rgba(226, 240, 236, 0.3) 100%);
   display: flex;
   flex-direction: column;
-  overflow-x: hidden;
-  animation: journey-appear 350ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  overflow: hidden;
+  height: 100dvh;
+  animation: journey-appear 420ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  /* Full screen gradient edge-to-edge top to bottom */
+  background: linear-gradient(
+    180deg,
+    #BCCCE0 0%,
+    #D5DFEB 30%,
+    #F5DFD3 60%,
+    #F7D8B5 80%,
+    #B6C2D4 95%,
+    #C7BEAC 100%
+  );
+  color: var(--journey-text-body);
 }
 
 @keyframes journey-appear {
   from {
     opacity: 0;
-    transform: scale(0.98);
+    transform: scale(0.985);
   }
   to {
     opacity: 1;
@@ -23,19 +66,220 @@
   }
 }
 
-/* Header Bar */
+/* ==========================================================================
+   Atmospheric Layers: Sunburst, Pure SVG Cloud Sea, Sunbeams, Particles
+   ========================================================================== */
+
+.journey-sky-backdrop {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+/* Diagonal Sunbeams / Light Rays (Vệt nắng chiều xiên nhẹ) */
+.journey-sunbeams-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70%;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    128deg,
+    rgba(255, 246, 224, 0.14) 0px,
+    rgba(255, 246, 224, 0.14) 38px,
+    transparent 38px,
+    transparent 115px
+  );
+  -webkit-mask-image: radial-gradient(ellipse 95% 85% at 20% 0%, #000 20%, rgba(0, 0, 0, 0.35) 60%, transparent 88%);
+  mask-image: radial-gradient(ellipse 95% 85% at 20% 0%, #000 20%, rgba(0, 0, 0, 0.35) 60%, transparent 88%);
+  animation: sunbeamPulse 10s ease-in-out infinite alternate;
+}
+
+@keyframes sunbeamPulse {
+  0% {
+    opacity: 0.75;
+    transform: scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+}
+
+/* Radial Soft Sunburst Glow at Horizon */
+.journey-sunburst-glow {
+  position: absolute;
+  left: 50%;
+  bottom: 10%;
+  transform: translateX(-50%);
+  width: min(760px, 130vw);
+  height: min(440px, 60vh);
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 246, 224, 0.85) 0%,
+    rgba(247, 216, 181, 0.5) 42%,
+    rgba(245, 223, 211, 0.2) 68%,
+    transparent 82%
+  );
+  filter: blur(38px);
+  animation: sunGlowPulse 8s ease-in-out infinite alternate;
+}
+
+@keyframes sunGlowPulse {
+  0% {
+    transform: translateX(-50%) scale(0.96);
+    opacity: 0.85;
+  }
+  100% {
+    transform: translateX(-50%) scale(1.05);
+    opacity: 1;
+  }
+}
+
+/* ==========================================================================
+   Pure SVG Sea of Clouds (Biển Mây Bồng Bềnh - Không dùng bất kỳ file ảnh)
+   ========================================================================== */
+
+.journey-cloud-sea {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: min(320px, 42vh);
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.cloud-wave-svg {
+  position: absolute;
+  bottom: 0;
+  left: -12%;
+  width: 124%;
+  height: 100%;
+}
+
+.wave-back {
+  height: 95%;
+  filter: blur(5px);
+  animation: waveFloatBack 24s ease-in-out infinite alternate;
+}
+
+.wave-mid {
+  height: 80%;
+  filter: blur(3px);
+  animation: waveFloatMid 18s ease-in-out infinite alternate-reverse;
+}
+
+.wave-front {
+  height: 65%;
+  filter: blur(2px);
+  animation: waveFloatFront 20s ease-in-out infinite alternate;
+}
+
+@keyframes waveFloatBack {
+  0% {
+    transform: translateX(-35px) scaleY(0.98);
+  }
+  100% {
+    transform: translateX(35px) scaleY(1.03);
+  }
+}
+
+@keyframes waveFloatMid {
+  0% {
+    transform: translateX(30px) scaleY(1.02);
+  }
+  100% {
+    transform: translateX(-30px) scaleY(0.97);
+  }
+}
+
+@keyframes waveFloatFront {
+  0% {
+    transform: translateX(-25px) scaleY(0.98);
+  }
+  100% {
+    transform: translateX(25px) scaleY(1.03);
+  }
+}
+
+/* Floating Sunset Particles (Golden Kem #FFF6E0 & Peach #F5DFD3) */
+.journey-particles-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.journey-sunset-particle {
+  position: absolute;
+  bottom: 10%;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: floatSunsetParticle linear infinite;
+}
+
+.p-1  { left: 12%; width: 4px; height: 4px; background: #FFF6E0; animation-duration: 9s; animation-delay: 0s; box-shadow: 0 0 8px #FFF6E0; }
+.p-2  { left: 24%; width: 6px; height: 6px; background: #F5DFD3; animation-duration: 12s; animation-delay: 2s; box-shadow: 0 0 10px #F5DFD3; }
+.p-3  { left: 38%; width: 5px; height: 5px; background: #FFF6E0; animation-duration: 10s; animation-delay: 1.5s; box-shadow: 0 0 8px #FFF6E0; }
+.p-4  { left: 52%; width: 7px; height: 7px; background: #F7D8B5; animation-duration: 13s; animation-delay: 3s; box-shadow: 0 0 12px #F7D8B5; }
+.p-5  { left: 66%; width: 4px; height: 4px; background: #FFF6E0; animation-duration: 8.5s; animation-delay: 0.8s; box-shadow: 0 0 8px #FFF6E0; }
+.p-6  { left: 78%; width: 6px; height: 6px; background: #F5DFD3; animation-duration: 11s; animation-delay: 2.5s; box-shadow: 0 0 10px #F5DFD3; }
+.p-7  { left: 88%; width: 5px; height: 5px; background: #FFF6E0; animation-duration: 9.5s; animation-delay: 4s; box-shadow: 0 0 8px #FFF6E0; }
+.p-8  { left: 18%; width: 5px; height: 5px; background: #F7D8B5; animation-duration: 14s; animation-delay: 5s; box-shadow: 0 0 10px #F7D8B5; }
+.p-9  { left: 45%; width: 4px; height: 4px; background: #FFF6E0; animation-duration: 10.5s; animation-delay: 4.2s; box-shadow: 0 0 8px #FFF6E0; }
+.p-10 { left: 60%; width: 6px; height: 6px; background: #F5DFD3; animation-duration: 12.5s; animation-delay: 1.8s; box-shadow: 0 0 10px #F5DFD3; }
+.p-11 { left: 72%; width: 4px; height: 4px; background: #FFF6E0; animation-duration: 9.8s; animation-delay: 3.5s; box-shadow: 0 0 8px #FFF6E0; }
+.p-12 { left: 84%; width: 5px; height: 5px; background: #F7D8B5; animation-duration: 11.5s; animation-delay: 0.3s; box-shadow: 0 0 10px #F7D8B5; }
+
+@keyframes floatSunsetParticle {
+  0% {
+    transform: translateY(0) translateX(0) scale(0.6);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.85;
+  }
+  80% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translateY(-75vh) translateX(25px) scale(1.15);
+    opacity: 0;
+  }
+}
+
+/* Subtle Watercolor Paper Texture Overlay (3% noise) */
+.journey-paper-texture {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  mix-blend-mode: multiply;
+}
+
+/* ==========================================================================
+   Header Top Bar (Compact & Streamlined)
+   ========================================================================== */
+
 .journey-shell-topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.85rem 1.4rem;
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--color-border-card);
+  padding: 0.6rem 1.4rem;
+  background: rgba(250, 247, 242, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255, 246, 224, 0.7);
+  box-shadow: 0 2px 12px rgba(126, 143, 159, 0.06);
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 25;
   flex-shrink: 0;
 }
 
@@ -43,125 +287,171 @@
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  font-size: 0.84rem;
+  font-size: 0.82rem;
   font-weight: 600;
-  color: var(--color-text-muted);
-  padding: 0.35rem 0.75rem;
+  color: var(--journey-text-title);
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(188, 204, 224, 0.6);
+  padding: 0.32rem 0.85rem;
   border-radius: var(--radius-full);
   transition: all var(--transition-fast);
+  cursor: pointer;
 }
 
 .journey-top-btn:hover {
-  color: var(--color-text-main);
-  background: var(--color-bg-base);
+  color: #556778;
+  background: #FFFFFF;
+  border-color: var(--journey-sky-apricot);
+  box-shadow: 0 2px 8px rgba(247, 216, 181, 0.4);
 }
 
 /* Progress Tracker */
 .journey-progress-tracker {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.45rem;
+  background: rgba(255, 255, 255, 0.65);
+  padding: 0.28rem 0.8rem;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(213, 223, 235, 0.6);
 }
 
 .progress-dot {
-  width: 9px;
-  height: 9px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background-color: var(--color-border-card);
+  background-color: rgba(188, 204, 224, 0.6);
   transition: all var(--transition-normal);
 }
 
 .progress-dot.active {
-  background-color: var(--color-accent-primary);
+  background-color: var(--journey-text-title);
   transform: scale(1.35);
-  box-shadow: 0 0 8px rgba(212, 140, 148, 0.6);
+  box-shadow: 0 0 10px rgba(247, 216, 181, 0.9), 0 0 4px var(--journey-text-title);
 }
 
 .progress-dot.completed {
-  background-color: var(--color-accent-sage);
+  background-color: var(--journey-accent-sage);
 }
 
 .progress-text {
   font-size: 0.78rem;
   font-weight: 600;
-  color: var(--color-accent-primary);
+  color: var(--journey-text-title);
   margin-left: 0.35rem;
   letter-spacing: 0.02em;
 }
 
-/* Scrollable Content Container */
+/* Symmetrical Right Spacer */
+.journey-topbar-spacer {
+  width: 130px;
+}
+
+/* ==========================================================================
+   Scrollable Content Area
+   ========================================================================== */
+
 .journey-shell-content {
   flex: 1;
   overflow-y: auto;
-  padding: 1.8rem 1.25rem 2.5rem;
+  padding: 0.8rem 1rem 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
+  z-index: 10;
   -webkit-overflow-scrolling: touch;
 }
 
-/* Bottom Bar */
+/* ==========================================================================
+   Bottom Navigation Bar (Streamlined)
+   ========================================================================== */
+
 .journey-shell-bottombar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 1.4rem;
-  background: rgba(255, 255, 255, 0.88);
+  padding: 0.6rem 1.4rem;
+  background: rgba(250, 247, 242, 0.86);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border-top: 1px solid var(--color-border-card);
+  border-top: 1px solid rgba(255, 246, 224, 0.75);
+  box-shadow: 0 -4px 16px rgba(126, 143, 159, 0.06);
   position: sticky;
   bottom: 0;
-  z-index: 10;
+  z-index: 25;
   flex-shrink: 0;
+}
+
+.journey-bottombar-spacer {
+  width: 100px;
 }
 
 .journey-nav-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  padding: 0.65rem 1.4rem;
+  padding: 0.62rem 1.4rem;
   border-radius: var(--radius-full);
   font-size: 0.9rem;
   font-weight: 600;
   transition: all var(--transition-fast);
+  cursor: pointer;
+  border: none;
 }
 
 .journey-nav-btn.primary {
-  background: var(--color-accent-primary);
-  color: #FFFFFF;
-  box-shadow: var(--shadow-button);
+  background: linear-gradient(135deg, #7E8F9F 0%, #687989 100%);
+  color: #FAF7F2;
+  box-shadow: 0 4px 16px rgba(126, 143, 159, 0.35);
   margin-left: auto;
 }
 
 .journey-nav-btn.primary:hover {
-  background: var(--color-accent-hover);
-  box-shadow: var(--shadow-button-hover);
+  background: linear-gradient(135deg, #6C7D8E 0%, #586978 100%);
+  box-shadow: 0 6px 20px rgba(126, 143, 159, 0.5), 0 0 12px rgba(247, 216, 181, 0.5);
   transform: translateY(-1px);
 }
 
 .journey-nav-btn.secondary {
-  background: var(--color-bg-base);
-  color: var(--color-text-main);
-  border: 1px solid var(--color-border-card);
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--journey-text-title);
+  border: 1px solid rgba(188, 204, 224, 0.8);
+  box-shadow: 0 2px 8px rgba(126, 143, 159, 0.06);
 }
 
 .journey-nav-btn.secondary:hover {
   background: #FFFFFF;
-  border-color: var(--color-accent-soft);
-  color: var(--color-accent-primary);
+  border-color: var(--journey-sky-apricot);
+  color: #556778;
+  box-shadow: 0 4px 12px rgba(247, 216, 181, 0.35);
+  transform: translateY(-1px);
 }
 
 @media (max-width: 540px) {
   .journey-shell-topbar {
-    padding: 0.75rem 0.85rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .journey-top-btn {
+    padding: 0.28rem 0.65rem;
+    font-size: 0.76rem;
+  }
+
+  .journey-topbar-spacer {
+    display: none;
   }
 
   .journey-shell-bottombar {
-    padding: 0.65rem 0.85rem;
+    padding: 0.5rem 0.75rem;
   }
 
   .journey-shell-content {
-    padding: 1.2rem 0.85rem 2rem;
+    padding: 0.6rem 0.6rem 0.85rem;
+  }
+
+  .journey-nav-btn {
+    padding: 0.55rem 1rem;
+    font-size: 0.84rem;
   }
 }

@@ -1,6 +1,5 @@
 import React from 'react';
 import { AppreciationItem } from '../../../types/journey';
-import { Sparkles } from 'lucide-react';
 import '../JourneyScenes.css';
 
 interface AppreciationSceneProps {
@@ -13,18 +12,14 @@ export const AppreciationScene: React.FC<AppreciationSceneProps> = ({
   return (
     <div className="scene-container" id="scene-appreciation">
       <header className="scene-header">
-        <span className="scene-tag">
-          <Sparkles size={13} aria-hidden="true" />
-          <span>Chặng 4 / 5</span>
-        </span>
         <h2 className="scene-title">Điều tớ trân trọng ở cậu</h2>
         <p className="scene-subtitle">
           Những điều đáng mến được gom nhặt từ những khoảnh khắc cậu chia sẻ công khai.
         </p>
       </header>
 
-      {/* 4 Thẻ trân trọng */}
-      <div className="apprec-grid">
+      {/* 4 Thẻ quan sát trân trọng */}
+      <div className="apprec-grid" role="region" aria-label="Những điều trân trọng ở cậu">
         {appreciations.map((item) => (
           <article key={item.id} className="apprec-card">
             <span className="apprec-tag">{item.tag}</span>

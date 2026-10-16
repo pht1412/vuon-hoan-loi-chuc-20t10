@@ -1,60 +1,135 @@
+/* ==========================================================================
+   PASSCODE DIALOG - NOSTALGIC WATERCOLOR SUNSET PALETTE
+   ========================================================================== */
+
 .passcode-dialog-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(60, 50, 42, 0.48);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background-color: rgba(65, 78, 92, 0.45);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 1.25rem;
   z-index: var(--z-modal-content);
   animation: modal-fade-in var(--transition-fast) forwards;
+  transition: opacity 0.4s ease;
+}
+
+.passcode-dialog-overlay.dialog-unlocking {
+  backdrop-filter: blur(14px);
+  background-color: rgba(188, 204, 224, 0.4);
 }
 
 .passcode-dialog-card {
   position: relative;
-  background: #FFFFFF;
-  border: 1px solid var(--color-border-card);
+  background: var(--journey-card-solid, #FAF7F2);
+  border: 1.5px solid rgba(255, 246, 224, 0.9);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-modal);
+  box-shadow: 0 20px 50px rgba(126, 143, 159, 0.22), 0 4px 16px rgba(199, 190, 172, 0.15);
   width: 100%;
-  max-width: 460px;
+  max-width: 450px;
   padding: 2.2rem 2rem;
-  color: var(--color-text-main);
+  color: var(--journey-text-body, #6B6D70);
   animation: modal-scale-up var(--transition-normal) forwards;
   text-align: center;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s ease;
 }
 
+.passcode-dialog-card.card-unlock-glow {
+  box-shadow: 0 0 50px rgba(255, 246, 224, 0.95), 0 20px 60px rgba(247, 216, 181, 0.5);
+  transform: scale(1.02);
+}
+
+/* Wax Seal with Sunset Peach / Apricot Gradient */
 .passcode-wax-seal {
-  width: 60px;
-  height: 60px;
+  position: relative;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #FFF0F2 0%, #FDE4E7 100%);
-  border: 1.5px solid var(--color-accent-soft);
-  color: var(--color-accent-primary);
+  background: linear-gradient(135deg, #FFF6E0 0%, #F5DFD3 50%, #F7D8B5 100%);
+  border: 1.5px solid rgba(255, 246, 224, 0.95);
+  color: var(--journey-text-title, #7E8F9F);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 1.1rem;
-  box-shadow: 0 4px 16px rgba(232, 180, 184, 0.35);
+  box-shadow: 0 6px 20px rgba(247, 216, 181, 0.5), 0 2px 6px rgba(126, 143, 159, 0.15);
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* 600ms Wax Seal Burst Effect */
+.passcode-wax-seal.seal-burst-active {
+  transform: scale(1.18);
+  background: linear-gradient(135deg, #FFF6E0 0%, #FFFDF8 100%);
+  box-shadow: 
+    0 0 35px #FFF6E0,
+    0 0 70px rgba(247, 216, 181, 0.8),
+    0 0 100px rgba(255, 246, 224, 0.6);
+  color: #7E8F9F;
+}
+
+.seal-sparkles-burst {
+  position: absolute;
+  inset: -20px;
+  pointer-events: none;
+}
+
+.burst-sparkle {
+  position: absolute;
+  font-size: 1.1rem;
+  color: #FFF6E0;
+  text-shadow: 0 0 8px #F7D8B5;
+  animation: burstParticle 0.6s ease-out forwards;
+}
+
+.s-1 { top: 0%; left: 50%; animation-delay: 0.02s; }
+.s-2 { top: 25%; right: 0%; animation-delay: 0.05s; }
+.s-3 { bottom: 15%; right: 10%; animation-delay: 0.08s; }
+.s-4 { bottom: 0%; left: 50%; animation-delay: 0.04s; }
+.s-5 { bottom: 15%; left: 10%; animation-delay: 0.07s; }
+.s-6 { top: 25%; left: 0%; animation-delay: 0.03s; }
+
+@keyframes burstParticle {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.3);
+  }
+  40% {
+    opacity: 1;
+    transform: translate(calc(var(--tx, 10px)), calc(var(--ty, -15px))) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--tx, 22px) * 1.5), calc(var(--ty, -30px) * 1.5)) scale(0.6);
+  }
+}
+
+.s-1 { --tx: 0px; --ty: -24px; }
+.s-2 { --tx: 22px; --ty: -12px; }
+.s-3 { --tx: 20px; --ty: 16px; }
+.s-4 { --tx: 0px; --ty: 24px; }
+.s-5 { --tx: -20px; --ty: 16px; }
+.s-6 { --tx: -22px; --ty: -12px; }
+
+/* Titles & Text - NO PURE BLACK */
 .passcode-title {
   font-family: var(--font-serif);
-  font-size: 1.6rem;
+  font-size: 1.65rem;
   font-weight: 600;
-  color: var(--color-text-main);
+  color: var(--journey-text-title, #7E8F9F);
   margin-bottom: 0.35rem;
 }
 
 .passcode-subtitle {
-  font-size: 0.88rem;
-  color: var(--color-text-muted);
-  line-height: 1.5;
+  font-size: 0.9rem;
+  color: var(--journey-text-muted, #8C8C8C);
+  line-height: 1.55;
   margin-bottom: 1.5rem;
 }
 
+/* Input Area */
 .passcode-input-wrapper {
   position: relative;
   width: 100%;
@@ -63,14 +138,14 @@
 
 .passcode-input {
   width: 100%;
-  padding: 0.8rem 2.8rem 0.8rem 1.1rem;
+  padding: 0.82rem 2.8rem 0.82rem 1.1rem;
   font-family: var(--font-sans);
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   letter-spacing: 0.15em;
   text-align: center;
-  color: var(--color-text-main);
-  background: var(--color-bg-ivory);
-  border: 1px solid var(--color-border-card);
+  color: var(--journey-text-body, #6B6D70);
+  background: #FFFFFF;
+  border: 1.5px solid rgba(213, 223, 235, 0.9);
   border-radius: var(--radius-md);
   transition: all var(--transition-fast);
   outline: none;
@@ -78,8 +153,8 @@
 
 .passcode-input:focus {
   background: #FFFFFF;
-  border-color: var(--color-accent-primary);
-  box-shadow: 0 0 0 3px rgba(212, 140, 148, 0.2);
+  border-color: var(--journey-text-title, #7E8F9F);
+  box-shadow: 0 0 0 3px rgba(247, 216, 181, 0.45);
 }
 
 .passcode-input.input-error {
@@ -92,21 +167,24 @@
   right: 0.85rem;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--color-text-muted);
+  color: var(--journey-text-muted, #8C8C8C);
+  background: transparent;
+  border: none;
   padding: 0.3rem;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: color var(--transition-fast);
+  cursor: pointer;
 }
 
 .passcode-eye-btn:hover {
-  color: var(--color-accent-primary);
+  color: var(--journey-text-title, #7E8F9F);
 }
 
 .passcode-error-msg {
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   color: #D3455B;
   margin-top: 0.4rem;
   display: flex;
@@ -117,6 +195,7 @@
   line-height: 1.4;
 }
 
+/* Action Buttons */
 .passcode-actions {
   display: flex;
   flex-direction: column;
@@ -131,20 +210,27 @@
   gap: 0.5rem;
   width: 100%;
   padding: 0.75rem 1.5rem;
-  background: var(--color-accent-primary);
-  color: #FFFFFF;
+  background: linear-gradient(135deg, #7E8F9F 0%, #687989 100%);
+  color: #FAF7F2;
+  border: none;
   border-radius: var(--radius-full);
   font-weight: 600;
-  font-size: 0.95rem;
-  box-shadow: var(--shadow-button);
+  font-size: 0.96rem;
+  box-shadow: 0 4px 16px rgba(126, 143, 159, 0.35);
   transition: all var(--transition-fast);
   cursor: pointer;
 }
 
 .passcode-submit-btn:hover:not(:disabled) {
-  background: var(--color-accent-hover);
-  box-shadow: var(--shadow-button-hover);
+  background: linear-gradient(135deg, #6C7D8E 0%, #586978 100%);
+  box-shadow: 0 6px 20px rgba(126, 143, 159, 0.5), 0 0 10px rgba(247, 216, 181, 0.4);
   transform: translateY(-1px);
+}
+
+.passcode-submit-btn.btn-unlocked {
+  background: linear-gradient(135deg, #F7D8B5 0%, #F5DFD3 100%);
+  color: #556778;
+  box-shadow: 0 0 25px rgba(255, 246, 224, 0.9);
 }
 
 .passcode-submit-btn:disabled {
@@ -160,23 +246,25 @@
   width: 100%;
   padding: 0.65rem 1.25rem;
   background: transparent;
-  color: var(--color-text-muted);
+  border: none;
+  color: var(--journey-text-muted, #8C8C8C);
   font-size: 0.88rem;
   font-weight: 500;
   border-radius: var(--radius-full);
   transition: all var(--transition-fast);
+  cursor: pointer;
 }
 
 .passcode-back-btn:hover {
-  color: var(--color-text-main);
-  background: var(--color-bg-base);
+  color: var(--journey-text-title, #7E8F9F);
+  background: rgba(255, 255, 255, 0.6);
 }
 
 .passcode-spinner {
   width: 16px;
   height: 16px;
   border: 2px solid rgba(255, 255, 255, 0.4);
-  border-top-color: #FFFFFF;
+  border-top-color: #FAF7F2;
   border-radius: 50%;
   animation: spinner-spin 0.75s linear infinite;
 }
