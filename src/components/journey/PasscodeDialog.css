@@ -1,0 +1,188 @@
+.passcode-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(60, 50, 42, 0.48);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  z-index: var(--z-modal-content);
+  animation: modal-fade-in var(--transition-fast) forwards;
+}
+
+.passcode-dialog-card {
+  position: relative;
+  background: #FFFFFF;
+  border: 1px solid var(--color-border-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-modal);
+  width: 100%;
+  max-width: 460px;
+  padding: 2.2rem 2rem;
+  color: var(--color-text-main);
+  animation: modal-scale-up var(--transition-normal) forwards;
+  text-align: center;
+}
+
+.passcode-wax-seal {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FFF0F2 0%, #FDE4E7 100%);
+  border: 1.5px solid var(--color-accent-soft);
+  color: var(--color-accent-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.1rem;
+  box-shadow: 0 4px 16px rgba(232, 180, 184, 0.35);
+}
+
+.passcode-title {
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--color-text-main);
+  margin-bottom: 0.35rem;
+}
+
+.passcode-subtitle {
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+
+.passcode-input-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 0.4rem;
+}
+
+.passcode-input {
+  width: 100%;
+  padding: 0.8rem 2.8rem 0.8rem 1.1rem;
+  font-family: var(--font-sans);
+  font-size: 1.1rem;
+  letter-spacing: 0.15em;
+  text-align: center;
+  color: var(--color-text-main);
+  background: var(--color-bg-ivory);
+  border: 1px solid var(--color-border-card);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+  outline: none;
+}
+
+.passcode-input:focus {
+  background: #FFFFFF;
+  border-color: var(--color-accent-primary);
+  box-shadow: 0 0 0 3px rgba(212, 140, 148, 0.2);
+}
+
+.passcode-input.input-error {
+  border-color: #D3455B;
+  background: #FFF8F9;
+}
+
+.passcode-eye-btn {
+  position: absolute;
+  right: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+  padding: 0.3rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--transition-fast);
+}
+
+.passcode-eye-btn:hover {
+  color: var(--color-accent-primary);
+}
+
+.passcode-error-msg {
+  font-size: 0.82rem;
+  color: #D3455B;
+  margin-top: 0.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.passcode-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-top: 1.5rem;
+}
+
+.passcode-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  background: var(--color-accent-primary);
+  color: #FFFFFF;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  font-size: 0.95rem;
+  box-shadow: var(--shadow-button);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.passcode-submit-btn:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+  box-shadow: var(--shadow-button-hover);
+  transform: translateY(-1px);
+}
+
+.passcode-submit-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.passcode-back-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.65rem 1.25rem;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 0.88rem;
+  font-weight: 500;
+  border-radius: var(--radius-full);
+  transition: all var(--transition-fast);
+}
+
+.passcode-back-btn:hover {
+  color: var(--color-text-main);
+  background: var(--color-bg-base);
+}
+
+.passcode-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #FFFFFF;
+  border-radius: 50%;
+  animation: spinner-spin 0.75s linear infinite;
+}
+
+@keyframes spinner-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

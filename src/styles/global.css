@@ -1,0 +1,238 @@
+@import './tokens.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-text-main);
+  /* Gradient matching the perimeter of nenpublic.jpg: pink on left, warm cream center, soft mint right */
+  background: linear-gradient(90deg, #F2D6E0 0%, #FDF3EC 30%, #FAF0E4 50%, #EFF8F5 70%, #E2F0EC 100%);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  position: relative;
+  line-height: 1.5;
+}
+
+body.body-locked {
+  overflow: hidden !important;
+  touch-action: none;
+}
+
+/* Background Artwork Layer with Soft Feathered Edges */
+.garden-background {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-background);
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+.garden-background-artwork {
+  position: relative;
+  /* 1:1 aspect ratio strictly matching nenpublic.jpg */
+  height: 100dvh;
+  width: 100dvh;
+  max-width: 100vw;
+  background-image: url('/nenpublic.jpg');
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  background-size: cover;
+  /* Multi-stage feathered gradient mask dissolving left & right borders into the pastel garden */
+  -webkit-mask-image: 
+    linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.3) 10%, #000000 28%, #000000 72%, rgba(0, 0, 0, 0.3) 90%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.5) 8%, #000000 24%, #000000 100%);
+  mask-image: 
+    linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.3) 10%, #000000 28%, #000000 72%, rgba(0, 0, 0, 0.3) 90%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.5) 8%, #000000 24%, #000000 100%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+@media (max-width: 860px) {
+  .garden-background-artwork {
+    width: 100vw;
+    height: 100%;
+    background-size: cover;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}
+
+
+/* Atmospheric Glow Layer radiating softly from the magical book */
+.garden-book-aura {
+  position: fixed;
+  left: 50%;
+  bottom: 8%;
+  transform: translateX(-50%);
+  width: min(560px, 90vw);
+  height: min(360px, 45vh);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 238, 194, 0.42) 0%, rgba(247, 194, 210, 0.22) 44%, rgba(226, 240, 236, 0.08) 68%, transparent 80%);
+  filter: blur(48px);
+  z-index: 1;
+  pointer-events: none;
+  animation: bookAuraPulse 7s ease-in-out infinite alternate;
+}
+
+@keyframes bookAuraPulse {
+  0% {
+    opacity: 0.65;
+    transform: translateX(-50%) scale(0.95);
+    filter: blur(42px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1.08);
+    filter: blur(56px);
+  }
+}
+
+/* Ultra-thin soft gradient only at the very top for title contrast */
+.garden-top-gradient {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 110px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Accessibility Focus Outline */
+:focus-visible {
+  outline: 2px solid var(--color-accent-primary);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+button {
+  font-family: inherit;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: inherit;
+}
+
+/* Typography Helpers */
+.font-serif {
+  font-family: var(--font-serif);
+}
+
+.font-sans {
+  font-family: var(--font-sans);
+}
+
+/* App Viewport Container: Fits perfectly within 100dvh on Desktop */
+.garden-app {
+  position: relative;
+  height: 100dvh;
+  max-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 2;
+  overflow: hidden;
+  width: 100%;
+}
+
+/* Responsive adjustments for Mobile/Tablet */
+@media (max-width: 860px) {
+  body {
+    height: auto;
+    min-height: 100dvh;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .garden-app {
+    height: auto;
+    min-height: 100dvh;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .garden-background {
+    background-size: cover;
+    background-position: center bottom;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}
+
+/* Phone & Phablet Screens (320px - 540px, including iPhone 16 Pro Max 430px & Galaxy A55 412px) */
+@media (max-width: 540px) {
+  .garden-app {
+    width: 100%;
+    max-width: 100vw;
+  }
+}
+
+/* Respect Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Quick link to Admin */
+.garden-admin-quick-link {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 40;
+  transition: all 0.2s ease;
+  opacity: 0.55;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.garden-admin-quick-link:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--color-accent-primary);
+  transform: scale(1.1);
+  box-shadow: 0 4px 14px rgba(212, 140, 148, 0.25);
+}

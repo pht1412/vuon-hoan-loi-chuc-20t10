@@ -1,0 +1,89 @@
+.placeholder-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(60, 50, 42, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  z-index: var(--z-modal-content);
+  animation: modal-fade-in var(--transition-fast) forwards;
+}
+
+.placeholder-modal-card {
+  position: relative;
+  background: #FFFFFF;
+  border: 1px solid var(--color-border-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-modal);
+  width: 100%;
+  max-width: 460px;
+  padding: 2.2rem 2rem;
+  text-align: center;
+  color: var(--color-text-main);
+  animation: modal-scale-up var(--transition-normal) forwards;
+}
+
+.placeholder-icon-badge {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: #FFF0F2;
+  color: var(--color-accent-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 16px rgba(232, 180, 184, 0.3);
+}
+
+.placeholder-milestone-tag {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-accent-primary);
+  background: rgba(232, 180, 184, 0.18);
+  padding: 0.2rem 0.75rem;
+  border-radius: var(--radius-full);
+  margin-bottom: 0.75rem;
+}
+
+.placeholder-title {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-text-main);
+  margin-bottom: 0.65rem;
+}
+
+.placeholder-desc {
+  font-size: 0.94rem;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.placeholder-primary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  background: var(--color-accent-primary);
+  color: #FFFFFF;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  font-size: 0.95rem;
+  box-shadow: var(--shadow-button);
+  transition: all var(--transition-fast);
+}
+
+.placeholder-primary-btn:hover,
+.placeholder-primary-btn:focus-visible {
+  background: var(--color-accent-hover);
+  box-shadow: var(--shadow-button-hover);
+  transform: translateY(-1px);
+}

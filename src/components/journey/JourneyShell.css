@@ -1,0 +1,167 @@
+.journey-shell-root {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  background-color: var(--color-bg-base);
+  background-image: 
+    radial-gradient(circle at 50% 10%, rgba(255, 253, 249, 0.96) 0%, rgba(250, 247, 242, 0.92) 50%, rgba(242, 214, 224, 0.45) 100%),
+    linear-gradient(135deg, rgba(242, 214, 224, 0.3) 0%, rgba(250, 240, 228, 0.4) 50%, rgba(226, 240, 236, 0.3) 100%);
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  animation: journey-appear 350ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes journey-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Header Bar */
+.journey-shell-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.4rem;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-border-card);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.journey-top-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-full);
+  transition: all var(--transition-fast);
+}
+
+.journey-top-btn:hover {
+  color: var(--color-text-main);
+  background: var(--color-bg-base);
+}
+
+/* Progress Tracker */
+.journey-progress-tracker {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.progress-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background-color: var(--color-border-card);
+  transition: all var(--transition-normal);
+}
+
+.progress-dot.active {
+  background-color: var(--color-accent-primary);
+  transform: scale(1.35);
+  box-shadow: 0 0 8px rgba(212, 140, 148, 0.6);
+}
+
+.progress-dot.completed {
+  background-color: var(--color-accent-sage);
+}
+
+.progress-text {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-accent-primary);
+  margin-left: 0.35rem;
+  letter-spacing: 0.02em;
+}
+
+/* Scrollable Content Container */
+.journey-shell-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.8rem 1.25rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Bottom Bar */
+.journey-shell-bottombar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.4rem;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid var(--color-border-card);
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.journey-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.65rem 1.4rem;
+  border-radius: var(--radius-full);
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all var(--transition-fast);
+}
+
+.journey-nav-btn.primary {
+  background: var(--color-accent-primary);
+  color: #FFFFFF;
+  box-shadow: var(--shadow-button);
+  margin-left: auto;
+}
+
+.journey-nav-btn.primary:hover {
+  background: var(--color-accent-hover);
+  box-shadow: var(--shadow-button-hover);
+  transform: translateY(-1px);
+}
+
+.journey-nav-btn.secondary {
+  background: var(--color-bg-base);
+  color: var(--color-text-main);
+  border: 1px solid var(--color-border-card);
+}
+
+.journey-nav-btn.secondary:hover {
+  background: #FFFFFF;
+  border-color: var(--color-accent-soft);
+  color: var(--color-accent-primary);
+}
+
+@media (max-width: 540px) {
+  .journey-shell-topbar {
+    padding: 0.75rem 0.85rem;
+  }
+
+  .journey-shell-bottombar {
+    padding: 0.65rem 0.85rem;
+  }
+
+  .journey-shell-content {
+    padding: 1.2rem 0.85rem 2rem;
+  }
+}

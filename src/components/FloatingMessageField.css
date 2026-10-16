@@ -1,0 +1,543 @@
+/* Floating Message Field Container */
+.floating-field-container {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Subtle Loading State: Prevents flash of empty state on refresh */
+.floating-field-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 1.25rem;
+  margin: 2.2rem auto auto;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: var(--radius-full);
+  box-shadow: 0 6px 20px rgba(184, 154, 142, 0.1);
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+  animation: loadingPillBreath 2.2s ease-in-out infinite alternate;
+  z-index: 5;
+}
+
+.loading-flower-sparkle {
+  font-size: 1.05rem;
+  display: inline-block;
+  animation: spinFlowerSlow 6s linear infinite;
+}
+
+@keyframes spinFlowerSlow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes loadingPillBreath {
+  0% {
+    opacity: 0.7;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+}
+
+/* Empty State: Elevated to the upper quadrant so it never obscures the glowing magical book */
+.floating-field-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1.6rem 1.75rem;
+  margin: 1.5rem auto auto;
+  max-width: 400px;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 30px rgba(184, 154, 142, 0.12), 0 1px 3px rgba(255, 255, 255, 0.8) inset;
+  transition: all var(--transition-normal);
+  z-index: 5;
+}
+
+.empty-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #FFF0F2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-accent-primary);
+  margin-bottom: 0.65rem;
+  box-shadow: 0 2px 8px rgba(232, 180, 184, 0.3);
+}
+
+.empty-title {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-main);
+  margin-bottom: 0.35rem;
+}
+
+.empty-text {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  line-height: 1.55;
+  margin-bottom: 1rem;
+}
+
+/* Local/Dev preview button inside empty state */
+.empty-dev-demo-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 1rem;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--color-accent-soft);
+  border-radius: var(--radius-full);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-accent-primary);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  box-shadow: 0 2px 8px rgba(232, 180, 184, 0.2);
+}
+
+.empty-dev-demo-btn:hover {
+  background: #FFFFFF;
+  border-color: var(--color-accent-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(232, 180, 184, 0.35);
+}
+
+/* Demo Mode Status Pill */
+.demo-mode-indicator {
+  position: absolute;
+  top: 0.35rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.3rem 0.85rem;
+  background: rgba(255, 245, 240, 0.92);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--color-accent-soft);
+  border-radius: var(--radius-full);
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: var(--color-accent-primary);
+  box-shadow: 0 2px 10px rgba(184, 154, 142, 0.15);
+  z-index: 20;
+}
+
+.demo-mode-exit-btn {
+  background: none;
+  border: none;
+  text-decoration: underline;
+  cursor: pointer;
+  color: var(--color-text-main);
+  font-weight: 600;
+  font-size: 0.74rem;
+  padding: 0;
+}
+
+.demo-mode-exit-btn:hover {
+  color: var(--color-accent-primary);
+}
+
+/* Card rotation fade effect */
+.card-fade-active {
+  animation: fieldFadeIn 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fieldFadeIn {
+  0% {
+    opacity: 0.55;
+    transform: scale(0.995);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Rotation Control Bar */
+.rotation-control-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 0.35rem 0.85rem;
+  margin: 0.35rem auto 0;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  border-radius: 9999px;
+  box-shadow: 0 3px 12px rgba(184, 154, 142, 0.12);
+  font-size: 0.76rem;
+  color: var(--color-text-muted);
+  user-select: none;
+  z-index: 15;
+}
+
+.rotation-indicator-text {
+  font-weight: 500;
+  color: var(--color-text-main);
+}
+
+.rotation-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.rotation-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid rgba(212, 140, 148, 0.3);
+  background: #fff;
+  color: var(--color-accent-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.rotation-btn:hover {
+  background: var(--color-accent-primary);
+  color: #fff;
+  transform: scale(1.08);
+}
+
+/* Floating Layout on Desktop (min-width: 980px):
+   12 slots: 6 slots on Left Wing, 6 slots on Right Wing.
+   Central clearing for glowing book is completely preserved!
+*/
+@media (min-width: 980px) {
+  .floating-canvas {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 440px;
+    margin: 0 auto;
+  }
+
+  .floating-slot {
+    position: absolute;
+    will-change: transform;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+  }
+
+  /* Any card exceeding the 12 wing slots is hidden */
+  .slot-desktop-overflow {
+    display: none !important;
+  }
+
+  /* LEFT WING - COLUMN 1 (Outer Left, x: 16px) */
+  .slot-0 {
+    top: 2%;
+    left: 16px;
+    animation-name: float-subtle-1;
+    animation-duration: 6.8s;
+  }
+  .slot-2 {
+    top: 35%;
+    left: 16px;
+    animation-name: float-subtle-3;
+    animation-duration: 6.2s;
+    animation-delay: -3.2s;
+  }
+  .slot-4 {
+    top: 68%;
+    left: 16px;
+    animation-name: float-subtle-2;
+    animation-duration: 6.5s;
+    animation-delay: -4.1s;
+  }
+
+  /* LEFT WING - COLUMN 2 (Inner Left, x: 246px) */
+  .slot-1 {
+    top: 12%;
+    left: 246px;
+    animation-name: float-subtle-2;
+    animation-duration: 7.6s;
+    animation-delay: -1.8s;
+  }
+  .slot-3 {
+    top: 45%;
+    left: 246px;
+    animation-name: float-subtle-1;
+    animation-duration: 7.9s;
+    animation-delay: -2.4s;
+  }
+  .slot-5 {
+    top: 78%;
+    left: 246px;
+    animation-name: float-subtle-3;
+    animation-duration: 7.1s;
+    animation-delay: -3.5s;
+  }
+
+  /* RIGHT WING - COLUMN 3 (Inner Right, x: 246px from right edge) */
+  .slot-7 {
+    top: 12%;
+    right: 246px;
+    animation-name: float-subtle-1;
+    animation-duration: 8.0s;
+    animation-delay: -2.8s;
+  }
+  .slot-9 {
+    top: 45%;
+    right: 246px;
+    animation-name: float-subtle-3;
+    animation-duration: 7.4s;
+    animation-delay: -1.6s;
+  }
+  .slot-11 {
+    top: 78%;
+    right: 246px;
+    animation-name: float-subtle-2;
+    animation-duration: 6.7s;
+    animation-delay: -4.2s;
+  }
+
+  /* RIGHT WING - COLUMN 4 (Outer Right, x: 16px from right edge) */
+  .slot-6 {
+    top: 2%;
+    right: 16px;
+    animation-name: float-subtle-3;
+    animation-duration: 7.2s;
+    animation-delay: -1.2s;
+  }
+  .slot-8 {
+    top: 35%;
+    right: 16px;
+    animation-name: float-subtle-2;
+    animation-duration: 6.9s;
+    animation-delay: -3.6s;
+  }
+  .slot-10 {
+    top: 68%;
+    right: 16px;
+    animation-name: float-subtle-1;
+    animation-duration: 7.5s;
+    animation-delay: -2.1s;
+  }
+
+  /* Pause on hover/focus */
+  .floating-slot:hover,
+  .floating-slot:focus-within {
+    animation-play-state: paused !important;
+    z-index: 30;
+  }
+}
+
+/* Intermediate Tablet (861px - 979px) */
+@media (min-width: 861px) and (max-width: 979px) {
+  .floating-canvas {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 440px;
+    margin: 0 auto;
+  }
+
+  .floating-slot {
+    position: absolute;
+    will-change: transform;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+  }
+
+  .slot-desktop-overflow {
+    display: none !important;
+  }
+
+  /* 4 cards left, 4 cards right */
+  .slot-0 { top: 2%;  left: 14px; animation-name: float-subtle-1; animation-duration: 6.8s; }
+  .slot-1 { top: 26%; left: 14px; animation-name: float-subtle-2; animation-duration: 7.6s; }
+  .slot-2 { top: 50%; left: 14px; animation-name: float-subtle-3; animation-duration: 6.2s; }
+  .slot-3 { top: 74%; left: 14px; animation-name: float-subtle-1; animation-duration: 7.9s; }
+  .slot-4, .slot-5 { display: none; }
+
+  .slot-6 { top: 2%;  right: 14px; animation-name: float-subtle-3; animation-duration: 7.2s; }
+  .slot-7 { top: 26%; right: 14px; animation-name: float-subtle-1; animation-duration: 8.0s; }
+  .slot-8 { top: 50%; right: 14px; animation-name: float-subtle-2; animation-duration: 6.9s; }
+  .slot-9 { top: 74%; right: 14px; animation-name: float-subtle-3; animation-duration: 7.4s; }
+  .slot-10, .slot-11 { display: none; }
+}
+
+/* Subtle Floating Keyframes */
+@keyframes float-subtle-1 {
+  0% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(2px, -5px, 0) rotate(0.3deg); }
+  100% { transform: translate3d(-2px, -9px, 0) rotate(-0.3deg); }
+}
+
+@keyframes float-subtle-2 {
+  0% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(-2px, -6px, 0) rotate(-0.3deg); }
+  100% { transform: translate3d(2px, -3px, 0) rotate(0.3deg); }
+}
+
+@keyframes float-subtle-3 {
+  0% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(2px, -4px, 0) rotate(0.2deg); }
+  100% { transform: translate3d(-1px, -8px, 0) rotate(-0.3deg); }
+}
+
+/* Tablet Screens (541px - 860px): Multi-column Grid Flow */
+@media (min-width: 541px) and (max-width: 860px) {
+  .floating-field-container {
+    padding: 0.5rem 1rem 6.5rem;
+    min-height: auto;
+  }
+
+  .floating-canvas {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 0.85rem;
+    padding: 0.25rem 0;
+  }
+
+  .floating-slot {
+    position: static;
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .slot-desktop-overflow {
+    display: block !important;
+  }
+
+  .floating-slot .message-card {
+    max-width: 100%;
+  }
+}
+
+/* Phone & Phablet Screens (<= 540px, iPhone 16 Pro Max 430px & Galaxy A55 412px):
+   Constrained to max-width: 400px centered!
+*/
+@media (max-width: 540px) {
+  .floating-field-container {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 0.5rem 1rem 6.5rem;
+    min-height: auto;
+  }
+
+  .floating-canvas {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+    width: 100%;
+    padding: 0.25rem 0;
+  }
+
+  .floating-slot {
+    position: static;
+    animation: none !important;
+    transform: none !important;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .slot-desktop-overflow {
+    display: flex !important;
+  }
+
+  .floating-slot .message-card {
+    width: 100%;
+    max-width: 380px;
+  }
+}
+
+/* Reduced Motion Mode */
+@media (prefers-reduced-motion: reduce) {
+  .floating-field-container {
+    overflow-y: auto !important;
+    max-height: calc(100dvh - 210px) !important;
+    padding: 0.75rem 1.5rem 2.5rem !important;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border-card) transparent;
+  }
+
+  .floating-field-container::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .floating-field-container::-webkit-scrollbar-thumb {
+    background-color: var(--color-border-card);
+    border-radius: 9999px;
+  }
+
+  .floating-canvas {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 1rem !important;
+    height: auto !important;
+    min-height: auto !important;
+    max-width: 980px !important;
+    margin: 0 auto !important;
+    padding: 0.5rem 0 2rem !important;
+  }
+
+  .floating-slot {
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    animation: none !important;
+    transform: none !important;
+    display: block !important;
+    width: 100% !important;
+  }
+
+  .floating-slot.slot-desktop-overflow,
+  .slot-desktop-overflow {
+    display: block !important;
+  }
+
+  .floating-slot .message-card {
+    max-width: 100% !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) and (max-width: 768px) {
+  .floating-canvas {
+    grid-template-columns: 1fr !important;
+    gap: 0.85rem !important;
+  }
+
+  .floating-field-container {
+    max-height: none !important;
+    overflow-y: visible !important;
+  }
+}

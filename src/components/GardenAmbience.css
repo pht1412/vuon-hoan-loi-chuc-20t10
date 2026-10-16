@@ -1,0 +1,311 @@
+/* Ambient Stardust & Adorable Falling Items System */
+.garden-ambience-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2; /* Sits just in front of background/book, behind cards */
+  overflow: hidden;
+}
+
+/* 1. Stardust Particles originating from the magical book spine */
+.stardust-container {
+  position: absolute;
+  left: 50%;
+  bottom: 12%;
+  width: 220px;
+  height: 140px;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.stardust-mote {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, #FFFDF8 20%, rgba(255, 226, 175, 0.9) 60%, rgba(247, 194, 210, 0) 100%);
+  box-shadow: 0 0 6px 1px rgba(255, 235, 185, 0.6);
+  opacity: 0;
+  animation: stardustRise 8s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+}
+
+/* Varied stardust positions and timings for organic feel */
+.mote-1 { left: 45%; bottom: 10px; width: 4px; height: 4px; animation-duration: 7.2s; animation-delay: 0s; --drift-x: -25px; }
+.mote-2 { left: 52%; bottom: 15px; width: 3px; height: 3px; animation-duration: 9.4s; animation-delay: 1.5s; --drift-x: 20px; }
+.mote-3 { left: 40%; bottom: 8px; width: 4px; height: 4px; animation-duration: 8.0s; animation-delay: 3.2s; --drift-x: -15px; }
+.mote-4 { left: 58%; bottom: 12px; width: 3.5px; height: 3.5px; animation-duration: 10.2s; animation-delay: 4.8s; --drift-x: 30px; }
+.mote-5 { left: 48%; bottom: 20px; width: 2.5px; height: 2.5px; animation-duration: 6.8s; animation-delay: 2.1s; --drift-x: 8px; }
+.mote-6 { left: 35%; bottom: 14px; width: 4.5px; height: 4.5px; animation-duration: 8.6s; animation-delay: 5.5s; --drift-x: -32px; }
+.mote-7 { left: 62%; bottom: 18px; width: 3px; height: 3px; animation-duration: 9.0s; animation-delay: 0.8s; --drift-x: 18px; }
+
+@keyframes stardustRise {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.6);
+  }
+  20% {
+    opacity: 0.85;
+    transform: translate(calc(var(--drift-x, 10px) * 0.3), -40px) scale(1);
+  }
+  60% {
+    opacity: 0.6;
+    transform: translate(calc(var(--drift-x, 10px) * 0.7), -120px) scale(0.9);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--drift-x, 10px), -210px) scale(0.4);
+  }
+}
+
+/* 2. Container for Adorable Falling Items */
+.falling-items-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.falling-item-wrap {
+  position: absolute;
+  top: -40px;
+  opacity: 0;
+  will-change: transform, opacity;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+.falling-svg {
+  display: block;
+  overflow: visible;
+}
+
+/* Kiểu 1: Cánh hoa hồng bay liệng uốn lượn */
+.falling-item-wrap.pink-petal {
+  animation-name: fallSwayPetalRight;
+}
+
+/* Kiểu 2: Cánh hoa vàng mơ bay liệng sang trái */
+.falling-item-wrap.yellow-petal {
+  animation-name: fallSwayPetalLeft;
+}
+
+/* Kiểu 3: Ngôi sao vàng lấp lánh chao nghiêng nhẹ */
+.falling-item-wrap.gold-star {
+  animation-name: fallStarTwinkle;
+}
+
+/* Kiểu 4: Trái tim hồng bồng bềnh êm đềm */
+.falling-item-wrap.pink-heart {
+  animation-name: fallHeartFloat;
+}
+
+/* Kiểu 5: Đốm sáng kim cương xoay tròn */
+.falling-item-wrap.gold-sparkle {
+  animation-name: fallSparkleGem;
+}
+
+/* Kiểu 6: Bông hoa nhỏ 5 cánh xoay chầm chậm */
+.falling-item-wrap.pink-flower {
+  animation-name: fallFlowerSpin;
+}
+
+/* Keyframes: Bông hoa nhỏ xoay chầm chậm */
+@keyframes fallFlowerSpin {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(0.9);
+  }
+  10% {
+    opacity: 0.95;
+    transform: translate3d(15px, 12vh, 0) rotate(45deg) scale(1.05);
+  }
+  35% {
+    transform: translate3d(-15px, 40vh, 0) rotate(140deg) scale(1);
+  }
+  65% {
+    transform: translate3d(20px, 70vh, 0) rotate(240deg) scale(1.05);
+  }
+  92% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(-10px, 106vh, 0) rotate(360deg) scale(0.85);
+  }
+}
+
+/* Keyframes: Cánh hoa lượn sang phải */
+@keyframes fallSwayPetalRight {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(0deg) rotateY(0deg);
+  }
+  8% {
+    opacity: 0.9;
+  }
+  25% {
+    transform: translate3d(24px, 25vh, 0) rotate(45deg) rotateY(40deg);
+  }
+  50% {
+    transform: translate3d(-18px, 52vh, 0) rotate(110deg) rotateY(180deg);
+  }
+  75% {
+    transform: translate3d(32px, 78vh, 0) rotate(190deg) rotateY(240deg);
+  }
+  92% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(12px, 106vh, 0) rotate(270deg) rotateY(360deg);
+  }
+}
+
+/* Keyframes: Cánh hoa lượn sang trái */
+@keyframes fallSwayPetalLeft {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(0deg) rotateY(0deg);
+  }
+  8% {
+    opacity: 0.9;
+  }
+  25% {
+    transform: translate3d(-26px, 26vh, 0) rotate(-45deg) rotateY(-40deg);
+  }
+  50% {
+    transform: translate3d(16px, 50vh, 0) rotate(-120deg) rotateY(-180deg);
+  }
+  75% {
+    transform: translate3d(-24px, 76vh, 0) rotate(-200deg) rotateY(-260deg);
+  }
+  92% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(-8px, 106vh, 0) rotate(-310deg) rotateY(-360deg);
+  }
+}
+
+/* Keyframes: Ngôi sao vàng lấp lánh rơi chầm chậm */
+@keyframes fallStarTwinkle {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(0.8);
+  }
+  10% {
+    opacity: 0.95;
+    transform: translate3d(10px, 10vh, 0) rotate(35deg) scale(1.05);
+  }
+  30% {
+    transform: translate3d(-14px, 32vh, 0) rotate(90deg) scale(0.9);
+  }
+  55% {
+    transform: translate3d(18px, 58vh, 0) rotate(180deg) scale(1.1);
+  }
+  80% {
+    transform: translate3d(-12px, 82vh, 0) rotate(270deg) scale(0.95);
+  }
+  94% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(8px, 106vh, 0) rotate(360deg) scale(0.75);
+  }
+}
+
+/* Keyframes: Trái tim hồng rơi êm đềm */
+@keyframes fallHeartFloat {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(-10deg) scale(0.85);
+  }
+  10% {
+    opacity: 0.9;
+    transform: translate3d(-12px, 12vh, 0) rotate(12deg) scale(1);
+  }
+  35% {
+    transform: translate3d(16px, 38vh, 0) rotate(-15deg) scale(0.95);
+  }
+  65% {
+    transform: translate3d(-18px, 68vh, 0) rotate(16deg) scale(1.02);
+  }
+  90% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(10px, 106vh, 0) rotate(-10deg) scale(0.75);
+  }
+}
+
+/* Keyframes: Đốm sáng kim cương */
+@keyframes fallSparkleGem {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(0.6);
+  }
+  12% {
+    opacity: 1;
+    transform: translate3d(8px, 14vh, 0) rotate(90deg) scale(1);
+  }
+  45% {
+    transform: translate3d(-12px, 48vh, 0) rotate(220deg) scale(0.85);
+  }
+  75% {
+    transform: translate3d(14px, 78vh, 0) rotate(320deg) scale(1.05);
+  }
+  94% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(-6px, 106vh, 0) rotate(420deg) scale(0.5);
+  }
+}
+
+/* 3. Sown Seed Flare: Subtle warm pulse expanding outward when a wish is submitted */
+.seed-flare-ring {
+  position: fixed;
+  left: 50%;
+  bottom: 22%;
+  transform: translate(-50%, 50%);
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 248, 225, 0.85) 0%, rgba(247, 194, 210, 0.45) 45%, rgba(226, 240, 236, 0.1) 75%, transparent 100%);
+  box-shadow: 0 0 50px 20px rgba(255, 235, 185, 0.5);
+  pointer-events: none;
+  animation: seedBloom 2.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  z-index: 3;
+}
+
+@keyframes seedBloom {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 50%) scale(0.2);
+  }
+  30% {
+    opacity: 0.95;
+    transform: translate(-50%, 50%) scale(2.2);
+    filter: blur(8px);
+  }
+  70% {
+    opacity: 0.6;
+    transform: translate(-50%, 50%) scale(4.5);
+    filter: blur(28px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, 50%) scale(6.2);
+    filter: blur(48px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stardust-mote,
+  .falling-item-wrap,
+  .seed-flare-ring {
+    animation: none !important;
+    display: none !important;
+  }
+}
