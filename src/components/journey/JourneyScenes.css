@@ -670,7 +670,7 @@
 .journal-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.35rem;
   width: 100%;
   margin-bottom: 1.6rem;
   perspective: 1200px;
@@ -682,7 +682,7 @@
   -webkit-backdrop-filter: blur(12px);
   border: 1.5px solid var(--journey-card-border, rgba(255, 246, 224, 0.9));
   border-radius: var(--radius-md);
-  padding: 1.3rem 1.5rem 1.3rem 1.8rem;
+  padding: 1.35rem 1.6rem 1.45rem 1.8rem;
   box-shadow: var(--journey-card-shadow);
   position: relative;
   transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -702,10 +702,28 @@
 }
 
 .journal-card:hover {
-  transform: translateY(-4px) rotateX(4deg) rotateY(-2deg) scale(1.02);
+  transform: translateY(-4px) rotateX(3deg) rotateY(-1.5deg) scale(1.015);
   background: #FAF7F2;
   border-color: var(--journey-sky-apricot, #F7D8B5);
   box-shadow: -8px 14px 30px rgba(126, 143, 159, 0.2);
+}
+
+.journal-card-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.journal-badge {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #8C6D58;
+  background: rgba(247, 216, 181, 0.45);
+  border: 1px solid rgba(247, 216, 181, 0.85);
+  padding: 0.22rem 0.75rem;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.02em;
 }
 
 .journal-card-num {
@@ -713,24 +731,169 @@
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--journey-text-title, #7E8F9F);
-  margin-bottom: 0.3rem;
-  display: inline-block;
   letter-spacing: 0.05em;
+}
+
+/* Photo Kept Keepsake Wrapper */
+.journal-photo-wrapper {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 1.1rem;
+}
+
+.journal-photo-wrapper.is-token {
+  width: 140px;
+  height: 140px;
+  margin: 0.5rem auto 1.15rem auto;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(247, 216, 181, 0.3));
+  border: 1.5px solid rgba(247, 216, 181, 0.9);
+  border-radius: 18px;
+  box-shadow: 0 6px 18px rgba(126, 143, 159, 0.12), inset 0 0 16px rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem;
+}
+
+.journal-photo-wrapper.is-token .journal-photo-inner {
+  width: 90px;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.journal-photo-wrapper.is-token .journal-photo-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 10px;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.12));
+  transition: transform 0.35s ease;
+}
+
+.journal-photo-wrapper.is-token:hover .journal-photo-img {
+  transform: scale(1.08);
+}
+
+.journal-photo-caption {
+  display: block;
+  font-size: 0.68rem;
+  color: var(--journey-text-title, #7E8F9F);
+  font-weight: 600;
+  margin-top: 0.25rem;
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
+.journal-photo-wrapper.is-wide {
+  width: 100%;
+  background: #EAE5DE;
+  border: 1.5px solid rgba(247, 216, 181, 0.85);
+  box-shadow: 0 6px 20px rgba(126, 143, 159, 0.12);
+  max-height: 220px;
+}
+
+.journal-photo-wrapper.is-wide .journal-photo-inner {
+  width: 100%;
+  height: 190px;
+  overflow: hidden;
+}
+
+.journal-photo-wrapper.is-wide .journal-photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.journal-photo-wrapper.is-wide:hover .journal-photo-img {
+  transform: scale(1.03);
 }
 
 .journal-card-title {
   font-family: var(--font-serif);
-  font-size: 1.18rem;
+  font-size: 1.22rem;
   font-weight: 600;
   color: var(--journey-text-title, #7E8F9F);
-  margin-bottom: 0.45rem;
+  margin-bottom: 0.55rem;
   line-height: 1.35;
 }
 
 .journal-card-content {
-  font-size: 0.94rem;
+  font-size: 0.95rem;
   line-height: 1.75;
   color: var(--journey-text-body, #6B6D70);
+}
+
+.journal-para {
+  margin-bottom: 0.65rem;
+  line-height: 1.75;
+}
+
+.journal-para:last-child {
+  margin-bottom: 0;
+}
+
+/* Đoạn kết của chặng 3 */
+.stage3-closing-card {
+  background: linear-gradient(135deg, rgba(255, 253, 248, 0.94) 0%, rgba(254, 244, 238, 0.9) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(232, 180, 184, 0.6);
+  border-radius: var(--radius-md);
+  padding: 1.35rem 1.6rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 8px 24px rgba(212, 140, 148, 0.1);
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  position: relative;
+  overflow: hidden;
+  animation: scene-fade-in 0.6s ease forwards;
+}
+
+.stage3-closing-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  bottom: 0;
+  background: linear-gradient(180deg, #E8B4B8 0%, #F4C095 100%);
+}
+
+.stage3-closing-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(232, 180, 184, 0.25);
+  border: 1px solid rgba(232, 180, 184, 0.6);
+  color: #D48C94;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+}
+
+.stage3-closing-body {
+  flex: 1;
+}
+
+.stage3-closing-para {
+  font-size: 0.94rem;
+  line-height: 1.8;
+  color: #5D564D;
+  margin-bottom: 0.6rem;
+}
+
+.stage3-closing-para:last-child {
+  margin-bottom: 0;
 }
 
 /* Nút P.S. Note gài kẹp giấy màu Vàng mơ #F7D8B5 */

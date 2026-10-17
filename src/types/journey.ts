@@ -10,8 +10,15 @@ export interface FlowerItem {
 export interface JournalItem {
   id: string;
   order: number;
+  badge?: string;
   title: string;
+  image?: string;
   content: string;
+}
+
+export interface Stage3Ending {
+  title?: string;
+  paragraphs: string[];
 }
 
 export interface AppreciationItem {
@@ -39,6 +46,7 @@ export interface PrivateJourneyData {
   flowers: FlowerItem[];
   easterEggFlower: FlowerItem;
   journal: JournalItem[];
+  stage3Ending?: Stage3Ending;
   psNote: {
     title: string;
     content: string;

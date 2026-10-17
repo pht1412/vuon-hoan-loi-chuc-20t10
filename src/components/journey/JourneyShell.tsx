@@ -126,7 +126,11 @@ export const JourneyShell: React.FC<JourneyShellProps> = ({ data, onExit }) => {
             />
           )}
           {currentChapter === 3 && (
-            <JournalScene journal={data.journal} psNote={data.psNote} />
+            <JournalScene
+              journal={data.journal}
+              psNote={data.psNote}
+              stage3Ending={data.stage3Ending}
+            />
           )}
           {currentChapter === 4 && (
             <AppreciationScene appreciations={data.appreciations} />
