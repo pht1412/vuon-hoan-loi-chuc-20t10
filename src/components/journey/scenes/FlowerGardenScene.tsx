@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { FlowerItem } from '../../../types/journey';
 import { Sparkles, Clover, Heart, Sun, Shield, Compass } from 'lucide-react';
 import '../JourneyScenes.css';
@@ -23,6 +23,9 @@ export const FlowerGardenScene: React.FC<FlowerGardenSceneProps> = ({
   const [burstFlowerId, setBurstFlowerId] = useState<string | null>(null);
   const [showSecret, setShowSecret] = useState(false);
 
+  // Ref dùng để cuộn êm ái tới thẻ chiêm ngưỡng khi mở
+  const revealCardRef = useRef<HTMLDivElement>(null);
+
   const handleSelectFlower = (fl: FlowerItem) => {
     const isSelected = activeFlower?.id === fl.id;
     if (isSelected) {
@@ -30,11 +33,17 @@ export const FlowerGardenScene: React.FC<FlowerGardenSceneProps> = ({
       setBurstFlowerId(null);
     } else {
       setActiveFlower(fl);
-      // Kích hoạt hiệu ứng bung 6-8 hạt sáng lấp lánh
+      // Kích hoạt hiệu ứng bung 8 hạt sáng lấp lánh
       setBurstFlowerId(fl.id);
+
+      // Tự động cuộn xuống thẻ sau khi mở (chờ DOM update)
+      setTimeout(() => {
+        revealCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 150);
+
       setTimeout(() => {
         setBurstFlowerId((prev) => (prev === fl.id ? null : prev));
-      }, 700);
+      }, 800);
     }
   };
 
@@ -107,7 +116,7 @@ export const FlowerGardenScene: React.FC<FlowerGardenSceneProps> = ({
                 <span className="flower-sub">{fl.subtitle}</span>
               </div>
 
-              {/* Hiệu ứng bung hạt sáng quanh bông hoa khi được chạm vào */}
+              {/* Hiệu ứng bung 8 hạt sáng theo màu riêng của từng đóa hoa */}
               {isBursting && (
                 <div className="flower-sparkle-burst" aria-hidden="true">
                   <span className="fl-sparkle fl-s-1">✦</span>
@@ -116,6 +125,8 @@ export const FlowerGardenScene: React.FC<FlowerGardenSceneProps> = ({
                   <span className="fl-sparkle fl-s-4">✦</span>
                   <span className="fl-sparkle fl-s-5">✦</span>
                   <span className="fl-sparkle fl-s-6">✦</span>
+                  <span className="fl-sparkle fl-s-7">✦</span>
+                  <span className="fl-sparkle fl-s-8">✦</span>
                 </div>
               )}
             </button>
@@ -126,6 +137,7 @@ export const FlowerGardenScene: React.FC<FlowerGardenSceneProps> = ({
       {/* Thẻ chiêm ngưỡng nghệ thuật & thông điệp khi chọn hoa */}
       {activeFlower && (
         <div
+          ref={revealCardRef}
           className="flower-art-reveal-card"
           role="region"
           aria-live="polite"

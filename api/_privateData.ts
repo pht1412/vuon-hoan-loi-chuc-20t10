@@ -66,38 +66,38 @@ export const privateJourneyContent: PrivateJourneyData = {
     {
       id: 'flower-1',
       title: 'Bình yên',
-      subtitle: 'Một khoảng lặng êm đềm',
+      subtitle: 'Từ những tập cậu từng chia sẻ',
       iconName: 'lotus',
       color: '#E8B4B8',
       message:
-        'Mong cậu luôn tìm thấy những khoảng lặng bình yên trong tâm hồn. Dù ngày hôm đó có nhiều điều làm cậu mệt mỏi, mong cậu luôn có một nơi chốn để trở về, tự pha cho mình một tách trà ấm và cảm thấy lòng mình dịu lại.',
+        'Có những tập podcast cậu chia sẻ, tớ mở lên không phải để tìm một câu trả lời. Chỉ là giọng cậu nói chuyện khiến khoảng thời gian ấy bớt vội đi một nhịp.\n\nTớ không biết những giờ ấy đối với cậu nghĩa là gì. Với tớ, chúng để lại một khoảng lặng dễ chịu — đủ để ngồi yên mà không cần làm gì thêm.\n\nMong trong ngày hôm nay, cậu cũng có một khoảng yên như thế, dành cho chính cậu, không cần phải chia sẻ với ai.',
     },
     {
       id: 'flower-2',
       title: 'Niềm vui',
-      subtitle: 'Những điều lấp lánh giản đơn',
+      subtitle: 'Những mẩu chuyện rất đỗi thường',
       iconName: 'sunflower',
       color: '#F4C095',
       message:
-        'Chúc cậu có thật nhiều những niềm vui nhỏ bé mỗi ngày: một buổi sáng trời đẹp, một bản nhạc tình cờ nghe được hợp tâm trạng, hay một lời hỏi han bất ngờ từ người cậu quý mến.',
+        'Cậu hay kể những điều bình thường: một ngày đi qua, một quan sát nhỏ, một chi tiết chẳng có gì phải lên giọng.\n\nTớ nhớ không phải vì chúng lớn lao. Chỉ vì chúng khiến tớ mỉm cười một cách vô cớ, rồi mang cảm giác ấy đi tiếp phần còn lại của ngày.\n\nChúc cậu giữ được những niềm vui nhỏ ấy. Và nếu hôm nay có một điều giản dị hiện đến, mong cậu được nhận nó một cách thảnh thơi.',
     },
     {
       id: 'flower-3',
       title: 'Can đảm',
-      subtitle: 'Vững vàng với những lựa chọn',
+      subtitle: 'Khi cậu nói về tình yêu và đời sống',
       iconName: 'rose',
       color: '#D48C94',
       message:
-        'Mong cậu luôn có đủ sự can đảm để bước tiếp trên con đường mình đã chọn, và cũng đủ can đảm để buông tay những điều không còn phù hợp. Cậu luôn mạnh mẽ hơn những gì cậu nghĩ đấy.',
+        'Có những lúc cậu nói về tình yêu, về cách sống, không đao to búa lớn, cũng không biến thành bài học.\n\nTớ không cầm những lời ấy như một kết luận về cậu. Chỉ biết chúng khiến tớ dừng lại, nghĩ thêm một chút, rồi đi tiếp với lòng nhẹ hơn.\n\nMong cậu được quyền nói, được quyền im, và được quyền chọn nhịp của riêng mình — không phải để chứng minh điều gì với ai.',
     },
     {
       id: 'flower-4',
       title: 'Khởi đầu mới',
-      subtitle: 'Tươi tắn như sớm mai',
+      subtitle: 'Một ngày được tính từ cậu',
       iconName: 'tulip',
       color: '#9CAF88',
       message:
-        'Mỗi ngày mới đều là một trang giấy sạch sẽ để bắt đầu lại. Mong những dự định ấp ủ của cậu sẽ dần đơm hoa kết trái, mang lại sự thỏa nguyện và nụ cười rạng rỡ cho cậu.',
+        'Những buổi livestream của cậu không ồn. Tớ ghé vào, ở lại một lúc, rồi mang cảm giác dễ thở ấy đi tiếp.\n\nTớ không lấy điều đó làm lý do để bảo cậu phải bắt đầu một điều gì lớn. Chưa đủ gần để nói hộ cậu về những dự định phía trước, nên tớ cũng không bịa thêm cho sâu sắc.\n\nChỉ muốn, sang ngày 20/10, cậu được phép bắt đầu một ngày thuộc về mình — chậm, vừa đủ, và không cần rạng rỡ hơn bất kỳ ai.',
     },
   ],
   easterEggFlower: {

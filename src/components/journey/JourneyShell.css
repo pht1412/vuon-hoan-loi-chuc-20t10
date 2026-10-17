@@ -4,32 +4,49 @@
 
 :root {
   /* 1. Nostalgic Watercolor Sunset Palette */
-  --journey-sky-top: #BCCCE0;       /* Dusty Sky Blue */
-  --journey-sky-mid: #D5DFEB;       /* Pale Mist Blue */
-  --journey-sky-peach: #F5DFD3;     /* Pastel Peach */
-  --journey-sky-apricot: #F7D8B5;   /* Apricot Glow */
-  --journey-sky-peri: #B6C2D4;      /* Hazy Periwinkle */
-  --journey-sky-sage: #C7BEAC;      /* Dry Sage Ochre */
+  --journey-sky-top: #BCCCE0;
+  /* Dusty Sky Blue */
+  --journey-sky-mid: #D5DFEB;
+  /* Pale Mist Blue */
+  --journey-sky-peach: #F5DFD3;
+  /* Pastel Peach */
+  --journey-sky-apricot: #F7D8B5;
+  /* Apricot Glow */
+  --journey-sky-peri: #B6C2D4;
+  /* Hazy Periwinkle */
+  --journey-sky-sage: #C7BEAC;
+  /* Dry Sage Ochre */
 
   /* Highlight & Sunburst Glow */
-  --journey-sunburst-glow: #FFF6E0; /* Soft Sunburst Glow */
-  --journey-sunburst-edge: #F7D8B5; /* Apricot Glow */
+  --journey-sunburst-glow: #FFF6E0;
+  /* Soft Sunburst Glow */
+  --journey-sunburst-edge: #F7D8B5;
+  /* Apricot Glow */
 
   /* Card Surfaces & Glassmorphism */
-  --journey-card-bg: rgba(250, 247, 242, 0.84); /* Warm Cream with soft glass */
-  --journey-card-solid: #FAF7F2;                 /* Solid Warm Cream */
-  --journey-card-border: rgba(255, 246, 224, 0.9);
+  --journey-card-bg: rgba(250, 247, 242, 0.88);
+  /* Warm Cream with soft glass */
+  --journey-card-solid: #FAF7F2;
+  /* Solid Warm Cream */
+  --journey-card-border: rgba(255, 246, 224, 0.95);
   --journey-card-border-subtle: rgba(245, 223, 211, 0.65);
   --journey-card-shadow: 0 12px 36px rgba(126, 143, 159, 0.16), 0 2px 8px rgba(199, 190, 172, 0.12);
 
   /* Typography & Accents - ABSOLUTELY NO PURE BLACK #000000 */
-  --journey-text-title: #7E8F9F;    /* Slate Blue-Grey (Headers, Icons, Accents) */
-  --journey-text-body: #6B6D70;     /* Muted Charcoal (Body & Letter Ink) */
-  --journey-text-muted: #8C8C8C;    /* Warm Taupe Grey (Subtitles, Notes) */
-  --journey-accent-sage: #C7BEAC;   /* Dry Sage Ochre (Decorative border, leaves) */
-  --journey-accent-peri: #B6C2D4;   /* Hazy Periwinkle */
-  --journey-accent-peach: #F5DFD3;  /* Pastel Peach */
-  --journey-accent-apricot: #F7D8B5;/* Apricot Glow */
+  --journey-text-title: #7E8F9F;
+  /* Slate Blue-Grey (Headers, Icons, Accents) */
+  --journey-text-body: #6B6D70;
+  /* Muted Charcoal (Body & Letter Ink) */
+  --journey-text-muted: #8C8C8C;
+  /* Warm Taupe Grey (Subtitles, Notes) */
+  --journey-accent-sage: #C7BEAC;
+  /* Dry Sage Ochre (Decorative border, leaves) */
+  --journey-accent-peri: #B6C2D4;
+  /* Hazy Periwinkle */
+  --journey-accent-peach: #F5DFD3;
+  /* Pastel Peach */
+  --journey-accent-apricot: #F7D8B5;
+  /* Apricot Glow */
 }
 
 /* Root Fullscreen Container */
@@ -42,16 +59,7 @@
   overflow: hidden;
   height: 100dvh;
   animation: journey-appear 420ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  /* Full screen gradient edge-to-edge top to bottom */
-  background: linear-gradient(
-    180deg,
-    #BCCCE0 0%,
-    #D5DFEB 30%,
-    #F5DFD3 60%,
-    #F7D8B5 80%,
-    #B6C2D4 95%,
-    #C7BEAC 100%
-  );
+  background-color: #FAF7F2;
   color: var(--journey-text-body);
 }
 
@@ -60,6 +68,7 @@
     opacity: 0;
     transform: scale(0.985);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -67,7 +76,41 @@
 }
 
 /* ==========================================================================
-   Atmospheric Layers: Sunburst, Pure SVG Cloud Sea, Sunbeams, Particles
+   1. Lớp Background Ảnh Gốc: cad.jpeg tĩnh bao phủ toàn màn hình
+   ========================================================================== */
+
+.journey-bg-cad {
+  position: absolute;
+  inset: -20px;
+  z-index: 0;
+  pointer-events: none;
+  background-image: url('/cad.jpeg');
+  background-size: cover;
+  background-position: 25% center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  transform: scale(1.04);
+  filter: blur(0px);
+}
+
+/* ==========================================================================
+   2 & 3. Lớp Kính Mờ Sương Dày (Frosted Glass) & Màu Dìm Tint Trắng Kem Ấm 45%
+   ========================================================================== */
+
+.journey-frosted-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  /* Lớp màu dìm Trắng kem ấm 45% opacity để mảng màu xanh, xám, cam của cad.jpeg hắt lên rõ nét */
+  background-color: rgba(250, 247, 242, 0.55);
+  /* Giảm blur xuống 20px để mảng màu hắt lên sống động */
+  backdrop-filter: blur(5px) saturate(110%);
+  -webkit-backdrop-filter: blur(20px) saturate(110%);
+}
+
+/* ==========================================================================
+   Atmospheric Layers: Tia Nắng Hoàng Hôn, Bụi Sao & Vân Giấy Màu Nước
    ========================================================================== */
 
 .journey-sky-backdrop {
@@ -75,7 +118,7 @@
   inset: 0;
   pointer-events: none;
   overflow: hidden;
-  z-index: 0;
+  z-index: 2;
 }
 
 /* Diagonal Sunbeams / Light Rays (Vệt nắng chiều xiên nhẹ) */
@@ -86,13 +129,11 @@
   right: 0;
   height: 70%;
   pointer-events: none;
-  background: repeating-linear-gradient(
-    128deg,
-    rgba(255, 246, 224, 0.14) 0px,
-    rgba(255, 246, 224, 0.14) 38px,
-    transparent 38px,
-    transparent 115px
-  );
+  background: repeating-linear-gradient(128deg,
+      rgba(255, 246, 224, 0.16) 0px,
+      rgba(255, 246, 224, 0.16) 38px,
+      transparent 38px,
+      transparent 115px);
   -webkit-mask-image: radial-gradient(ellipse 95% 85% at 20% 0%, #000 20%, rgba(0, 0, 0, 0.35) 60%, transparent 88%);
   mask-image: radial-gradient(ellipse 95% 85% at 20% 0%, #000 20%, rgba(0, 0, 0, 0.35) 60%, transparent 88%);
   animation: sunbeamPulse 10s ease-in-out infinite alternate;
@@ -103,6 +144,7 @@
     opacity: 0.75;
     transform: scale(0.98);
   }
+
   100% {
     opacity: 1;
     transform: scale(1.02);
@@ -113,18 +155,16 @@
 .journey-sunburst-glow {
   position: absolute;
   left: 50%;
-  bottom: 10%;
+  bottom: 8%;
   transform: translateX(-50%);
   width: min(760px, 130vw);
   height: min(440px, 60vh);
   border-radius: 50%;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(255, 246, 224, 0.85) 0%,
-    rgba(247, 216, 181, 0.5) 42%,
-    rgba(245, 223, 211, 0.2) 68%,
-    transparent 82%
-  );
+  background: radial-gradient(ellipse at center,
+      rgba(255, 246, 224, 0.75) 0%,
+      rgba(247, 216, 181, 0.45) 42%,
+      rgba(245, 223, 211, 0.2) 68%,
+      transparent 82%);
   filter: blur(38px);
   animation: sunGlowPulse 8s ease-in-out infinite alternate;
 }
@@ -134,76 +174,10 @@
     transform: translateX(-50%) scale(0.96);
     opacity: 0.85;
   }
+
   100% {
     transform: translateX(-50%) scale(1.05);
     opacity: 1;
-  }
-}
-
-/* ==========================================================================
-   Pure SVG Sea of Clouds (Biển Mây Bồng Bềnh - Không dùng bất kỳ file ảnh)
-   ========================================================================== */
-
-.journey-cloud-sea {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: min(320px, 42vh);
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.cloud-wave-svg {
-  position: absolute;
-  bottom: 0;
-  left: -12%;
-  width: 124%;
-  height: 100%;
-}
-
-.wave-back {
-  height: 95%;
-  filter: blur(5px);
-  animation: waveFloatBack 24s ease-in-out infinite alternate;
-}
-
-.wave-mid {
-  height: 80%;
-  filter: blur(3px);
-  animation: waveFloatMid 18s ease-in-out infinite alternate-reverse;
-}
-
-.wave-front {
-  height: 65%;
-  filter: blur(2px);
-  animation: waveFloatFront 20s ease-in-out infinite alternate;
-}
-
-@keyframes waveFloatBack {
-  0% {
-    transform: translateX(-35px) scaleY(0.98);
-  }
-  100% {
-    transform: translateX(35px) scaleY(1.03);
-  }
-}
-
-@keyframes waveFloatMid {
-  0% {
-    transform: translateX(30px) scaleY(1.02);
-  }
-  100% {
-    transform: translateX(-30px) scaleY(0.97);
-  }
-}
-
-@keyframes waveFloatFront {
-  0% {
-    transform: translateX(-25px) scaleY(0.98);
-  }
-  100% {
-    transform: translateX(25px) scaleY(1.03);
   }
 }
 
@@ -222,18 +196,125 @@
   animation: floatSunsetParticle linear infinite;
 }
 
-.p-1  { left: 12%; width: 4px; height: 4px; background: #FFF6E0; animation-duration: 9s; animation-delay: 0s; box-shadow: 0 0 8px #FFF6E0; }
-.p-2  { left: 24%; width: 6px; height: 6px; background: #F5DFD3; animation-duration: 12s; animation-delay: 2s; box-shadow: 0 0 10px #F5DFD3; }
-.p-3  { left: 38%; width: 5px; height: 5px; background: #FFF6E0; animation-duration: 10s; animation-delay: 1.5s; box-shadow: 0 0 8px #FFF6E0; }
-.p-4  { left: 52%; width: 7px; height: 7px; background: #F7D8B5; animation-duration: 13s; animation-delay: 3s; box-shadow: 0 0 12px #F7D8B5; }
-.p-5  { left: 66%; width: 4px; height: 4px; background: #FFF6E0; animation-duration: 8.5s; animation-delay: 0.8s; box-shadow: 0 0 8px #FFF6E0; }
-.p-6  { left: 78%; width: 6px; height: 6px; background: #F5DFD3; animation-duration: 11s; animation-delay: 2.5s; box-shadow: 0 0 10px #F5DFD3; }
-.p-7  { left: 88%; width: 5px; height: 5px; background: #FFF6E0; animation-duration: 9.5s; animation-delay: 4s; box-shadow: 0 0 8px #FFF6E0; }
-.p-8  { left: 18%; width: 5px; height: 5px; background: #F7D8B5; animation-duration: 14s; animation-delay: 5s; box-shadow: 0 0 10px #F7D8B5; }
-.p-9  { left: 45%; width: 4px; height: 4px; background: #FFF6E0; animation-duration: 10.5s; animation-delay: 4.2s; box-shadow: 0 0 8px #FFF6E0; }
-.p-10 { left: 60%; width: 6px; height: 6px; background: #F5DFD3; animation-duration: 12.5s; animation-delay: 1.8s; box-shadow: 0 0 10px #F5DFD3; }
-.p-11 { left: 72%; width: 4px; height: 4px; background: #FFF6E0; animation-duration: 9.8s; animation-delay: 3.5s; box-shadow: 0 0 8px #FFF6E0; }
-.p-12 { left: 84%; width: 5px; height: 5px; background: #F7D8B5; animation-duration: 11.5s; animation-delay: 0.3s; box-shadow: 0 0 10px #F7D8B5; }
+.p-1 {
+  left: 12%;
+  width: 4px;
+  height: 4px;
+  background: #FFF6E0;
+  animation-duration: 9s;
+  animation-delay: 0s;
+  box-shadow: 0 0 8px #FFF6E0;
+}
+
+.p-2 {
+  left: 24%;
+  width: 6px;
+  height: 6px;
+  background: #F5DFD3;
+  animation-duration: 12s;
+  animation-delay: 2s;
+  box-shadow: 0 0 10px #F5DFD3;
+}
+
+.p-3 {
+  left: 38%;
+  width: 5px;
+  height: 5px;
+  background: #FFF6E0;
+  animation-duration: 10s;
+  animation-delay: 1.5s;
+  box-shadow: 0 0 8px #FFF6E0;
+}
+
+.p-4 {
+  left: 52%;
+  width: 7px;
+  height: 7px;
+  background: #F7D8B5;
+  animation-duration: 13s;
+  animation-delay: 3s;
+  box-shadow: 0 0 12px #F7D8B5;
+}
+
+.p-5 {
+  left: 66%;
+  width: 4px;
+  height: 4px;
+  background: #FFF6E0;
+  animation-duration: 8.5s;
+  animation-delay: 0.8s;
+  box-shadow: 0 0 8px #FFF6E0;
+}
+
+.p-6 {
+  left: 78%;
+  width: 6px;
+  height: 6px;
+  background: #F5DFD3;
+  animation-duration: 11s;
+  animation-delay: 2.5s;
+  box-shadow: 0 0 10px #F5DFD3;
+}
+
+.p-7 {
+  left: 88%;
+  width: 5px;
+  height: 5px;
+  background: #FFF6E0;
+  animation-duration: 9.5s;
+  animation-delay: 4s;
+  box-shadow: 0 0 8px #FFF6E0;
+}
+
+.p-8 {
+  left: 18%;
+  width: 5px;
+  height: 5px;
+  background: #F7D8B5;
+  animation-duration: 14s;
+  animation-delay: 5s;
+  box-shadow: 0 0 10px #F7D8B5;
+}
+
+.p-9 {
+  left: 45%;
+  width: 4px;
+  height: 4px;
+  background: #FFF6E0;
+  animation-duration: 10.5s;
+  animation-delay: 4.2s;
+  box-shadow: 0 0 8px #FFF6E0;
+}
+
+.p-10 {
+  left: 60%;
+  width: 6px;
+  height: 6px;
+  background: #F5DFD3;
+  animation-duration: 12.5s;
+  animation-delay: 1.8s;
+  box-shadow: 0 0 10px #F5DFD3;
+}
+
+.p-11 {
+  left: 72%;
+  width: 4px;
+  height: 4px;
+  background: #FFF6E0;
+  animation-duration: 9.8s;
+  animation-delay: 3.5s;
+  box-shadow: 0 0 8px #FFF6E0;
+}
+
+.p-12 {
+  left: 84%;
+  width: 5px;
+  height: 5px;
+  background: #F7D8B5;
+  animation-duration: 11.5s;
+  animation-delay: 0.3s;
+  box-shadow: 0 0 10px #F7D8B5;
+}
 
 @keyframes floatSunsetParticle {
   0% {
@@ -242,15 +323,36 @@
   }
   20% {
     opacity: 0.85;
+    transform: translateY(-15vh) translateX(15px) scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-40vh) translateX(-10px) scale(1.1);
   }
   80% {
     opacity: 0.85;
+    transform: translateY(-60vh) translateX(20px) scale(0.9);
   }
   100% {
-    transform: translateY(-75vh) translateX(25px) scale(1.15);
+    transform: translateY(-80vh) translateX(-5px) scale(1.15);
     opacity: 0;
   }
 }
+
+@keyframes fireflyWander {
+  0% { transform: translate(0, 0) scale(1); opacity: 0; }
+  10% { opacity: 1; }
+  25% { transform: translate(30px, -20px) scale(1.2); opacity: 0.8; }
+  50% { transform: translate(-20px, -50px) scale(0.9); opacity: 1; }
+  75% { transform: translate(40px, -80px) scale(1.1); opacity: 0.7; }
+  90% { opacity: 1; }
+  100% { transform: translate(-10px, -110px) scale(1); opacity: 0; }
+}
+
+.p-1, .p-5, .p-9 { animation-name: fireflyWander; }
+.p-2, .p-6, .p-10 { animation-name: floatSunsetParticle; }
+.p-3, .p-7, .p-11 { animation-name: fireflyWander; animation-direction: reverse; }
+.p-4, .p-8, .p-12 { animation-name: floatSunsetParticle; animation-direction: alternate; }
 
 /* Subtle Watercolor Paper Texture Overlay (3% noise) */
 .journey-paper-texture {
@@ -354,13 +456,86 @@
 .journey-shell-content {
   flex: 1;
   overflow-y: auto;
-  padding: 0.8rem 1rem 1rem;
+  overflow-x: hidden;
+  padding: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 100%;
   position: relative;
   z-index: 10;
   -webkit-overflow-scrolling: touch;
+}
+
+.journey-content-area {
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto;
+  transition: transform var(--transition-normal);
+  position: relative;
+  /* Hiệu ứng chuyển cảnh điện ảnh mượt mà, sâu lắng hơn */
+  animation: chapterEntrance 1s cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
+/* Hiệu ứng tia sáng lướt qua khi mở chặng mới */
+.journey-content-area::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 20%,
+    rgba(255, 246, 224, 0.25) 50%,
+    transparent 80%
+  );
+  background-size: 200% 200%;
+  pointer-events: none;
+  z-index: 50;
+  border-radius: inherit;
+  animation: sceneLightSweep 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes chapterEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+    filter: blur(10px) brightness(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0px) brightness(1);
+  }
+}
+
+@keyframes sceneLightSweep {
+  0% {
+    background-position: 200% -50%;
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    background-position: -50% 200%;
+    opacity: 0;
+  }
+}
+
+.journey-content-area:not(.is-welcome) {
+  padding: 0.8rem 1rem 1.6rem;
+}
+
+.journey-content-area.is-welcome {
+  height: 100%;
+  flex: 1;
+  padding: 0;
 }
 
 /* ==========================================================================
@@ -417,7 +592,7 @@
   background: rgba(255, 255, 255, 0.8);
   color: var(--journey-text-title);
   border: 1px solid rgba(188, 204, 224, 0.8);
-  box-shadow: 0 2px 8px rgba(126, 143, 159, 0.06);
+  box-shadow: 0 2px 8px rgba(126, 143, 159, 0.08);
 }
 
 .journey-nav-btn.secondary:hover {
@@ -447,11 +622,25 @@
   }
 
   .journey-shell-content {
-    padding: 0.6rem 0.6rem 0.85rem;
+    padding: 0;
   }
 
   .journey-nav-btn {
     padding: 0.55rem 1rem;
     font-size: 0.84rem;
+  }
+}
+
+/* ==========================================================================
+   Asymmetrical Balance: Shift content 4% to the right on Desktop (>= 980px)
+   ========================================================================== */
+
+@media (min-width: 980px) {
+  .journey-content-area {
+    transform: translateX(4%);
+  }
+
+  .journey-content-area.is-welcome {
+    transform: none;
   }
 }

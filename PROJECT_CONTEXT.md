@@ -1,8 +1,19 @@
-# PROJECT_CONTEXT.md — Tài Liệu Ngữ Cảnh & Kiểm Kê Dự Án Website 20/10
+# PROJECT_CONTEXT.md — Bàn Giao Toàn Bộ Dự Án « Vườn Lời Chúc 20/10 »
 
-> **Mục đích tài liệu:** Bàn giao toàn bộ hiện trạng kỹ thuật, cấu trúc giao diện, hệ thống thẩm mỹ, animation và trải nghiệm người dùng của dự án **"Vườn Lời Chúc 20/10"** cho AI reviewer / Designer / Frontend Architect để thực hiện đánh giá UX/UI, phân tích visual & motion, và đề xuất nâng cấp thẩm mỹ.
-> **Ngày thực hiện audit:** 16/10/2026.
-> **Trạng thái mã nguồn:** Nguyên trạng, không chỉnh sửa code sản phẩm trong quá trình lập tài liệu.
+> **Mục đích:** Đây là nguồn sự thật duy nhất (single source of truth) để một AI khác hiểu **toàn bộ** giao diện, hiệu ứng, luồng người dùng, kiến trúc kỹ thuật và ranh giới không được phá. Đọc file này trước khi mở code.
+>
+> **Ngày cập nhật:** 17/10/2026.
+> **Cách xác minh:** Đối chiếu trực tiếp mã nguồn hiện tại (không phải bản mô tả cũ). Các mục đánh `[VERIFIED]` khớp với code tại thời điểm này.
+
+---
+
+## Cách AI tiếp theo nên dùng tài liệu này
+
+1. Đọc mục **1 → 4** để nắm sản phẩm, route, cây file.
+2. Đọc mục **5 → 7** trước khi đụng CSS: có **hai hệ thẩm mỹ** (Vườn công khai vs Hành trình riêng). Không trộn palette hồng đất của vườn vào hành trình, và ngược lại.
+3. Đọc mục **10 + 15** trước khi sửa API / bảo mật / nội dung riêng tư.
+4. **Không copy** nội dung lá thư từ `api/_privateData.ts` vào tài liệu công khai, commit message, hay UI công khai.
+5. Không refactor ồ ạt. Đề xuất theo giai đoạn, giữ nguyên hợp đồng API và state machine đã ổn định.
 
 ---
 
@@ -12,7 +23,7 @@
 2. [Executive Summary](#2-executive-summary)
 3. [Project Structure](#3-project-structure)
 4. [Route & Navigation Map](#4-route--navigation-map)
-5. [Current UI Inventory & Visual Blueprint (Không Cần Chụp Màn Hình)](#5-current-ui-inventory--visual-blueprint-không-cần-chụp-màn-hình)
+5. [UI Inventory & Visual Blueprint](#5-ui-inventory--visual-blueprint)
 6. [Visual Design System](#6-visual-design-system)
 7. [Motion & Interaction Inventory](#7-motion--interaction-inventory)
 8. [Feature & State Inventory](#8-feature--state-inventory)
@@ -28,666 +39,684 @@
 
 ## 1. Project Overview
 
-- **Tên dự án:** Vườn Lời Chúc 20/10 (Tên gói package: `vuon-loi-chuc-20-10`).
-- **Bối cảnh & Mục tiêu:** Ứng dụng web kỷ niệm Ngày Phụ nữ Việt Nam 20/10. Tạo ra một không gian mở dịu dàng để mọi người gửi gắm lời chúc chân thành đến phái đẹp, đồng thời tích hợp một "Hành trình riêng tư" (Private Journey) bí mật mở bằng mã số dành riêng cho một người đặc biệt.
-- **Đối tượng sử dụng:**
-  - *Người dùng đại chúng (Public):* Ghé thăm vườn hoa, đọc những lời chúc trôi nổi, gửi lời chúc mới (ẩn danh hoặc kèm tên).
-  - *Người nhận phong bì riêng (Private):* Nhập mật mã riêng tư để mở cánh cửa 5 chặng tương tác cảm xúc và đọc lá thư tay.
-  - *Quản trị viên (Admin):* Truy cập `/admin` bằng mật khẩu để kiểm duyệt nội dung, ẩn tin spam và ghim lời chúc nổi bật.
-- **Tinh thần thiết kế (Design Tone & Mood):** Ấm áp, dịu êm, giàu chất thơ (poetic & atmospheric). Sử dụng bảng màu kem ấm (`#FAF7F2`), hồng phấn đất (`#D48C94`), xanh xô thơm (`#9CAF88`), kết hợp font có chân cổ điển `Cormorant Garamond` và font không chân hiện đại `Plus Jakarta Sans`. Không lạm dụng icon trái tim sến sẩm, tôn trọng khoảng lặng và ánh sáng phát ra từ cuốn sách trung tâm.
-- **Tech Stack đã xác minh:**
-  - Core: React 18.3.1 + TypeScript ~5.6.2 (Bundler mode).
-  - Build Tool: Vite 6.4.4.
-  - Styling: Pure CSS Modules / Vanilla CSS với biến Design Tokens (`tokens.css`, `global.css`).
-  - Icons: `lucide-react` (v1.16.0).
-  - Backend & Serverless: Vercel Serverless Functions (`/api/*`).
-  - Database & Auth: Supabase PostgreSQL (`@supabase/supabase-js` v2.49.1) với Row Level Security (RLS) và cơ chế In-Memory Hybrid Fallback khi dev local.
-- **Trạng thái tổng thể hiện tại:** Đã hoàn thiện toàn bộ tính năng cốt lõi (Milestone 1, 2, 3, 4 + Admin Dashboard). Sẵn sàng deploy production.
+- **Tên dự án:** Vườn Lời Chúc 20/10 (package: `vuon-loi-chuc-20-10`).
+- **Bối cảnh:** Website kỷ niệm Ngày Phụ nữ Việt Nam 20/10. Một khu vườn công khai để gửi/đọc lời chúc, cộng một **hành trình riêng tư 5 chặng** chỉ mở được bằng mật mã.
+- **Đối tượng:**
+  - **Công chúng:** xem thẻ lời chúc, gửi lời chúc (ẩn danh hoặc kèm tên).
+  - **Người nhận phong bì:** nhập mật mã để đi 5 chặng cảm xúc và đọc lá thư.
+  - **Admin:** `/admin` — ghim, ẩn, xóa, tìm kiếm, lọc.
+- **Tinh thần thiết kế:** ấm, thơ, atmospheric. Không icon trái tim sến trên vườn công khai. Tôn trọng khoảng trống quanh cuốn sách phát sáng. Hành trình riêng dùng palette hoàng hôn màu nước (slate / peach / apricot), **không dùng đen thuần `#000`**.
+- **Tech stack (đã đối chiếu `package.json`):**
+  - React 18.3.1 + TypeScript ~5.6.2
+  - Vite 6.x (`vite.config.ts` gắn middleware giả lập `/api/*` cho `dev` và `preview`)
+  - CSS thuần + design tokens (`src/styles/tokens.css`, `global.css`)
+  - `lucide-react` ^1.16.0
+  - Vercel Serverless Functions trong `api/`
+  - Supabase (`@supabase/supabase-js` ^2.118.0) + fallback in-memory khi thiếu env
+- **Routing:** client-side nhẹ trong `App.tsx` (`/` ↔ `/admin` hoặc hash `#/admin`). Không dùng React Router.
+- **Ngôn ngữ UI:** tiếng Việt, xưng hô thân mật « cậu / tớ » trong hành trình riêng.
 
 ---
 
 ## 2. Executive Summary
 
-- **Những gì đã hoạt động hoàn chỉnh [VERIFIED]:**
-  1. Khu vườn công khai hiển thị tối đa 12 thẻ lời chúc dạng 2 cánh chữ V trên Desktop và 1 cột thẻ căn giữa trên Mobile.
-  2. Cơ chế tự động xoay vòng (Carousel) mỗi 18 giây khi số lượng lời chúc > 12, hỗ trợ tạm dừng khi rê chuột và nút chuyển thủ công.
-  3. Luồng "Gửi một lời chúc" với State Machine 6 trạng thái (`idle` → `preview` → `submitting` → `success` / `error` / `uncertain`), hỗ trợ chuẩn hóa ký tự, giữ nguyên `\n` và chống trùng lặp `idempotencyKey`.
-  4. Hộp thoại nhập passcode phong bì riêng với Rate Limit (5 lần sai = khóa 30 giây).
-  5. Hành trình riêng 5 chặng độc lập với 4 bông hoa tương tác, nụ mầm may mắn (Easter Egg), 4 trang sổ tay, ghi chú P.S., 4 quan sát tinh tế và Lá thư cuối hoàn chỉnh.
-  6. Backend Vercel Serverless Functions (`/api/public-messages`, `/api/unlock-journey`, `/api/admin`) hoạt động ổn định ở cả môi trường kết nối Supabase thật và chế độ In-Memory.
-  7. Trang Quản trị viên (`/admin`) đầy đủ thống kê, tìm kiếm, lọc tab, Ghim (Pin), Ẩn (Hide) và Xóa (Delete).
-  8. Bảo mật Frontend Bundle: 100% nội dung riêng tư nằm ở server file `api/_privateData.ts`, hoàn toàn không lọt vào `dist/`.
-- **Những gì còn thiếu hoặc là cơ hội nâng cấp thị giác:**
-  1. Các file ảnh tĩnh trong `public/` (`hoa1.jpg` đến `hoa4.jpg`, `Congchao.jpg`, `coimay.png`) chưa được gắn vào giao diện, Chặng 2 hiện chỉ dùng vector icon Lucide thay vì hình vẽ hoa chân thực.
-  2. Chưa có hiệu ứng âm thanh nền nhẹ nhàng (BGM / Ambient Sound) hoặc hiệu ứng cánh hoa rơi tự nhiên (Canvas Particle Effects).
-  3. Giao diện Desktop của khu vườn đang cố định `height: 100dvh` nên khi số thẻ ít hoặc nhiều, việc phân bố vị trí dựa vào tọa độ phần trăm tĩnh (`top`, `left`, `right`) có thể cần thêm độ ngẫu nhiên sinh động.
-- **3 Vấn đề đáng chú ý nhất phát hiện qua Audit:**
-  - *Vấn đề 1 (Đã fix trong đợt audit trước):* Thuộc tính `overflow: hidden` trên `body` từng làm kẹt thanh cuộn trang Admin; hiện đã được dọn sạch về `overflow-y: auto`.
-  - *Vấn đề 2:* Dữ liệu hiện tại đang ở trạng thái rỗng 100% (Production Clean), cần người dùng gửi lời chúc thật hoặc chạy SQL hạt giống nếu muốn demo có sẵn dữ liệu.
-  - *Vấn đề 3:* Bố cục phablet (412px–440px) cần tiếp tục giám sát vùng đệm ActionArea để các nút bấm không sát mép thanh điều hướng dưới cùng của hệ điều hành di động.
-- **Giới hạn của cuộc audit:** Kiểm tra trực quan dựa trên Chrome DevTools browser session runtime trên Vite Preview (port 4173) và đối chiếu trực tiếp mã nguồn. Không can thiệp DB Supabase từ xa để tôn trọng tính toàn vẹn dữ liệu của người dùng.
+### Đã hoàn thiện [VERIFIED]
+
+1. Vườn công khai: empty state, loading, 12 slot chữ V trên desktop, 8 slot tablet, grid nhỏ hơn trên mobile.
+2. Carousel 18s khi > 12 lời chúc; pause khi hover; nút pause/play + chuyển thủ công.
+3. Gửi lời chúc: state machine 6 bước, chuẩn hóa `\n`, giới hạn 3–300 ký tự, tên ≤ 40, `idempotencyKey`.
+4. Passcode + rate limit 5 lần sai / khóa 30s (server IP + client lock).
+5. Hành trình 5 chặng: Welcome (ảnh cổng), 4 tranh hoa + easter egg, sổ tay + P.S., 4 thẻ trân trọng, lá thư cuối.
+6. Nền hành trình: `cad.jpeg` + kính mờ kem + tia nắng + hạt hoàng hôn.
+7. Admin dashboard + Realtime (postgres_changes + broadcast hide/pin/delete).
+8. Nội dung riêng tư chỉ nằm server-side `api/_privateData.ts` (file `_` không thành route). Frontend không import file này.
+9. Ambience vườn: hào quang sách 7s, 7 hạt stardust, 24 hạt rơi SVG, vòng `seedBloom` khi gửi thành công.
+
+### Còn mở (không phải bug chặn ship)
+
+1. `public/coimay.png` chưa gắn vào UI.
+2. Không có BGM / SFX.
+3. `PlaceholderModal` còn file nhưng **không được import** — dead code.
+4. `src/lib/supabaseClient.ts` có URL/anon key fallback hardcode khi thiếu `VITE_*` (anon key vốn public, nhưng nên ưu tiên env).
 
 ---
 
 ## 3. Project Structure
 
-### Cây thư mục dự án
 ```
 20thang10/
-├── .env                          # Biến môi trường local (SUPABASE_URL, PASSCODE, ADMIN_PASSWORD)
-├── .env.example                  # Mẫu cấu hình môi trường chuẩn
-├── .gitignore                    # Bảo vệ .env, node_modules, dist
-├── index.html                    # Entry point HTML, load Google Fonts & favicon hoa anh đào
-├── package.json                  # Cấu hình dự án & dependencies
-├── tsconfig.json                 # Cấu hình TypeScript compiler (Bao gồm types node, api, src)
-├── vercel.json                   # Cấu hình Vercel Serverless rewrite /api/(.*) và SPA
-├── vite.config.ts                # Vite config tích hợp API middleware giả lập cho dev/preview
-├── api/                          # Backend Vercel Serverless Functions
-│   ├── _privateData.ts           # [BẢO MẬT] Dữ liệu 5 chặng Hành trình riêng (không lộ thành route)
-│   ├── admin.ts                  # API Admin: Login, messages, update (pin/hide), delete
-│   ├── public-messages.ts        # API Public: GET danh sách (ưu tiên ghim), POST gửi lời chúc
-│   └── unlock-journey.ts         # API Unlock: Kiểm tra passcode, IP rate limiting
-├── public/                       # Static Assets
-│   ├── Congchao.jpg              # Ảnh cổng chào (asset dự phòng)
-│   ├── coimay.png                # Asset khói mây trang trí
-│   ├── hoa1.jpg -> hoa4.jpg      # 4 ảnh hoa nghệ thuật (asset dự phòng)
-│   └── nenpublic.jpg             # Ảnh nền chính của khu vườn (cuốn sách phát sáng trung tâm)
-├── supabase/
-│   └── schema.sql                # SQL Schema tạo bảng public_messages, RLS & chỉ mục
+├── .env / .env.example
+├── index.html                 # Fonts, favicon 🌸, OG image /nenpublic.jpg
+├── package.json
+├── tsconfig.json
+├── vercel.json                # /api/(.*) + SPA fallback
+├── vite.config.ts             # React + apiDevMiddleware
+├── api/
+│   ├── _privateData.ts        # [BẢO MẬT] payload 5 chặng — KHÔNG lộ ra frontend
+│   ├── admin.ts
+│   ├── public-messages.ts
+│   └── unlock-journey.ts
+├── public/
+│   ├── nenpublic.jpg          # Nền vườn: sách phát sáng
+│   ├── cad.jpeg               # Nền toàn hành trình riêng
+│   ├── Congchao.jpg           # Hero Chặng 1 (cổng hoa)
+│   ├── hoa1.jpg … hoa4.jpg    # Tranh Chặng 2
+│   └── coimay.png             # Chưa dùng
+├── supabase/schema.sql
 └── src/
-    ├── main.tsx                  # React DOM mount entry point
-    ├── App.tsx                   # Client-side routing nhẹ giữa GardenPage và AdminPage
-    ├── components/               # Các UI components chính
-    │   ├── ActionArea.tsx / .css           # Thanh nút bấm dưới chân trang ("Gửi lời chúc", "Mở phong bì")
-    │   ├── FloatingMessageField.tsx / .css # Vùng thẻ lời chúc trôi nổi 12 slots + Carousel 18s
-    │   ├── HeroSection.tsx / .css          # Tiêu đề vườn hoa & lời dẫn nhập
-    │   ├── MessageCard.tsx / .css          # Thẻ lời chúc công khai (hỗ trợ badge Ghim ⭐)
-    │   ├── MessageDetailDialog.tsx / .css  # Hộp thoại đọc chi tiết lời chúc
-    │   ├── PlaceholderModal.tsx / .css     # Modal placeholder (đã được thay thế hoàn toàn)
-    │   ├── PrivateEnvelope.tsx / .css      # Nút phong bì phong cách cổ điển
-    │   ├── SendMessageDialog.tsx / .css    # Modal gửi lời chúc (State machine 6 bước)
-    │   └── journey/                        # Module Hành trình riêng 5 chặng
-    │       ├── JourneyScenes.css           # Styling chi tiết cho cả 5 chặng
-    │       ├── JourneyShell.tsx / .css     # Khung điều hướng, progress 5 chấm, thanh header/footer
-    │       ├── PasscodeDialog.tsx / .css   # Hộp thoại nhập mật mã mở phong bì
+    ├── main.tsx
+    ├── App.tsx
+    ├── components/
+    │   ├── ActionArea.*
+    │   ├── FloatingMessageField.*
+    │   ├── GardenAmbience.*
+    │   ├── HeroSection.*
+    │   ├── MessageCard.*
+    │   ├── MessageDetailDialog.*
+    │   ├── PlaceholderModal.*     # dead code
+    │   ├── PrivateEnvelope.*
+    │   ├── SendMessageDialog.*
+    │   └── journey/
+    │       ├── JourneyScenes.css
+    │       ├── JourneyShell.*
+    │       ├── PasscodeDialog.*
     │       └── scenes/
-    │           ├── WelcomeScene.tsx        # Chặng 1: Một cánh cửa nhỏ
-    │           ├── FlowerGardenScene.tsx   # Chặng 2: 4 đóa hoa tương tác + Nụ mầm Easter Egg
-    │           ├── JournalScene.tsx        # Chặng 3: 4 trang sổ tay + Ghi chú P.S.
-    │           ├── AppreciationScene.tsx   # Chặng 4: 4 quan sát chân thành
-    │           └── FinalLetterScene.tsx    # Chặng 5: Bức thư tay hoàn chỉnh
-    ├── data/
-    │   └── publicMessages.ts     # Danh sách tin nhắn khởi tạo (hiện để [] cho production)
-    ├── pages/
-    │   ├── GardenPage.tsx        # Trang chủ khu vườn công khai
-    │   ├── AdminPage.tsx / .css  # Trang Dashboard quản trị viên (/admin)
-    ├── services/
-    │   ├── messageApi.ts         # Tầng gọi API public messages với AbortController
-    │   └── privateJourneyApi.ts  # Tầng gọi API unlock journey (0% chứa data nhạy cảm)
-    ├── styles/
-    │   ├── tokens.css            # Hệ thống Design Tokens (Màu, font, shadow, radius, z-index)
-    │   └── global.css            # CSS toàn cục, background artwork, responsive media queries
-    └── types/
-        ├── journey.ts            # TypeScript interfaces cho 5 chặng
-        └── message.ts            # TypeScript interfaces cho PublicMessage
-
+    │           ├── WelcomeScene.tsx
+    │           ├── FlowerGardenScene.tsx
+    │           ├── JournalScene.tsx
+    │           ├── AppreciationScene.tsx
+    │           └── FinalLetterScene.tsx
+    ├── data/publicMessages.ts     # [] production + 12 demo local
+    ├── lib/supabaseClient.ts      # Realtime browser client
+    ├── pages/GardenPage.tsx, AdminPage.*
+    ├── services/messageApi.ts, privateJourneyApi.ts
+    ├── styles/tokens.css, global.css
+    └── types/journey.ts, message.ts
 ```
 
-### Các file nên đọc đầu tiên nếu AI khác muốn hiểu dự án:
-1. `./src/styles/tokens.css` & `./src/styles/global.css`: Nắm toàn bộ ngôn ngữ thiết kế và bố cục nền.
-2. `./src/pages/GardenPage.tsx`: Trung tâm điều phối toàn bộ trải nghiệm công khai.
-3. `./src/components/FloatingMessageField.tsx`: Trọng tâm bố cục 12 slots và thuật toán xoay vòng.
-4. `./src/components/journey/JourneyShell.tsx`: Trọng tâm trải nghiệm Hành trình riêng.
-5. `./src/pages/AdminPage.tsx`: Logic quản trị, kiểm duyệt và phân loại nội dung.
+### File nên đọc theo thứ tự
+
+| Thứ tự | File | Vì sao |
+| ---: | :--- | :--- |
+| 1 | `src/styles/tokens.css` + `global.css` | Tokens vườn + lớp nền sách |
+| 2 | `src/pages/GardenPage.tsx` | Orchestrator public |
+| 3 | `src/components/FloatingMessageField.css` | 12 slot tuyệt đối |
+| 4 | `src/components/GardenAmbience.tsx` + `.css` | Hạt rơi / seed bloom |
+| 5 | `src/components/journey/JourneyShell.tsx` + `.css` | Palette + lớp nền hành trình |
+| 6 | `src/components/journey/JourneyScenes.css` | Chi tiết 5 chặng |
+| 7 | `api/_privateData.ts` | Copy chữ — **chỉ đọc, không đưa vào bundle client** |
+| 8 | `api/public-messages.ts`, `unlock-journey.ts`, `admin.ts` | Hợp đồng API |
 
 ---
 
 ## 4. Route & Navigation Map
 
-### Bảng đối chiếu Route & Màn hình thực tế
-
-| Route / Hash | Component chính | Mục đích | Entry Point | Các hành động chính | Trạng thái xác minh |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| `/` (hoặc rỗng) | `GardenPage` | Khu vườn lời chúc công khai | Trang chủ mặc định | Xem thẻ, mở chi tiết thẻ, bấm gửi lời chúc, bấm mở phong bì riêng, bấm nút ổ khóa admin | `[VERIFIED]` |
-| `/admin` (hoặc `#/admin`) | `AdminPage` | Quản trị viên kiểm duyệt lời chúc | Click icon ổ khóa hoặc gõ trực tiếp URL `/admin` | Đăng nhập mật khẩu, ghim/bỏ ghim, ẩn/hiện, xóa vĩnh viễn, lọc tab, tìm kiếm, quay về vườn | `[VERIFIED]` |
-| Overlay Modals (trên `/`) | `SendMessageDialog` | Soạn và gửi lời chúc mới | Nút "Gửi một lời chúc" tại `ActionArea` | Nhập tên/ẩn danh, nhập nội dung, xem trước, gửi, xử lý lỗi mạng/timeout | `[VERIFIED]` |
-| Overlay Modals (trên `/`) | `MessageDetailDialog` | Đọc toàn văn lời chúc | Click vào bất kỳ `MessageCard` nào | Đọc nội dung đầy đủ, đóng bằng phím ESC / nút X / click backdrop | `[VERIFIED]` |
-| Overlay Modals (trên `/`) | `PasscodeDialog` | Nhập mã mở phong bì riêng | Nút "Mở phong bì riêng" tại `ActionArea` | Nhập mã `2010`, ẩn/hiện password, bấm mở hoặc ấn phím Enter | `[VERIFIED]` |
-| View Mode (trên `/`) | `JourneyShell` | Hành trình riêng 5 chặng | Tự động kích hoạt khi `PasscodeDialog` thành công | Điều hướng Chặng 1 → 5, tương tác hoa, mở Easter Egg, mở P.S., quay về vườn | `[VERIFIED]` |
-
-### Sơ đồ luồng điều hướng (Navigation Flow)
+| Route / lớp | Component | Entry | Hành động |
+| :--- | :--- | :--- | :--- |
+| `/` | `GardenPage` | mặc định | xem thẻ, gửi lời chúc, mở phong bì, lock admin |
+| `/admin` hoặc `#/admin` | `AdminPage` | ổ khóa góc phải hoặc URL | login, pin/hide/delete, search, filter |
+| Overlay | `SendMessageDialog` | « Gửi một lời chúc » | 6 states |
+| Overlay | `MessageDetailDialog` | click `MessageCard` | đọc full, ESC / X / backdrop |
+| Overlay | `PasscodeDialog` | « Mở phong bì riêng » | passcode, eye toggle, Enter |
+| Fullscreen overlay z-index 120 | `JourneyShell` | unlock thành công | 5 chặng, Về vườn, Tiếp tục |
 
 ```mermaid
 flowchart TD
-    Home["Khu Vườn Lời Chúc (/)"]
-    
-    Home -->|Click thẻ lời chúc| DetailModal["MessageDetailDialog (Đọc lời chúc)"]
-    DetailModal -->|Đóng| Home
-    
-    Home -->|Click 'Gửi một lời chúc'| SendModal["SendMessageDialog (6 States)"]
-    SendModal -->|Gửi thành công| Home
-    
-    Home -->|Click 'Mở phong bì riêng'| PasscodeModal["PasscodeDialog (Xác thực 2010)"]
-    PasscodeModal -->|Nhập sai| PasscodeModal
-    PasscodeModal -->|Nhập đúng| JourneyFlow["JourneyShell (Hành trình 5 chặng)"]
-    
-    subgraph JourneyFlow [Không Gian Riêng Tư]
-        S1["Chặng 1: WelcomeScene"] --> S2["Chặng 2: FlowerGardenScene"]
-        S2 --> S3["Chặng 3: JournalScene"]
-        S3 --> S4["Chặng 4: AppreciationScene"]
-        S4 --> S5["Chặng 5: FinalLetterScene"]
-        S5 -->|Quay về| Home
-        S1 -.->|Nút Về vườn| Home
-        S2 -.->|Nút Về vườn| Home
-        S3 -.->|Nút Về vườn| Home
-        S4 -.->|Nút Về vườn| Home
+    Home["Khu vườn /"]
+    Home -->|Click thẻ| Detail["MessageDetailDialog"]
+    Detail -->|Đóng| Home
+    Home -->|Gửi lời chúc| Send["SendMessageDialog 6 states"]
+    Send -->|success + seedBloom| Home
+    Home -->|Mở phong bì| Pass["PasscodeDialog"]
+    Pass -->|sai / 429| Pass
+    Pass -->|đúng| Journey["JourneyShell fullscreen"]
+    subgraph Journey [Hành trình riêng]
+        S1["Chặng 1 Welcome + Congchao.jpg"] --> S2["Chặng 2 4 tranh hoa"]
+        S2 --> S3["Chặng 3 Journal + P.S."]
+        S3 --> S4["Chặng 4 Appreciation"]
+        S4 --> S5["Chặng 5 Final letter"]
+        S5 -->|Quay về vườn / Đọc lại| Home
     end
-    
-    Home -->|Click icon ổ khóa hoặc truy cập /admin| AdminRoute["/admin (AdminPage)"]
-    AdminRoute -->|Chưa đăng nhập| AdminLogin["Form nhập mật khẩu"]
-    AdminLogin -->|Đăng nhập thành công| AdminDashboard["Bảng điều khiển Quản Trị"]
-    AdminDashboard -->|Nút 'Xem vườn'| Home
+    Home -->|ổ khóa /admin| Admin["AdminPage"]
+```
+
+**Quy tắc điều hướng hành trình (quan trọng):**
+
+- Header chỉ còn **một nút trái** « Về vườn lời chúc » + 5 chấm tiến trình ở giữa. Không có nút phải trên topbar.
+- Footer Chặng 1: **không** có « Chặng trước » (spacer trái). Nút phải nhãn **« Bước qua cánh cửa »**.
+- Chặng 2–4: « Chặng trước » + « Tiếp tục ».
+- Chặng 5: footer shell **ẩn nút Tiếp tục**; scene tự có « Đọc lại từ Chặng 1 » và « Quay về Vườn lời chúc ».
+- Nút Tiếp tục **luôn mở sẵn** — không khóa theo puzzle. Click hoa / P.S. / easter egg là tùy chọn.
+- `currentChapter` đổi → `scrollTo({ top: 0 })` trong content ref.
+- Chặng 1 class `is-welcome`: content area không padding, không `translateX(4%)`. Chặng 2–5 desktop dịch nội dung **+4%** sang phải để cân bất đối xứng với nền `cad.jpeg`.
+
+---
+
+## 5. UI Inventory & Visual Blueprint
+
+### 5.0 Phân lớp (stacking) — Vườn công khai
+
+Từ sau ra trước (`GardenPage`):
+
+| Lớp | Class / component | z-index | Việc làm |
+| :--- | :--- | ---: | :--- |
+| Body | `body` gradient ngang | — | Hồng `#F2D6E0` → kem `#FAF0E4` → mint `#E2F0EC` |
+| Artwork | `.garden-background-artwork` | 0 | `/nenpublic.jpg` 1:1, neo đáy giữa, mask feather trái/phải/trên |
+| Aura | `.garden-book-aura` | 1 | Radial vàng mật + hồng, blur 42–56px, pulse 7s |
+| Top wash | `.garden-top-gradient` | 1 | Trắng 45% → trong suốt, cao 110px |
+| Ambience | `.garden-ambience-layer` | (trên aura) | 7 stardust + 24 falling SVG + seed flare |
+| App | `.garden-app` | 2 | flex column, **100dvh, overflow hidden** desktop |
+| Hero | `.hero-section` | 20 | badge / title / subtitle |
+| Field | floating field | 10 | slots / empty / loading |
+| Dock | `.action-area-dock` | 30 | 2 CTA |
+| Admin lock | `.garden-admin-quick-link` | 40 | 32px, top-right, opacity 0.55 |
+| Modal | backdrop / content | 90 / 100 | dialogs |
+| Journey | `.journey-shell-root` | 120 | phủ toàn màn |
+
+Desktop `>= 861px`: vườn **không cuộn** (`height: 100dvh`). `<= 860px`: `.garden-app` height auto, body cuộn, mask artwork tắt.
+
+---
+
+### MÀN 1 — Vườn empty
+
+- Hero:
+  - Badge kính mờ pill: icon Sparkles sage + chữ hồng « Gửi trao yêu thương ».
+  - H1 serif `clamp(2rem, 3.8vw, 2.7rem)`: « Vườn lời chúc ».
+  - Subtitle italic serif hồng đất: « Một chút yêu thương cho ngày 20/10 ».
+  - Mô tả muted: « Có những điều nhỏ bé cũng đủ làm một ngày trở nên dịu dàng hơn. »
+- Loading: viên thuốc kính « 🌸 Đang đón gió vào vườn... » (hoa xoay 6s, pill thở 2.2s).
+- Empty card: `max-width: 400px`, `margin: 1.5rem auto auto` (đẩy lên, **không che sách**). Icon Sparkles trong vòng `#FFF0F2`. Tiêu đề « Khu vườn đang chờ bạn ». Nút secondary « Xem thử bố cục 12 lời chúc » → nạp `devDemoMessages` **chỉ local, không ghi DB**.
+- Dock viên thuốc `rgba(255,255,255,0.52)` blur 14px:
+  - Primary hồng `#D48C94`, chữ trắng, Sparkles, hover nâng -2px + icon xoay 12°.
+  - Divider 1px.
+  - Secondary: Mail + « Mở phong bì riêng » + badge « Riêng tư ».
+- Overlay hạt rơi luôn chạy (kể cả empty).
+
+```
++------------------------------------------------------------------+
+| [hồng]                                              [mint]  [🔒] |
+|              🌸 Gửi trao yêu thương                              |
+|                 Vườn lời chúc                                    |
+|           Một chút yêu thương cho ngày 20/10                     |
+|                                                                  |
+|              +----------------------------+                      |
+|   🌸 rơi     | ✨ Khu vườn đang chờ bạn   |     ⭐ rơi          |
+|              | [Xem thử bố cục 12 lời chúc]|                     |
+|              +----------------------------+                      |
+|                     ☁️  sách phát sáng  ☁️                       |
+|     (  [✨ Gửi một lời chúc] | [✉️ Mở phong bì riêng]  )        |
++------------------------------------------------------------------+
 ```
 
 ---
 
-## 5. Current UI Inventory & Visual Blueprint (Không Cần Chụp Màn Hình)
+### MÀN 2 — 12 thẻ chữ V
 
-> **Dành cho AI Reviewer:** Mục này mô tả chi tiết 100% hình thái thị giác, màu sắc, vị trí, kích thước, hiệu ứng lớp và sơ đồ ASCII Wireframe của từng khung hình. Bạn có thể hình dung chính xác toàn bộ giao diện như đang trực tiếp nhìn vào màn hình mà không cần bất kỳ ảnh chụp màn hình nào.
+**Desktop ≥ 980px:** 4 cột tuyệt đối, khe giữa trống cho sách.
 
----
+| Slot | Cánh | Vị trí |
+| ---: | :--- | :--- |
+| 0, 2, 4 | trái ngoài | `left: 16px` — top 2% / 35% / 68% |
+| 1, 3, 5 | trái trong | `left: 246px` — top 12% / 45% / 78% |
+| 6, 8, 10 | phải ngoài | `right: 16px` — top 2% / 35% / 68% |
+| 7, 9, 11 | phải trong | `right: 246px` — top 12% / 45% / 78% |
 
-### 5.0. Bản Thiết Kế Trực Quan Chi Tiết Từng Khung Hình (Scene-by-Scene Visual Blueprint)
+**861–979px:** 8 slot (ẩn 4,5,10,11), `left/right: 14px`.
+**541–860px:** CSS grid nhiều cột.
+**≤ 540px:** 1 cột, container hẹp.
 
-#### 🖼️ MÀN 1: KHU VƯỜN LỜI CHÚC — TRẠNG THÁI TRỐNG (EMPTY STATE)
-- **Viewport:** Desktop `1440 x 900` (Khóa cứng trong `100dvh`, không cuộn thanh cuộn).
-- **Phối cảnh thị giác từ nền đến bề mặt:**
-  1. *Lớp nền xa (`body`):* Dải màu pastel êm dịu kéo dài từ mép trái sang mép phải: Hồng phấn (`#F2D6E0`) ➔ Kem ấm (`#FAF0E4`) ➔ Xanh bạc hà xô thơm (`#E2F0EC`).
-  2. *Lớp tranh trung tâm (`.garden-background-artwork`):* Hình ảnh `nenpublic.jpg` (tỷ lệ chuẩn 1:1, kích thước `900 x 900px`) đặt chính giữa đáy màn hình. Hai mép trái và phải được hòa trộn bằng **multi-stage linear gradient mask**, giúp tranh tan hoàn toàn vào nền trời pastel mà không để lại bất kỳ đường viền sắc cạnh nào.
-  3. *Lớp ánh sáng ma thuật (`.garden-book-aura`):* Phía sau gáy cuốn sách phát ra một vầng hào quang ấm áp (kết hợp ánh vàng mật ong và hồng phấn mờ `blur: 48px`), thở chậm rãi theo chu kỳ 7 giây (`opacity: 0.65 ➔ 1.0`).
-  4. *Lớp vi hạt & cánh hoa rơi (`GardenAmbience`):*
-     - 7 hạt bụi sao (`stardust-mote`) nhỏ 3-4px lấp lánh bốc lên từ gáy sách và bay lên cao.
-     - Cơn mưa gồm 24 cánh hoa đào hồng phấn (`26px`), cánh hoa cúc vàng (`25px`), ngôi sao vàng óng (`24px`), trái tim pastel (`22px`) và đóa hoa 5 cánh mini (`23px`) chầm chậm chao liệng 3D từ trên trời xuống khắp không gian.
-  5. *Đỉnh màn hình (HeroSection):* Tag bo tròn `"🌸 Gửi trao yêu thương"`, tiêu đề lớn `"Vườn lời chúc"` bằng font có chân *Cormorant Garamond* (`font-size: 2.8rem`), phụ đề màu nâu đất mềm mại.
-  6. *Trung tâm phía trên (Thẻ trạng thái rỗng - Elevated Empty Card):* Được đẩy lên cao (`margin: 1.5rem auto auto;`), kích thước `400 x 220px`, chất liệu kính mờ sương tuyết (`rgba(255, 255, 255, 0.65)` + `backdrop-filter: blur(16px)`). **Hoàn toàn không che khuất cuốn sách phát sáng ở phía dưới.**
-     - Biểu tượng ngôi sao 4 cánh lấp lánh trong vòng tròn hồng đào.
-     - Tiêu đề: *"Khu vườn đang chờ bạn"*.
-     - Lời nhắn: *"Chưa có lời chúc nào trong vườn. Hãy là người đầu tiên gieo một hạt mầm..."*.
-     - Nút thử nghiệm: `[ 🌿 Xem thử bố cục 12 lời chúc ]` (viền hồng nhạt, bấm vào sẽ nạp tạm 12 lời chúc demo trên máy mà không ghi vào database).
-  7. *Chân trang (ActionArea Dock):* Một thanh điều khiển hình viên thuốc nổi nhẹ (`background: rgba(255, 255, 255, 0.52)` + `backdrop-filter: blur(14px)`), gồm:
-     - Nút chính: `[ ✨ Gửi một lời chúc ]` (Màu hồng đất nhung `#D48C94`, chữ trắng, đổ bóng ấm).
-     - Nút phụ: `[ ✉️ Mở phong bì riêng  🏷️ Riêng tư ]` (Nền trắng ngà, kín đáo, khơi gợi tò mò).
+**MessageCard:** max-width 220px, kính `rgba(255,255,255,0.72)` blur 8px, radius 14px. Header: chấm sage + tên hồng đất. Body 3 dòng `-webkit-line-clamp`. Footer « Đọc tiếp → ». Hover: scale 1.02, nâng -3px, viền hồng mềm. Pinned: viền hổ phách, icon `Pin` `#D97706` thay Feather.
 
-```
-+---------------------------------------------------------------------------------------+
-|  [Hồng Pastel #F2D6E0]                                          [Xanh Sage #E2F0EC]  |
-|                                                                                 [🔒]  |
-|                                🌸 Gửi trao yêu thương                                 |
-|                                   VƯỜN LỜI CHÚC                                       |
-|                  Có những điều nhỏ bé cũng đủ làm một ngày trở nên dịu dàng hơn.     |
-|                                                                                       |
-|   ⭐ (Sao vàng rơi)             +-------------------------+                           |
-|        🌸 (Cánh hoa rơi)        |    ✨ (Sparkle Icon)    |           🌼 (Hoa vàng rơi)|
-|                                 |   Khu vườn đang chờ bạn |                           |
-|                                 | Chưa có lời chúc nào... |      💖 (Trái tim rơi)    |
-|                                 |                         |                           |
-|                                 | [🌿 Xem thử 12 lời chúc]|                           |
-|                                 +-------------------------+                           |
-|                                                                                       |
-|                                    ☁️      ⭐      ☁️                                 |
-|                                       🦋   ✨   🌸                                    |
-|                                   /===================\                               |
-|                                  /  CUỐN SÁCH MA THUẬT \                              |
-|   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/     PHÁT SÁNG MỞ RA   \~~~~~~~~~~~~~~~~~~~~~~~~~~~  |
-|   [Tranh hòa tan vào nền]      ===========================     [Tranh hòa tan vào nền]|
-|                                                                                       |
-|                        (  [ ✨ Gửi một lời chúc ]   |   [ ✉️ Mở phong bì riêng ]  )   |
-+---------------------------------------------------------------------------------------+
-```
+**Carousel:** tin ghim luôn giữ slot; chỉ xoay unpinned mỗi 18s (`fieldFadeIn` 0.65s). Thanh pill: « Đang xem 12 / N » + Pause/Play + RefreshCw.
+
+Demo mode: banner « 🌿 Bố cục 12 lời chúc thử nghiệm · Quay lại vườn gốc ».
+
+Cache: `sessionStorage` key `vuon_public_messages_cache` — F5 không flash empty nếu đã có list.
 
 ---
 
-#### 🖼️ MÀN 2: KHU VƯỜN LỜI CHÚC — BỐ CỤC 12 THẺ LỜI CHÚC (12-SLOT WINGS LAYOUT)
-- **Cấu trúc:** 12 thẻ lời chúc chia đều thành 2 cánh đối xứng ôm lấy trung tâm:
-  - **Cánh trái (Slots 0 – 5):** 6 thẻ bay lượn ở tọa độ `left: 2%` đến `left: 24%`. Thẻ có ghim (`isPinned`) mang dải ruy băng màu vàng hổ phách và icon kim ghim `📌`.
-  - **Khoảng trống trung tâm (Khoảng 500px):** Để lộ hoàn toàn cuốn sách phát sáng, bầy bướm bay và các đám mây hồng từ bức tranh `nenpublic.jpg`.
-  - **Cánh phải (Slots 6 – 11):** 6 thẻ bay lượn ở tọa độ `right: 2%` đến `right: 24%`.
-- **Thanh trạng thái xem trước:** Trên đỉnh đầu xuất hiện một thanh thông báo nhỏ xinh: `[ 🌿 Bố cục 12 lời chúc thử nghiệm · Quay lại vườn gốc ]`.
-- **Tương tác thẻ (`MessageCard`):** Mỗi thẻ mang nền trắng ngọc trai bo góc `14px`, bóng đổ nhẹ. Khi hover chuột, thẻ phóng to nhẹ `1.02` và tạm dừng dao động bồng bềnh để người dùng đọc rõ nội dung.
+### MÀN 3 — SendMessageDialog (6 states)
 
-```
-+---------------------------------------------------------------------------------------+
-|                                🌸 Gửi trao yêu thương                                 |
-|                                   VƯỜN LỜI CHÚC                                       |
-|                   [ 🌿 Bố cục 12 lời chúc thử nghiệm · Quay lại vườn gốc ]             |
-|                                                                                       |
-| +--------------------+                                           +------------------+ |
-| | 📌 Ban Tổ Chức     |                                           | • Thùy Chi       | |
-| | Chúc các cô gái... |                                           | Dịu dàng với...  | |
-| +--------------------+                                           +------------------+ |
-|        +--------------------+                     +--------------------+              |
-|        | 📌 Người Bạn Nhỏ   |    (VÙNG TRUNG TÂM  | • Đồng nghiệp      |              |
-|        | Rạng rỡ như ánh... |     TRỐNG 500PX     | Nụ cười tươi...    |              |
-|        +--------------------+     ĐỂ LỘ CUỐN SÁCH +--------------------+              |
-| +--------------------+            VÀ NGÔI SAO)                   +------------------+ |
-| | • Một người bạn    |                                           | • Hải Đăng       | |
-| | Giấc ngủ bình yên..|           ☁️   ⭐   ☁️                    | Ngàn đóa hoa...  | |
-| +--------------------+                 ✨                        +------------------+ |
-|        +--------------------+   /===============\ +--------------------+              |
-|        | • Hoàng Lan        |  /  CUỐN SÁCH MỞ   \| • Một người bạn    |              |
-|        | Vững vàng bước...  | ====================| Xinh đẹp nhất...   |              |
-|        +--------------------+                     +--------------------+              |
-| +--------------------+                                           +------------------+ |
-| | • Minh Khoa        |                                           | • Khánh Linh     | |
-| | Ngày 20/10 vui vẻ..|                                           | Ước mơ thành...  | |
-| +--------------------+                                           +------------------+ |
-|        +--------------------+                     +--------------------+              |
-|        | • Một người bạn    |                     | • Ẩn danh          |              |
-|        | Nguồn năng lượng...|                     | Góc nhỏ bình yên...|              |
-|        +--------------------+                     +--------------------+              |
-|                                                                                       |
-|                        (  [ ✨ Gửi một lời chúc ]   |   [ ✉️ Mở phong bì riêng ]  )   |
-+---------------------------------------------------------------------------------------+
-```
+Overlay: `rgba(60,50,42,0.45)` blur 8px. Panel trắng radius 20px, max ~480px. ESC bị chặn khi `submitting`. Focus trap. `body.body-locked`.
+
+| State | UI |
+| :--- | :--- |
+| `idle` | Tiêu đề « Gửi gắm yêu thương ». Tên ≤ 40. Checkbox ẩn danh khóa ô tên. Textarea kem, đếm `n/300`, cảnh báo từ 260. Nút « Xem trước lời chúc → » |
+| `preview` | Mô phỏng MessageCard. « ← Sửa lại » / « Gieo vào khu vườn » |
+| `submitting` | Khóa form, spinner |
+| `success` | Mầm nở. Garden nhận message + `isSeedFlaring` 2.8s (`seedBloom`) |
+| `error` | Retry giữ nguyên `idempotencyKey` |
+| `uncertain` | Timeout 10s / 504 |
+
+Hook test server: nội dung chứa `[test:error]` → 500; `[test:timeout]` → 504 lần đầu.
 
 ---
 
-#### 🖼️ MÀN 3: MODAL GỬI LỜI CHÚC (`SendMessageDialog` — 6 TRẠNG THÁI)
-- **Overlay:** Nền tối mờ sang trọng `rgba(60, 50, 42, 0.45)` với `backdrop-filter: blur(8px)`.
-- **Khung hộp thoại:** Nền trắng tinh khiết, bo góc lớn `20px`, viền mềm mại, rộng tối đa `480px`.
-- **Các bước trong luồng State Machine:**
-  1. `idle (Soạn thảo)`:
-     - Header: Icon hoa nhỏ, tiêu đề *"Gửi gắm yêu thương"*, phụ đề *"Những dòng chữ vụng về đôi khi lại là món quà ấm áp nhất."*
-     - Ô nhập tên: *"Tên hoặc biệt danh của bạn"* (Tối đa 40 ký tự).
-     - Checkbox: `[✓] Gửi ẩn danh` ➔ Khi tick vào, ô nhập tên tự động làm mờ và khóa lại.
-     - Ô nội dung: Khung textarea kem ấm có placeholder thủ thỉ, bộ đếm thời gian thực `(128/300)`. Khi vượt quá 260 ký tự, số đếm đổi sang màu cam cảnh báo.
-     - Footer: Nút `[ Xem trước lời chúc → ]` (Hồng đất nhung).
-  2. `preview (Xem trước)`:
-     - Mô phỏng chính xác 100% hình ảnh chiếc thẻ `MessageCard` sẽ xuất hiện ngoài khu vườn (gồm tên người gửi hoặc nhãn "Một người bạn", thời gian hiện tại, trích đoạn nội dung).
-     - 2 nút hành động: `[ ← Sửa lại ]` và `[ Gieo vào khu vườn 🌷 ]`.
-  3. `submitting (Đang gửi)`: Form khóa lại, nút hiển thị spinner hoa đào xoay tròn.
-  4. `success (Thành công)`:
-     - Biểu tượng mầm hoa hé nở màu hồng pastel.
-     - Tiêu đề: *"Lời chúc đã được gieo vào khu vườn!"*.
-     - Ngay tại khoảnh khắc này, ngoài nền vườn kích hoạt hiệu ứng **Sown Seed Bloom** (vòng hào quang nở bừng từ tâm sách lan tỏa ra ngoài) và lời chúc mới đã được ghim ngay vào đầu danh sách.
-     - Nút: `[ Quay lại khu vườn ]`.
+### MÀN 4 — MessageDetailDialog
 
-```
-                  +----------------------------------------------+
-                  |  [X] (Đóng)                                  |
-                  |                   🌸                         |
-                  |          GỬI GẮM YÊU THƯƠNG                  |
-                  |    Những dòng chữ vụng về đôi khi lại là     |
-                  |          món quà ấm áp nhất.                 |
-                  |                                              |
-                  |  Tên của bạn (không bắt buộc)                |
-                  |  [ Nhập tên hoặc để trống...               ] |
-                  |  [ ] Gửi ẩn danh (Người nhận sẽ thấy ẩn danh)|
-                  |                                              |
-                  |  Lời chúc của bạn *                          |
-                  |  +----------------------------------------+  |
-                  |  | Chúc cậu luôn rạng rỡ và hạnh phúc     |  |
-                  |  | trên từng chặng đường phía trước...    |  |
-                  |  |                                        |  |
-                  |  +----------------------------------------+  |
-                  |                                    (42/300)  |
-                  |                                              |
-                  |          [ Xem trước lời chúc → ]            |
-                  +----------------------------------------------+
-```
+Cùng overlay language. Hiện full `content` (giữ newline), tên theo `getSenderDisplayName` (ẩn danh / trống → « Một người bạn »). Đóng: ESC, X, backdrop. Trả focus về thẻ vừa click.
 
 ---
 
-#### 🖼️ MÀN 4: HỘP THOẠI MẬT MÃ PHONG BÌ RIÊNG (`PasscodeDialog`)
-- **Thiết kế:** Mô phỏng phong bì thư cổ điển châu Âu.
-- **Dấu ấn niêm phong:** Con dấu sáp tròn màu hồng kem (`passcode-wax-seal`, `60x60px`) ở trên cùng, dập nổi hình trái tim/bông hoa hồng với đường viền nổi.
-- **Tiêu đề:** *"Góc Nhỏ Riêng Tư"*.
-- **Ô nhập Passcode:** Căn giữa, cỡ chữ lớn `1.2rem`, giãn cách chữ rộng (`letter-spacing: 0.15em`), có nút icon con mắt `Eye / EyeOff` để bật/tắt hiển thị mật khẩu.
-- **Cơ chế phản hồi:**
-  - Nhập sai: Khung viền ửng hồng đỏ, thông điệp dịu dàng: *"Hình như mã mở cửa chưa đúng rồi, cậu kiểm tra lại tin nhắn nhé 🌷"*.
-  - Nhập sai 5 lần: Khóa form trong 30 giây, hiển thị bộ đếm lùi thời gian thực `(Còn 29s...)`.
-  - Nhập đúng (`2010`): Hiển thị dấu tích hoa, mượt mà chuyển cảnh bước vào **Hành trình riêng 5 chặng**.
+### MÀN 5 — PasscodeDialog
 
-```
-                  +----------------------------------------------+
-                  |  [X] (Đóng)                                  |
-                  |                    (🕯️)                       |
-                  |             [ CON DẤU SÁP HỒNG ]             |
-                  |                                              |
-                  |              GÓC NHỎ RIÊNG TƯ                |
-                  |   Nhập mật mã bí mật để mở phong bì dành     |
-                  |              riêng cho cậu nhé.              |
-                  |                                              |
-                  |         +-------------------------+          |
-                  |         |       • • • •     [👁️]  |          |
-                  |         +-------------------------+          |
-                  |                                              |
-                  |             [  Mở phong bì  ]                |
-                  +----------------------------------------------+
-```
+Phong bì cổ điển, con dấu sáp 60×60. Tiêu đề « Góc nhỏ riêng tư ». Input `letter-spacing: 0.15em`, Eye/EyeOff. Sai: viền ửng, câu tulip. 5 lần: 429 + countdown. Đúng: state `isUnlocking` rồi mount `JourneyShell`.
+
+Passcode **không hardcode trên frontend**. Server: `PRIVATE_JOURNEY_PASSCODE` (fallback code `'2010'` nếu thiếu env) **hoặc** chuỗi `'tu-do'`. `.env.example` ghi `1412` — giá trị thật là env production, đừng giả định một số duy nhất khi review.
 
 ---
 
-#### 🖼️ MÀN 5: KHÔNG GIAN HÀNH TRÌNH RIÊNG (`JourneyShell` — 5 CHẶNG ĐỘC LẬP)
-- **Không gian bao bọc:** Toàn bộ màn hình chuyển sang nền giấy màu ngà ấm áp `#FDFBF7`.
-- **Thanh tiêu đề trên cùng:** Nút `"← Quay lại"`, thanh tiến trình 5 nốt tròn hồng pastel (`Chặng X / 5`), nút `"Về vườn 🌿"`.
-- **Thanh chân trang:** Nút `"← Chặng trước"` và nút `"Tiếp tục →"` (luôn sáng rõ, không bắt buộc người dùng giải câu đố).
+### MÀN 6 — JourneyShell (không gian riêng)
 
-##### CHI TIẾT 5 CHẶNG:
-1. **Chặng 1 — Một cánh cửa nhỏ (`WelcomeScene`):**
-   - Icon bông sen hồng hé nở tỏa hương.
-   - Thư mời mở đầu: *"Chào cậu, cảm ơn cậu đã dành một chút thời gian để ghé vào góc nhỏ này giữa những ngày bận rộn... Cứ thong thả bước qua từng chặng nhỏ nhé."*
-2. **Chặng 2 — Bốn đóa hoa riêng tặng cậu (`FlowerGardenScene` — NÂNG CẤP BẰNG TRANH MÀU NƯỚC):**
-   - **Lưới 4 tác phẩm nghệ thuật (2x2 Grid):**
-     - **Hoa 1 — Bình yên:** Tranh màu nước bông sen hồng thanh tao [hoa1.jpg](file:///c:/Users/lhp14/learn_afterUni/20thang10/public/hoa1.jpg) trong khung viền gốm sứ.
-     - **Hoa 2 — Niềm vui:** Tranh màu nước hoa hướng dương vàng nắng rực rỡ [hoa2.jpg](file:///c:/Users/lhp14/learn_afterUni/20thang10/public/hoa2.jpg).
-     - **Hoa 3 — Can đảm:** Tranh hoa chuông tuyết trắng ngần vươn lên từ sương sớm [hoa3.jpg](file:///c:/Users/lhp14/learn_afterUni/20thang10/public/hoa3.jpg).
-     - **Hoa 4 — Khởi đầu mới:** Tranh đóa hoa oải hương tím biếc thanh bình [hoa4.jpg](file:///c:/Users/lhp14/learn_afterUni/20thang10/public/hoa4.jpg).
-   - **Thẻ chiêm ngưỡng mở rộng (`.flower-art-reveal-card`):** Khi chạm vào bất kỳ bông hoa nào, thẻ phía dưới bung nở với vầng hào quang chuyển sắc đồng màu: tranh hoa phóng to bên trái (`140x140px`) và lời nhắn gửi thủ thỉ bên phải.
-   - **Nụ mầm bí mật:** Nút cỏ 4 lá nép góc vườn `[ 🍀 Một nụ mầm nhỏ nép bên góc vườn ]`, bấm vào sẽ bật mí một lời chúc ngộ nghĩnh bất ngờ.
-3. **Chặng 3 — Những điều ít khi được nói (`JournalScene`):**
-   - 4 trang sổ tay viền chỉ kem ấm (`journal-card`): Lời nhắc nhở *"Không phải lúc nào cũng cần gồng mình mạnh mẽ"*, *"Được quyền nghỉ ngơi khi thấy mệt"*.
-   - Nút bật ghi chú ẩn `[ ✍️ Mở ghi chú P.S. ]`.
-4. **Chặng 4 — Điều tớ trân trọng ở cậu (`AppreciationScene`):**
-   - 4 thẻ ghi nhận tinh tế với nhãn pastel: Podcast giọng nói dịu dàng, cách kể chuyện mộc mạc, sự kiên trì âm thầm, năng lượng chữa lành cho người khác.
-5. **Chặng 5 — Bức thư tay cuối cùng (`FinalLetterScene`):**
-   - Trình bày trên nền giấy da thư cổ điển (`.letter-parchment`): Lời chào xưng hô thân mật, 4 đoạn văn tâm sự giàu cảm xúc, ngày tháng `20/10/2026`, chữ ký nghiêng mềm mại và 2 nút bấm: `[ ↺ Đọc lại từ đầu ]` hoặc `[ Trở về vườn lời chúc ]`.
+**Hai lớp thẩm mỹ hoàn toàn khác vườn.**
 
-```
-+---------------------------------------------------------------------------------------+
-|  ← Quay lại                   •  • (•) •  •  Chặng 2/5                        Về vườn |
-|                                                                                       |
-|                             BỐN ĐÓA HOA RIÊNG TẶNG CẬU                               |
-|        Chạm vào từng bức tranh để ngắm nhìn và lắng nghe những lời nhắn nhỏ...        |
-|                                                                                       |
-|     +-------------------------+                     +-------------------------+       |
-|     |   [ TRANH HOA 1: SEN ]  |                     |  [ TRANH HOA 2: HƯỚNG DƯƠNG ]|  |
-|     |        BÌNH YÊN         |                     |        NIỀM VUI         |       |
-|     |  Một khoảng lặng êm đềm |                     | Những điều lấp lánh...  |       |
-|     +-------------------------+                     +-------------------------+       |
-|     +-------------------------+                     +-------------------------+       |
-|     | [ TRANH HOA 3: CHUÔNG ] |                     | [ TRANH HOA 4: LAVENDER]|       |
-|     |        CAN ĐẢM          |                     |     KHỞI ĐẦU MỚI        |       |
-|     | Vững vàng với lựa chọn  |                     |   Tươi tắn như sớm mai  |       |
-|     +-------------------------+                     +-------------------------+       |
-|                                                                                       |
-|     +-------------------------------------------------------------------------+       |
-|     | [ 🌸 Tranh Hoa Phóng To ]  | ĐÓA HOA BÌNH YÊN — Một khoảng lặng êm đềm  |       |
-|     | (Viền men sứ, vầng sáng)   | "Mong cậu luôn tìm thấy những khoảng lặng  |       |
-|     |                            | bình yên trong tâm hồn. Dù ngày hôm đó có  |       |
-|     |                            | mệt mỏi, mong cậu luôn có nơi để trở về..."|       |
-|     |                            | ✦ Gửi tặng cậu đóa hoa dịu êm này           |       |
-|     +-------------------------------------------------------------------------+       |
-|                                                                                       |
-|                           [ 🍀 Một nụ mầm nhỏ nép bên góc vườn ]                      |
-|                                                                                       |
-|  [ ← Chặng trước ]                                                    [ Tiếp tục → ]  |
-+---------------------------------------------------------------------------------------+
-```
+Stack:
+
+1. `.journey-bg-cad` — `url('/cad.jpeg')` cover, `background-position: 25% center`, scale 1.04, inset -20px.
+2. `.journey-frosted-overlay` — `rgba(250,247,242,0.55)` + backdrop blur (~5–20px) saturate 110%.
+3. `.journey-sky-backdrop`:
+   - sunbeams repeating-linear 128°, pulse 10s
+   - sunburst radial đáy, pulse 8s
+   - 12 hạt `.journey-sunset-particle` màu `#FFF6E0` / `#F5DFD3` / `#F7D8B5`
+   - `.journey-paper-texture` noise ~3.5%
+4. Topbar kính: nút « ← Về vườn lời chúc », 5 dots (upcoming peri / active scale 1.35 glow apricot / completed sage), chữ « Chặng n/5 ».
+5. Main scroll.
+6. Bottombar kem 86% blur 14px.
+
+Vào shell: `journey-appear` 420ms fade+scale 0.985→1. Mỗi chapter: `chapterEntrance` 1s (blur 10px + translateY 24px) và `sceneLightSweep` 1.2s.
 
 ---
 
-#### 🖼️ MÀN 6: TRANG QUẢN TRỊ VIÊN (`AdminPage` — ROUTE `/admin`)
-- **Màn hình Đăng nhập:** Card kính mờ tối giản ở giữa màn hình, ô nhập mật khẩu admin (biến `ADMIN_PASSWORD`), nút đăng nhập hồng đất và nút *"Quay về vườn"*.
-- **Bảng điều khiển Quản trị (Dashboard):**
-  - **4 Thẻ số liệu thống kê (Header KPI Cards):**
-    1. Tổng lời chúc (Icon MessageSquare, viền xanh dương).
-    2. Đang hiển thị (Icon Eye, viền xanh lá cây).
-    3. Đã ghim nổi bật (Icon Pin, viền vàng hổ phách).
-    4. Đã ẩn (Icon EyeOff, viền đỏ hồng).
-  - **Thanh công cụ lọc:** 4 Tab chọn (`Tất cả`, `Đang hiển thị`, `Đã ghim`, `Đã ẩn`), ô tìm kiếm lọc nội dung/tên tác giả theo thời gian thực và nút làm mới danh sách.
-  - **Bảng danh sách lời chúc:** Mỗi dòng là một tấm thẻ trắng viền xám ấm, hiển thị đầy đủ tên, nhãn ẩn danh, ngày giờ đăng định dạng chuẩn tiếng Việt, nội dung thư và 3 nút tác vụ nhanh:
-    - `[ 📌 Ghim / Bỏ ghim ]` (Đưa lên vị trí ưu tiên số 1 ngoài vườn).
-    - `[ 👁️ Ẩn / Bỏ ẩn ]` (Ẩn ngay lập tức khỏi khu vườn công khai mà không xóa dữ liệu).
-    - `[ 🗑️ Xóa vĩnh viễn ]` (Có hộp thoại xác nhận an toàn trước khi xóa khỏi DB).
+### Chặng 1 — WelcomeScene « Một cánh cửa nhỏ »
 
-```
-+---------------------------------------------------------------------------------------+
-|  🌿 Vườn Lời Chúc / Quản Trị Viên                                       [ Về vườn ↗ ] |
-|                                                                                       |
-|  +----------------+   +----------------+   +----------------+   +----------------+    |
-|  |   TỔNG CỘNG    |   | ĐANG HIỂN THỊ  |   |    ĐÃ GHIM     |   |     ĐÃ ẨN      |    |
-|  |       12       |   |       11       |   |       2        |   |       1        |    |
-|  +----------------+   +----------------+   +----------------+   +----------------+    |
-|                                                                                       |
-|  [Tất cả (12)]  [Đang hiển thị (11)]  [Đã ghim (2)]  [Đã ẩn (1)]    [🔍 Tìm kiếm...]   |
-|                                                                                       |
-|  +---------------------------------------------------------------------------------+  |
-|  | 📌 Ban Tổ Chúc   •   08:00 16/10/2026   •   [ Đang ghim ]                       |  |
-|  | "Chúc toàn thể các cô gái một ngày 20/10 ngập tràn nụ cười, luôn tự tin tỏa     |  |
-|  | sáng và được yêu thương trọn vẹn theo cách riêng của mình!"                     |  |
-|  |                                    [ 📌 Bỏ ghim ]   [ 👁️ Ẩn tin ]   [ 🗑️ Xóa ]  |  |
-|  +---------------------------------------------------------------------------------+  |
-|  | 👤 Ẩn danh        •   08:30 16/10/2026   •   [ Bình thường ]                     |  |
-|  | "Dù ngoài kia có bộn bề thế nào, mong mỗi tối về nhà cậu đều tìm thấy sự...    |  |
-|  |                                    [ 📌 Ghim tin ]  [ 👁️ Ẩn tin ]   [ 🗑️ Xóa ]  |  |
-|  +---------------------------------------------------------------------------------+  |
-+---------------------------------------------------------------------------------------+
-```
+- Full-bleed `/Congchao.jpg`, mask fade đỉnh 0–15% để hòa vào `cad.jpeg`.
+- `heroImgBreathe` 14s scale 1 → 1.035.
+- Vignette hoàng hôn + sunburst blur 28px pulse 6s.
+- 5 sparkle `✦` `#FFF6E0` `floatArchSpeck` 4s.
+- Title serif có text-shadow nắng. Subtitle pill kính (data.subtitle từ server).
+- `.welcome-crystal-card` đáy: greeting / message / invitation — stagger `slideUpFade` 0.2s / 0.5s / 0.8s.
+- **Không** còn icon sen Lucide; **không** badge « Chặng 1/5 » trong scene (đã nằm ở shell).
 
 ---
 
-### 5.1. Bảng Tổng Hợp Kiểm Kê Giao Diện & Điểm Chạm (UI Inventory Summary)
-- Đầy đủ 6 màn hình / trạng thái cốt lõi: Vườn công khai (Empty & 12-Slot), Modal gửi lời chúc, Modal xem chi tiết, Modal Passcode, Hành trình riêng 5 chặng, và Dashboard Quản trị.
-- 100% các nút bấm đều có trạng thái hover, active và focus-visible với viền màu hồng nhạt.
-- Tuân thủ tiêu chuẩn tiếp cận Accessibility: Hỗ trợ đóng modal bằng phím `Escape`, bẫy tiêu điểm (focus trap), hỗ trợ bàn phím đầy đủ và tắt animation khi người dùng bật `prefers-reduced-motion`.
+### Chặng 2 — FlowerGardenScene
+
+Grid 2×2. Map ảnh:
+
+| id | file | vai trò UI |
+| :--- | :--- | :--- |
+| `flower-1` | `/hoa1.jpg` | Sen — Bình yên |
+| `flower-2` | `/hoa2.jpg` | Hướng dương — Niềm vui |
+| `flower-3` | `/hoa3.jpg` | Hoa chuông — Can đảm |
+| `flower-4` | `/hoa4.jpg` | Lavender — Khởi đầu mới |
+
+Title/subtitle/message/color lấy từ `PrivateJourneyData.flowers` (server). Fallback icon Lucide nếu thiếu file.
+
+Thẻ: kính kem, `cardFloat` 6s ±6px (chẵn delay -3s). Preview 96×96 `object-fit: contain`. Hover: pause float, scale 1.03, glow sunburst. Click: 8 hạt `✦` bung theo `--flower-theme-color` 0.8s; toggle đóng nếu click lại. Reveal card: ảnh 145×145 + halo thở 4s + badge + body + footer « Gửi tặng cậu một ngày thật dịu êm ». Auto `scrollIntoView`.
+
+Easter egg: clover « Một nụ mầm nhỏ nép bên góc vườn », `eggPulse` 3s, reveal `eggBounce`.
+
+---
+
+### Chặng 3 — JournalScene
+
+4 `.journal-card` số `01`… serif, hover nghiêng 3D (`rotateX/Y`, `preserve-3d`). Nút kẹp giấy: « Một ghi chú nhỏ (P.S.) » / « Gấp lại ghi chú nhỏ ». P.S. `psPaperFlip` 0.4s.
+
+---
+
+### Chặng 4 — AppreciationScene
+
+Grid 4 thẻ: tag pastel, title, description. Hover nảy + inset glow `::after`.
+
+---
+
+### Chặng 5 — FinalLetterScene
+
+`.letter-parchment` giấy kem. Title chào. Mỗi đoạn class `letter-p-0…` `paragraphStaggerFade` (blur → rõ). Signoff: wax seal Mail `waxSealPulse` 3s + date + signature italic. Hai CTA: secondary « Đọc lại từ Chặng 1 », primary « Quay về Vườn lời chúc ».
+
+---
+
+### MÀN 7 — AdminPage `/admin`
+
+- Chưa login: card giữa, password `ADMIN_PASSWORD`, Eye toggle, « Quay về vườn ». Token `sessionStorage.garden_admin_token`.
+- Dashboard: 4 KPI (tổng / hiển thị / ghim / ẩn) — MessageSquare / Eye / Pin / EyeOff.
+- Tab All / Visible / Pinned / Hidden + search realtime + refresh.
+- Mỗi hàng: tên, ẩn danh, datetime vi-VN, content, Pin, Hide, Delete (confirm).
+- Realtime channel `admin_messages_realtime`. Garden channel `garden_public_messages_realtime` + broadcast `admin_toggle_hide` / `admin_delete` / `admin_toggle_pin`.
+- Body **được cuộn** (không `overflow: hidden` trên admin).
 
 ---
 
 ## 6. Visual Design System
 
-Toàn bộ thông số được đọc trực tiếp từ [./src/styles/tokens.css](file:///c:/Users/lhp14/learn_afterUni/20thang10/src/styles/tokens.css) và [./src/styles/global.css](file:///c:/Users/lhp14/learn_afterUni/20thang10/src/styles/global.css):
+### 6.1 Tokens vườn (`tokens.css`) — chỉ dùng ngoài hành trình
 
-### 6.1. Bảng màu (Color Palette)
-- **Nền tảng (Backgrounds):**
-  - `--color-bg-base`: `#FAF7F2` (Màu kem ấm chính)
-  - `--color-bg-ivory`: `#FFFDF9` (Màu ngà sáng)
-  - `--color-bg-card`: `#FFFFFF`
-  - `--color-bg-card-glass`: `rgba(255, 255, 255, 0.88)` (Kính mờ phủ sương)
-  - Gradient viền trang: `linear-gradient(90deg, #F2D6E0 0%, #FDF3EC 30%, #FAF0E4 50%, #EFF8F5 70%, #E2F0EC 100%)`
-- **Màu nhấn (Accents):**
-  - `--color-accent-primary`: `#D48C94` (Hồng đất nhung)
-  - `--color-accent-soft`: `#E8B4B8` (Hồng pastel cánh hoa)
-  - `--color-accent-hover`: `#C57780` (Hồng đất đậm khi hover)
-  - `--color-accent-sage`: `#9CAF88` (Xanh lá xô thơm)
-  - `--color-accent-sage-soft`: `#D1DEC7`
-- **Màu chữ (Typography Colors):**
-  - `--color-text-main`: `#4A4238` (Nâu xám đậm, êm mắt hơn đen tuyền)
-  - `--color-text-muted`: `#7D7468` (Nâu đất trung tính)
-  - `--color-text-light`: `#A49B8F` (Nâu nhạt phụ)
-  - `--color-text-on-accent`: `#FFFFFF`
-- **Đường viền (Borders):**
-  - `--color-border-card`: `#F2E3DF`
-  - `--color-border-subtle`: `rgba(242, 227, 223, 0.7)`
+**Nền:** `--color-bg-base #FAF7F2`, ivory `#FFFDF9`, card `#FFF`, glass `rgba(255,255,255,0.88)`.
 
-### 6.2. Typography
-- **Font có chân (Serif Heading):** `'Cormorant Garamond', Georgia, serif` (Sử dụng cho Tiêu đề Hero, tên chặng, tiêu đề thư, số đếm).
-- **Font không chân (Sans Body):** `'Plus Jakarta Sans', system-ui, -apple-system, sans-serif` (Sử dụng cho nội dung lời chúc, nhãn nút, form nhập liệu).
+**Accent:** primary `#D48C94`, soft `#E8B4B8`, hover `#C57780`, sage `#9CAF88`, sage-soft `#D1DEC7`.
 
-### 6.3. Bo góc & Độ sâu (Radius & Elevation)
-- **Bo góc (Border Radius):**
-  - `--radius-sm`: `8px` (Nút bấm nhỏ, badge, input)
-  - `--radius-md`: `14px` (Thẻ lời chúc `MessageCard`)
-  - `--radius-lg`: `20px` (Khung Modal, Card lớn)
-  - `--radius-full`: `9999px` (Thanh điều hướng bo tròn, nút tròn)
-- **Đổ bóng (Shadows):**
-  - Thẻ lời chúc: `box-shadow: 0 4px 16px rgba(184, 154, 142, 0.1), 0 1px 2px rgba(255, 255, 255, 0.6) inset`
-  - Nút chính: `box-shadow: 0 6px 18px rgba(212, 140, 148, 0.35)`
-  - Modal: `box-shadow: 0 24px 60px rgba(74, 66, 56, 0.22), 0 4px 12px rgba(74, 66, 56, 0.08)`
+**Chữ:** main `#4A4238`, muted `#7D7468`, light `#A49B8F`, on-accent `#FFF`.
 
-### 6.4. Breakpoints & Viewport Constraints
-- Desktop Rộng: `>= 980px` (Hiển thị 12 slot trôi nổi 2 cánh).
-- Tablet Trung gian: `861px - 979px` (Hiển thị 8 slot trôi nổi).
-- Tablet Nhỏ: `541px - 860px` (Chuyển sang CSS Grid nhiều cột).
-- Mobile & Phablet: `<= 540px` (Khóa cứng container `max-width: 400px; margin: 0 auto;` ngăn hiện tượng phình ngang).
+**Viền:** `#F2E3DF`.
+
+**Radius:** sm 8 / md 14 / lg 20 / full 9999.
+
+**Shadow:** card ấm nâu-hồng; button `0 6px 18px rgba(212,140,148,0.35)`; modal `0 24px 60px rgba(74,66,56,0.22)`.
+
+**Motion easing:** `--transition-fast 180ms`, normal 280ms, slow 450ms — cubic-bezier(0.16, 1, 0.3, 1).
+
+**z:** background 0, field 10, header 20, action 30, modal 90/100. Journey **vượt tokens**: 120.
+
+### 6.2 Palette hành trình (`JourneyShell.css :root`)
+
+Không import tokens màu vườn cho scene. Dùng:
+
+| Token | Hex | Vai trò |
+| :--- | :--- | :--- |
+| `--journey-sky-top` | `#BCCCE0` | trời |
+| `--journey-sky-peach` | `#F5DFD3` | đào |
+| `--journey-sky-apricot` | `#F7D8B5` | mơ |
+| `--journey-sunburst-glow` | `#FFF6E0` | nắng |
+| `--journey-sky-sage` | `#C7BEAC` | rêu khô |
+| `--journey-text-title` | `#7E8F9F` | tiêu đề / CTA primary |
+| `--journey-text-body` | `#6B6D70` | thân |
+| `--journey-text-muted` | `#8C8C8C` | phụ |
+| `--journey-card-bg` | `rgba(250,247,242,0.88)` | kính kem |
+
+CTA primary hành trình: gradient `#7E8F9F → #687989`, chữ `#FAF7F2` — **không** dùng hồng đất `#D48C94`.
+
+Cấm `#000000` trong journey.
+
+### 6.3 Typography
+
+- Serif: `'Cormorant Garamond'` 500/600/700 + italic 400 — hero, scene title, journal num, letter.
+- Sans: `'Plus Jakarta Sans'` 400–700 — body, nút, form.
+- Load: Google Fonts trong `index.html`.
+
+### 6.4 Breakpoints
+
+| Width | Vườn | Hành trình |
+| :--- | :--- | :--- |
+| ≥ 980 | 12 slot V | content `translateX(4%)` trừ welcome |
+| 861–979 | 8 slot | — |
+| 541–860 | grid, app cuộn | — |
+| ≤ 540 | 1 cột, hero max 400px, dock padding đáy an toàn | ẩn spacer topbar |
+
+`prefers-reduced-motion: reduce` — global + ambience + floating: tắt animation.
 
 ---
 
 ## 7. Motion & Interaction Inventory
 
-| Phần tử / Component | Trigger | Hiệu ứng thị giác | Cơ chế kỹ thuật | Trạng thái xác minh | Ghi chú |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| Thẻ lời chúc trôi nổi | Tự động (Mount) | Dao động bồng bềnh nhẹ 3 chiều (`float-subtle-1, 2, 3`) | CSS `@keyframes` translate3d + rotate | `[VERIFIED]` | 3 chu kỳ khác nhau (6.2s, 6.8s, 7.6s) so le tự nhiên |
-| Thẻ lời chúc khi Hover | Mouse enter / Focus | Tạm dừng animation bồng bềnh, phóng to 1.02, đổ bóng hồng | CSS `:hover, :focus-within` | `[VERIFIED]` | Giúp người dùng đọc chữ không bị rung rinh |
-| Xoay vòng Carousel 12 thẻ | Tự động mỗi 18s | Tráo đổi các thẻ chưa ghim, mờ dần rồi hiện rõ | React `setInterval` + CSS `fieldFadeIn` | `[VERIFIED]` | Tự động dừng khi hover vào khu vực lời chúc |
-| Nút bấm tương tác chính | Hover / Active | Nâng nhẹ translateY(-2px), đổ bóng đậm hơn | CSS `transition: all 0.2s ease` | `[VERIFIED]` | Phản hồi xúc giác tốt |
-| Chuyển cảnh Hành trình | Click "Tiếp tục" / "Quay lại" | Nội dung chặng mới lướt nhẹ từ dưới lên và mờ dần | CSS `sceneSlideIn` (0.45s cubic-bezier) | `[VERIFIED]` | Chuyển cảnh êm, không giật cục |
-| Hoa bung nở (Chặng 2) | Click từng bông hoa | Khung thông điệp mở ra mềm mại bên dưới | React state + CSS `accordionReveal` | `[VERIFIED]` | Có hỗ trợ `aria-expanded` |
-| P.S. Note & Easter Egg | Click nút ẩn | Bung thông điệp bí mật với viền màu nổi bật | React conditional rendering + FadeIn | `[VERIFIED]` | Phần thưởng khám phá tùy chọn |
-| Hỗ trợ Giảm chuyển động | Cài đặt OS | Tắt toàn bộ animation trôi nổi, đưa về grid tĩnh | `@media (prefers-reduced-motion: reduce)` | `[VERIFIED]` | Chuẩn tiếp cận Accessibility |
+| Phần tử | Trigger | Hiệu ứng | Kỹ thuật |
+| :--- | :--- | :--- | :--- |
+| Book aura | mount | thở opacity 0.65–1, scale 0.95–1.08 | `bookAuraPulse` 7s |
+| Stardust ×7 | mount | bay lên từ gáy sách | `stardustRise` 8s |
+| 24 falling | mount | petal/star/heart/flower/sparkle 3D | `fallSway*` / `fallStarTwinkle` / `fallHeartFloat` 11–13.8s |
+| Seed bloom | gửi success | vòng hào quang nở 2.8s | `seedBloom` |
+| MessageCard float | mount desktop | translate3d ±2–9px, rotate ±0.3° | `float-subtle-1/2/3` 6.2–8s |
+| Card hover | hover/focus | pause float, scale 1.02 | CSS |
+| Carousel | 18s / nút | fade canvas | `fieldFadeIn` |
+| Loading pill | loading | thở + hoa xoay | `loadingPillBreath`, `spinFlowerSlow` |
+| Modal | open | fade + scale up | `modal-fade-in`, `modal-scale-up` |
+| Passcode burst | success path | hạt | `burstParticle` |
+| Journey enter | unlock | fade scale | `journey-appear` 420ms |
+| Chapter change | next/back | blur-in + light sweep | `chapterEntrance`, `sceneLightSweep` |
+| Congchao | chặng 1 | Ken Burns nhẹ | `heroImgBreathe` 14s |
+| Gate sparkles | chặng 1 | ✦ bay xoay | `floatArchSpeck` |
+| Crystal text | chặng 1 | stagger slide up | `slideUpFade` |
+| Sunbeams / sunburst / particles | shell | pulse + float | 10s / 8s / 8–13s |
+| Flower cards | chặng 2 | float 6s, burst 8 sparkles | `cardFloat`, `flSparkleBurst` |
+| Reveal | chọn hoa | pop + halo breathe + art float | `flowerRevealPop`, `haloBreathe`, `subtleArtFloat` |
+| Egg | chặng 2 | pulse / bounce | `eggPulse`, `eggBounce` |
+| Journal | hover | 3D tilt | transform preserve-3d |
+| P.S. | toggle | lật giấy | `psPaperFlip` |
+| Apprec | hover | nảy + inset glow | `::after` |
+| Letter paras | mount | stagger blur fade | `paragraphStaggerFade` |
+| Wax seal | mount | nhịp | `waxSealPulse` 3s |
+| Admin lock | hover | scale 1.1, opacity 1 | CSS |
+| Primary garden CTA | hover | -2px, sparkle rotate | CSS |
+
+Không có Web Audio. Không có canvas particle — toàn CSS/SVG/DOM.
 
 ---
 
 ## 8. Feature & State Inventory
 
-### Kiểm kê Trạng thái Tính năng
+### Garden (`GardenPage`)
 
-1. **Vườn Lời Chúc (Garden):**
-   - `Initial (Empty)`: `[VERIFIED]` Hiển thị Empty State khung kem ấm với lời mời gieo hạt mầm.
-   - `Active (<= 12 thẻ)`: `[VERIFIED]` Hiển thị tĩnh các thẻ lời chúc trên 12 vị trí cánh.
-   - `Active (> 12 thẻ)`: `[VERIFIED]` Kích hoạt bộ xoay vòng tự động 18 giây kèm thanh điều khiển.
-   - `Hovering`: `[VERIFIED]` Tạm dừng xoay vòng và tạm dừng float animation trên thẻ được trỏ chuột.
+- `messages`, `isLoading`, `isDevDemoActive`, `isSeedFlaring`
+- `selectedMessage` + `isDetailOpen`
+- `isSendDialogOpen`, `isPasscodeOpen`
+- `journeyData: PrivateJourneyData | null` — truthy ⇒ mount JourneyShell
+- `activeTriggerEl` — trả focus a11y
+- Sort: pinned trước, rồi `createdAt` mới → cũ
+- Realtime INSERT/UPDATE/DELETE + 3 broadcast admin; **bỏ qua** khi demo local bật
 
-2. **Gửi một lời chúc (SendMessageDialog):**
-   - `State: idle`: `[VERIFIED]` Form soạn thảo với bộ đếm ký tự.
-   - `State: preview`: `[VERIFIED]` Thẻ mô phỏng trước khi gửi.
-   - `State: submitting`: `[VERIFIED]` Khóa form và hiện icon loading.
-   - `State: success`: `[VERIFIED]` Đã xác nhận nạp thẻ ngay vào state trước khi đóng modal.
-   - `State: error`: `[VERIFIED]` Hiển thị thông điệp lỗi và nút thử lại (giữ `idempotencyKey`).
-   - `State: uncertain`: `[VERIFIED]` Kích hoạt khi gặp timeout mạng.
+### Send dialog
 
-3. **Phong Bì Riêng (PasscodeDialog):**
-   - `Normal`: `[VERIFIED]` Form nhập mật mã.
-   - `Verifying`: `[VERIFIED]` Đang gửi POST `/api/unlock-journey` (delay 600ms mô phỏng bảo mật).
-   - `Incorrect Passcode`: `[VERIFIED]` Hiện thông báo hoa tulip nhắc kiểm tra tin nhắn.
-   - `Locked (Rate-limited)`: `[VERIFIED]` Nhập sai 5 lần liên tiếp sẽ khóa nút thử trong 30 giây kèm bộ đếm ngược.
+`idle → preview → submitting → success | error | uncertain`
 
-4. **Trang Quản Trị Viên (AdminPage):**
-   - `Unauthenticated`: `[VERIFIED]` Hiển thị form đăng nhập mật khẩu admin.
-   - `Authenticated`: `[VERIFIED]` Bảng điều khiển quản trị, thanh thống kê thời gian thực.
-   - `Filtering`: `[VERIFIED]` Lọc tức thì theo Tất cả, Đang hiển thị, Đã ghim, Đã ẩn hoặc tìm kiếm.
-   - `Mutating`: `[VERIFIED]` Đổi trạng thái Ghim/Ẩn hoặc Xóa cập nhật ngay trên giao diện.
+Validate: content trim 3–300, name 40, ẩn danh bỏ tên. Idempotency UUID; regenerate khi user sửa draft; giữ khi retry.
+
+### Passcode
+
+`normal / verifying / unlocking / error / locked`
+
+Delay UX ~600ms khi verify (trong dialog). Client lock đồng bộ từ 429.
+
+### Journey
+
+`currentChapter: 1..5`. Không persist (thoát = mất vị trí). Easter egg / P.S. / hoa active là local scene state.
+
+### Admin
+
+`token | null`, filter `all|visible|pinned|hidden`, `searchQuery`, `actionLoadingId`.
+
+### Message model
+
+```ts
+PublicMessage {
+  id, content, displayName: string | null,
+  isAnonymous, isHidden?, isPinned?, createdAt
+}
+```
+
+Ẩn danh hoặc tên trống → « Một người bạn ».
+
+### Journey model (shape, không copy chữ)
+
+`welcome { greeting, subtitle, message, invitation }`
+`flowers: FlowerItem[]` (id, title, subtitle, iconName, message, color)
+`easterEggFlower: FlowerItem`
+`journal: JournalItem[]` (id, order, title, content)
+`psNote { title, content }`
+`appreciations: AppreciationItem[]` (category, title, description, tag)
+`finalLetter { title, date, paragraphs[], signature }`
+
+`iconName`: `'rose' | 'lotus' | 'sunflower' | 'tulip' | 'clover'`.
 
 ---
 
 ## 9. Assets Inventory
 
-| Tên File Asset | Đường dẫn thực tế | Định dạng | Kích thước | Tình trạng sử dụng trong code | Mục đích & Đánh giá chất lượng |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| `nenpublic.jpg` | `./public/nenpublic.jpg` | JPEG | 20.9 KB | **Đang sử dụng thực tế** (trong `global.css`) | Nền chính của vườn hoa. Tranh minh họa cuốn sách ma thuật mở ra ở góc dưới với bươm bướm và đám mây phát sáng. |
-| `Congchao.jpg` | `./public/Congchao.jpg` | JPEG | 103 KB | *Chưa sử dụng trong source* | Tranh cổng chào hoa nở. Có thể dùng làm background cho Chặng 1 Hành trình riêng. |
-| `coimay.png` | `./public/coimay.png` | PNG | 38.2 KB | *Chưa sử dụng trong source* | Texture khói mây trang trí có nền trong suốt. Tiềm năng dùng làm visual layer bay lơ lửng. |
-| `hoa1.jpg` | `./public/hoa1.jpg` | JPEG | 43.2 KB | **Đang sử dụng thực tế** (trong `FlowerGardenScene.tsx`) | Tranh màu nước Đóa hoa Bình yên (Sen hồng thanh khiết). Khung tranh bo góc, vầng sáng pastel và thẻ chiêm ngưỡng lớn. |
-| `hoa2.jpg` | `./public/hoa2.jpg` | JPEG | 48.4 KB | **Đang sử dụng thực tế** (trong `FlowerGardenScene.tsx`) | Tranh màu nước Đóa hoa Niềm vui (Hướng dương vàng nắng kèm bụi sao lấp lánh). |
-| `hoa3.jpg` | `./public/hoa3.jpg` | JPEG | 42.6 KB | **Đang sử dụng thực tế** (trong `FlowerGardenScene.tsx`) | Tranh màu nước Đóa hoa Can đảm (Hoa chuông tuyết trắng ngần vươn lên từ sương mai). |
-| `hoa4.jpg` | `./public/hoa4.jpg` | JPEG | 97.7 KB | **Đang sử dụng thực tế** (trong `FlowerGardenScene.tsx`) | Tranh màu nước Đóa hoa Khởi đầu mới (Nhánh oải hương tím biếc thanh bình). |
-| Favicon Hoa Đào | Trong `<head>` `index.html` | SVG Inline | Data URI | **Đang sử dụng thực tế** | Icon emoji 🌸 sắc nét trên tab trình duyệt. |
-| Google Fonts | CDN Google Fonts | Woff2 | N/A | **Đang sử dụng thực tế** | `Cormorant Garamond` (Weights 500, 600, 700) & `Plus Jakarta Sans` (Weights 400, 500, 600, 700). |
+| File | Dùng ở | Ghi chú |
+| :--- | :--- | :--- |
+| `nenpublic.jpg` | `global.css`, OG image | Sách mở, bướm, mây — mask feather desktop |
+| `cad.jpeg` | `JourneyShell.css` | Nền watercolor sunset toàn hành trình |
+| `Congchao.jpg` | `JourneyScenes.css` Welcome | Cổng hoa, mask đỉnh |
+| `hoa1.jpg`–`hoa4.jpg` | `FlowerGardenScene.tsx` | Tranh màu nước 2×2 |
+| `coimay.png` | **chưa dùng** | Texture mây trong suốt |
+| Favicon SVG 🌸 | `index.html` | data URI |
+| Google Fonts | `index.html` | Cormorant + Jakarta |
+
+`PlaceholderModal.*` tồn tại nhưng không nằm trong cây render.
 
 ---
 
 ## 10. Technical Architecture
 
-### 10.1. Sơ đồ Tầng Dữ Liệu & Backend
+### 10.1 API
+
 ```
-[Client Browser]
-       │
-       ├── GET  /api/public-messages  ────────> [api/public-messages.ts]
-       ├── POST /api/public-messages  ────────> (Hybrid Mode: Supabase DB hoặc In-Memory)
-       │
-       ├── POST /api/unlock-journey   ────────> [api/unlock-journey.ts]
-       │                                        └── Trả về [api/_privateData.ts] khi đúng passcode
-       │
-       └── GET/PATCH/DELETE /api/admin ───────> [api/admin.ts] (Xác thực Bearer Token)
+GET  /api/public-messages     → list visible, pin-first, limit 100
+POST /api/public-messages     → create { content, displayName, isAnonymous, idempotencyKey }
+POST /api/unlock-journey      → { passcode } → { success, data: PrivateJourneyData }
+GET  /api/admin?action=messages
+POST /api/admin               login
+PATCH/DELETE /api/admin       pin/hide/delete + Bearer token
 ```
 
-### 10.2. Bảo mật Dữ liệu Riêng Tư (Confidentiality)
-- Tệp `api/_privateData.ts` mang tiền tố gạch dưới `_`, đảm bảo Vercel không bao giờ biến tệp này thành route truy cập trực tiếp.
-- Thư mục `src/` (Frontend) đã được cách ly sạch sẽ 100%, không import bất kỳ dòng nào từ `_privateData.ts`. Quá trình build `dist/assets/*.js` hoàn toàn sạch bóng nội dung lá thư bí mật.
+Dev: `vite.config.ts` middleware parse JSON body và gọi thẳng handler.
 
-### 10.3. Cơ chế Kháng lỗi Mất mạng (Resilience & Hybrid Fallback)
-- Mọi hàm gọi mạng trong `messageApi.ts` và `privateJourneyApi.ts` đều bọc `AbortController` với thời gian chờ 8–10 giây.
-- Backend tự kiểm tra biến môi trường `SUPABASE_URL` và key: nếu phát hiện chưa có database hoặc database mất kết nối, hệ thống tự động fallback về bộ nhớ RAM (In-Memory) mà không bao giờ quăng lỗi làm sập ứng dụng.
+Production: `vercel.json` rewrite `/api/(.*)` rồi SPA.
+
+### 10.2 Hybrid DB
+
+`getSupabaseClient()` dùng `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` hoặc `SUPABASE_ANON_KEY`. Thiếu / lỗi → `inMemoryMessages` + `inMemoryIdempotencyStore`. App không crash.
+
+Bảng `public_messages`: uuid, content 3–300, display_name ≤ 40, flags, unique `idempotency_key`, RLS SELECT/INSERT/UPDATE/DELETE (policy rộng — **bảo vệ thật nằm ở service role trên API admin**, không phải RLS chặt). Realtime publication bật trong `schema.sql`.
+
+Frontend `supabase` client: `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` (có fallback trong `supabaseClient.ts`).
+
+### 10.3 Bảo mật hành trình
+
+- `api/_privateData.ts` prefix `_` → Vercel không tạo HTTP route.
+- `src/` không import `_privateData`.
+- Passcode so khớp server, lowercase trim.
+- Rate limit **in-memory theo IP** (reset khi cold start serverless — hạn chế đã biết).
+- Client timeout 8s GET list, 10s POST/unlock.
+
+### 10.4 Env (`.env.example`)
+
+```
+SUPABASE_URL, SUPABASE_ANON_KEY, VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY
+SUPABASE_SERVICE_ROLE_KEY
+PRIVATE_JOURNEY_PASSCODE
+ADMIN_PASSWORD
+```
+
+Không commit `.env`.
+
+### 10.5 A11y (đã làm)
+
+- `lang="vi"`
+- Focus visible 2px accent
+- Modal: ESC, focus trap, restore trigger, `body-locked`
+- `aria-expanded` hoa, `aria-live` reveal/egg/P.S.
+- `prefers-reduced-motion`
+- Admin lock `aria-label`
 
 ---
 
 ## 11. Quality Audit
 
-### 11.1. Visual Hierarchy & Composition
-- **Điểm sáng:** Tiêu đề Hero thanh thoát, tôn trọng tranh nền. Cuốn sách phát sáng ở trung tâm không bị bất kỳ thẻ nào che khuất trên màn hình Desktop rộng. Thẻ rỗng và thanh điều khiển dưới chân nhẹ nhàng, không gây cảm giác đè nặng lên cuốn sách.
-- **Hòa trộn không gian:** Mép tranh `nenpublic.jpg` được làm mềm tuyệt đối bằng mask gradient, không còn ranh giới chữ nhật.
+**Điểm mạnh**
 
-### 11.2. Typography & Readability
-- **Điểm sáng:** Sự phối hợp giữa `Cormorant Garamond` (chân chữ mềm mại, đậm chất thơ) và `Plus Jakarta Sans` (rõ ràng, dễ đọc) mang lại cảm giác dễ chịu. Màu chữ nâu xám `#4A4238` ấm cúng hơn màu đen `#000`.
+- Phân tầng vườn rõ: sách trung tâm không bị 12 thẻ che trên desktop.
+- Hai thế giới màu (hồng-kem vs hoàng hôn slate) tách bạch sau khi gắn `cad.jpeg`.
+- Motion chậm, so le, có nhánh reduced-motion.
+- Optimistic UX: cache session, seed bloom, realtime không F5.
 
-### 11.3. Motion Quality
-- **Điểm sáng:** Chuyển động bồng bềnh `float-subtle` không gây chóng mặt. Hệ thống 24 hạt rơi (cánh hoa, ngôi sao, trái tim) chuyển động 3D lượn sóng tự nhiên, thời gian rơi kéo dài 11s–13.5s tạo cảm giác êm ả như một thước phim lãng mạn.
+**Rủi ro thiết kế/kỹ thuật**
+
+- Slot tọa độ cứng (px) — màn siêu rộng / siêu thấp có thể lệch.
+- Frosted overlay hành trình: `backdrop-filter` vs `-webkit-backdrop-filter` **không cùng số blur** (5px vs 20px) — Safari/Chrome khác nhau.
+- `background-attachment: fixed` trên `.journey-bg-cad` có thể giật iOS.
+- RLS UPDATE/DELETE `USING (true)` — dựa vào việc client không gọi thẳng Supabase mutate (admin đi qua API + service role). Đừng đưa service role ra frontend.
 
 ---
 
 ## 12. Known Issues & Missing Pieces
 
-| Phân loại | Mô tả chi tiết | Vị trí code | Mức độ ảnh hưởng | Trạng thái hiện tại |
-| :--- | :--- | :--- | :--- | :--- |
-| **Tranh hoa nghệ thuật** | 4 tranh hoa (`hoa1.jpg`–`hoa4.jpg`) đã được đưa vào Chặng 2 Hành trình riêng | `./src/components/journey/scenes/FlowerGardenScene.tsx` | Visual cao | **[ĐÃ HOÀN THÀNH]** |
-| **Hiệu ứng hạt rơi & hào quang** | 24 hạt cánh hoa, ngôi sao, trái tim rơi tone Hồng-Vàng + Hào quang sách thở 7s | `./src/components/GardenAmbience.tsx` | Visual cao | **[ĐÃ HOÀN THÀNH]** |
-| **Mép tranh nền** | Xóa bỏ ranh giới chữ nhật, hòa trộn tranh vào pastel nền | `./src/styles/global.css` | Visual cao | **[ĐÃ HOÀN THÀNH]** |
-| **Bố cục thẻ rỗng** | Nâng cao thẻ rỗng, mở chế độ xem trước 12 vị trí cánh hoa | `./src/components/FloatingMessageField.tsx` | UX cao | **[ĐÃ HOÀN THÀNH]** |
-| **Âm thanh** | Chưa có tùy chọn bật nhạc nền du dương (Background Music) | Toàn trang web | Trải nghiệm cảm xúc | *Cơ hội mở rộng tùy chọn* |
+| Mục | Chi tiết | Ảnh hưởng |
+| :--- | :--- | :--- |
+| `coimay.png` | Chưa mount | visual tùy chọn |
+| BGM/SFX | Không có | cảm xúc |
+| PlaceholderModal | Dead code | dọn được |
+| Passcode fallback kép | env + `'2010'` + `'tu-do'` | nhớ khi đổi mật mã |
+| Rate limit serverless | Map RAM theo instance | không chặt như Redis |
+| Phablet dock | padding đáy đã có media 540px — vẫn canh safe-area nếu cần | UX điện thoại |
+| Hardcoded supabase fallback | `supabaseClient.ts` | nên env-first |
+
+Các hạng mục « thiếu tranh hoa / thiếu hạt rơi / mép tranh chữ nhật » **đã xong** — đừng làm lại từ zero.
 
 ---
 
 ## 13. Recommended Improvement Opportunities
 
-### A. Đã hoàn thành xuất sắc trong các đợt nâng cấp:
-1. **Hòa trộn không gian:** Mặt tranh trung tâm tan mịn vào nền gradient pastel.
-2. **Cuốn sách sống động:** Ánh sáng hào quang thở 7 giây, 7 hạt bụi sao bốc lên từ gáy sách và vòng sóng hạt mầm (`seedBloom`) nở bừng khi gửi lời chúc thành công.
-3. **Cơn mưa lung linh Hồng & Vàng:** 24 cánh hoa đào, cánh hoa cúc, ngôi sao vàng, trái tim pastel và hoa mini 5 cánh rơi nhẹ nhàng khắp không gian.
-4. **Phòng tranh nghệ thuật Chặng 2:** Tích hợp trọn vẹn 4 bức tranh màu nước với hiệu ứng zoom và thẻ chiêm ngưỡng lớn.
+Chỉ làm khi được yêu cầu, theo thứ tự gợi ý:
 
-### B. Cơ hội nâng cấp tùy chọn cho tương lai (Nếu người dùng yêu cầu):
-1. **Âm thanh nền (BGM):** Tích hợp nút bật/tắt nhạc nền acoustic piano hoặc lofi guitar nhẹ nhàng ở góc trên màn hình.
-2. **Hiệu ứng âm thanh xúc giác:** Bổ sung tiếng lật trang giấy khẽ khàng khi chuyển qua lại giữa 5 chặng Hành trình riêng.
+1. Gắn `coimay.png` lớp parallax rất mờ trên vườn hoặc journey — không che chữ.
+2. Nút mute BGM góc vườn (piano/lofi), mặc định off, nhớ `localStorage`.
+3. SFX lật trang khi đổi chặng (cùng mute).
+4. Thống nhất blur overlay journey.
+5. `env(safe-area-inset-bottom)` cho dock + journey footer.
+6. Xóa `PlaceholderModal` nếu không cần.
+7. Đưa supabase URL/key fallback ra env, bỏ hardcode.
+
+**Không** tự ý:
+
+- Đổi state machine 6 bước.
+- Khóa nút « Tiếp tục » theo việc đã chọn hoa.
+- Import `_privateData` vào `src/`.
+- Thay 12-slot V bằng masonry che sách.
+- Đổi CTA hành trình sang hồng đất (phá palette sunset).
 
 ---
 
 ## 14. Verification Matrix
 
-| Hạng mục kiểm tra | Phương pháp | Kết quả thực tế | Bằng chứng kiểm tra | Giới hạn |
-| :--- | :--- | :--- | :--- | :--- |
-| **Build Production** | Terminal `npm run build` | `PASS` (0 lỗi, 3.35s) | `dist/assets/index-*.js`, `dist/index.html` | Không |
-| **Audit Bảo mật Bundle** | Ripgrep search từ khóa nhạy cảm | `PASS` (0 kết quả) | `dist/` hoàn toàn sạch nội dung thư riêng | Không |
-| **Desktop Layout (1440x900)** | Browser subagent | `PASS` (12 vị trí cánh cân đối) | Bố cục chữ V để hở sách trung tâm | Đã test trên Chrome DevTools |
-| **Mobile Layout (390x844)** | Browser subagent | `PASS` (1 cột thẻ, container 400px) | Không bị phình bè ngang trên iPhone & Galaxy | Đã test trên Chrome DevTools |
-| **Gửi Lời Chúc (6 States)** | Browser interaction | `PASS` | Đã test submit lời chúc thật và xác nhận | Không |
-| **Mở Khóa Passcode** | Browser interaction | `PASS` | Đã test sai mã (tulip warning) và đúng mã (vào Chặng 1) | Không |
-| **Admin Dashboard** | Browser interaction | `PASS` | Đăng nhập `admin2010`, test Ghim, Ẩn và cuộn trang | Không |
-| **Supabase Realtime Engine** | WebSocket `postgres_changes` | `PASS` | Tự động đồng bộ Xóa/Ghim/Ẩn/Thêm mới không cần F5 trong ~100ms | Đã cấu hình trên `GardenPage` và `AdminPage` |
+| Hạng mục | Cách | Kỳ vọng |
+| :--- | :--- | :--- |
+| Build | `npm run build` | tsc + vite, 0 error |
+| Bundle leak | search `dist/` chuỗi thư riêng | 0 hit |
+| Empty garden | xóa cache + 0 message | empty card không che sách |
+| Demo 12 | nút xem thử | 12 slot, không ghi DB |
+| Carousel | >12 tin | 18s, pause hover |
+| Send 6 states | form | preview, success, seed bloom |
+| Passcode sai/đúng | dialog | tulip / vào chặng 1 cổng hoa |
+| Journey nav | 1→5 | nhãn cửa chặng 1; chặng 5 không có Tiếp tục shell |
+| Flower art | chặng 2 | 4 jpg + burst + reveal |
+| Admin | `/admin` | KPI, pin/hide/delete, cuộn được |
+| Realtime | 2 tab garden+admin | ẩn/xóa biến mất ~ngay |
+| Reduced motion | OS setting | hạt/float dừng |
+| Mobile 390 | DevTools | 1 cột, không overflow-x |
 
 ---
 
 ## 15. Handoff Guide for the Next AI
 
-### Lời nhắn gửi AI tiếp quản tiếp theo:
-> Chào bạn! Bạn đang tiếp quản một sản phẩm web 20/10 đã hoàn thiện đầy đủ về mặt khung logic, kiến trúc backend và tính năng nghiệp vụ. Nhiệm vụ của bạn là **đóng vai trò Lead Product Designer & Creative Frontend Developer** để thẩm định và nâng cấp website này đạt đến độ tinh tế, thẩm mỹ và lay động cảm xúc cao nhất.
+Bạn đang tiếp quản website 20/10 **đã đủ logic + backend + hành trình 5 chặng có artwork**. Nhiệm vụ mặc định là **Lead Product Designer / Creative Frontend**: tinh chỉnh cảm xúc, không đập nền tảng.
 
-### Nguyên tắc hành động:
-1. **Đọc tệp này (`PROJECT_CONTEXT.md`) trước tiên:** Mọi thông số màu sắc, CSS variables và luồng dữ liệu đều đã được kiểm kê chi tiết ở các mục trên.
-2. **Không phá vỡ logic sẵn có:**
-   - Giữ nguyên cấu trúc API `/api/*` và tầng service `messageApi.ts`, `privateJourneyApi.ts`.
-   - Giữ nguyên tính độc lập bảo mật của `api/_privateData.ts`.
-   - Giữ nguyên cơ chế mở sẵn nút "Tiếp tục →" trong Hành trình riêng.
-3. **Tập trung vào giá trị gia tăng thị giác (Visual & Emotional Delight):**
-   - Đưa các asset tranh hoa đẹp đang nằm chờ trong `public/` vào Chặng 2.
-   - Bổ sung hiệu ứng hạt sáng hoặc cánh hoa rơi bay bổng.
-   - Làm cho chuyển động mở phong bì và lật mở trang thư trở nên kỳ diệu hơn.
-4. **Không refactor ồ ạt:** Hãy đề xuất kế hoạch nâng cấp theo từng giai đoạn rõ ràng trước khi tiến hành code.
+### Giữ nguyên
+
+- Hợp đồng `/api/public-messages`, `/api/unlock-journey`, `/api/admin`
+- `src/services/*` timeout + error mapping
+- `_privateData.ts` chỉ server
+- Nút tiến hành trình luôn sẵn
+- 12-slot cánh + khe sách
+- Hai palette: Garden tokens vs Journey sunset tokens
+
+### Copywriting riêng tư
+
+Nội dung chào, hoa, journal, P.S., appreciation, thư nằm trong `api/_privateData.ts`. Sửa chữ thì sửa file đó. **Không** nhúng vào component. **Không** dán nguyên văn vào README/PR.
+
+### Checklist trước khi kết luận một thay đổi UI
+
+1. Desktop 1440: sách còn thấy rõ?
+2. Mobile 390: dock không đè nội dung, không phình ngang?
+3. Empty + 12 demo + >12 carousel?
+4. Gửi lời chúc còn seed bloom?
+5. Unlock → chặng 1 còn Congchao + crystal card?
+6. Chặng 2 còn 4 tranh + easter egg?
+7. `prefers-reduced-motion` chưa bị phá?
+8. `dist/` sau build vẫn sạch thư riêng?
+
+### Giọng điệu khi thêm UI copy
+
+Nhẹ, cụ thể, không sến, không quá nhiều emoji. Vườn: « cậu » trung tính. Hành trình: thân mật đã có sẵn từ data server.
 
 ---
 
-### Prompt gợi ý để bắt đầu phiên làm việc tiếp theo:
-```markdown
-"Tôi đã đọc kỹ toàn bộ tệp PROJECT_CONTEXT.md. 
-Tôi đã hiểu kiến trúc sản phẩm, hệ thống design tokens, bố cục 12 slots trôi nổi, không gian Hành trình riêng 5 chặng và trang Admin.
-Bây giờ, tôi sẵn sàng đóng vai trò Lead Creative Designer để phân tích visual/motion hiện tại và đề xuất kế hoạch nâng cấp thẩm mỹ chi tiết theo từng mức độ ưu tiên (P0, P1, P2) trước khi chỉnh sửa code."
-```
+*Hết tài liệu bàn giao. Mọi mô tả UI/hiệu ứng ở trên khớp mã nguồn ngày 17/10/2026.*
