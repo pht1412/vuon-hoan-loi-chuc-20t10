@@ -2,7 +2,7 @@
 
 > **Mục đích:** Đây là nguồn sự thật duy nhất (single source of truth) để một AI khác hiểu **toàn bộ** giao diện, hiệu ứng, luồng người dùng, kiến trúc kỹ thuật và ranh giới không được phá. Đọc file này trước khi mở code.
 >
-> **Ngày cập nhật:** 18/10/2026 (tăng hạt sáng hành trình: chặng 1 lên 10 sao ✦ cỡ 3.2–4.8rem; chặng 2–5 lên 20 hạt vàng cỡ 14–24px; nội dung chặng 2–5 đã biên tập lần 5; còn F3 (câu chữ) và chặng 3 mục 2 chờ xác nhận).
+> **Ngày cập nhật:** 18/10/2026 (tách dữ liệu và hình hoa của vườn công khai khỏi chặng 2 riêng; bổ sung hiệu ứng tương tác và hỗ trợ reduced-motion cho sáu thư công khai. Nội dung bốn hoa riêng của Cad không thay đổi).
 > **Cách xác minh:** Đối chiếu trực tiếp mã nguồn hiện tại (không phải bản mô tả cũ). Các mục đánh `[VERIFIED]` khớp với code tại thời điểm này.
 
 ---
@@ -62,11 +62,11 @@
 
 ### Đã hoàn thiện [VERIFIED]
 
-1. Vườn công khai: empty state, loading, 12 slot chữ V trên desktop, 8 slot tablet, grid nhỏ hơn trên mobile.
+1. Vườn công khai: empty state, loading, 12 slot chữ V trên desktop, 8 slot tablet, grid nhỏ hơn trên mobile; modal khu vườn có sáu hoa và sáu thư phổ quát, dữ liệu độc lập với hành trình riêng.
 2. Carousel 18s khi > 12 lời chúc; pause khi hover; nút pause/play + chuyển thủ công.
 3. Gửi lời chúc: state machine 6 bước, chuẩn hóa `\n`, giới hạn 3–300 ký tự, tên ≤ 40, `idempotencyKey`.
 4. Passcode + rate limit 5 lần sai / khóa 30s (server IP + client lock).
-5. Hành trình 5 chặng: Welcome (ảnh cổng), 4 tranh hoa + easter egg, sổ tay + P.S., 4 thẻ trân trọng, lá thư cuối.
+5. Hành trình riêng 5 chặng: Welcome (ảnh cổng), 4 tranh hoa + easter egg, sổ tay + P.S., 4 thẻ trân trọng, lá thư cuối. Bốn hoa và nội dung riêng ở chặng 2 không dùng trong vườn công khai.
 6. Nền hành trình: `cad.jpeg` + kính mờ kem + tia nắng + hạt hoàng hôn.
 7. Admin dashboard + Realtime (postgres_changes + broadcast hide/pin/delete).
 8. Nội dung riêng tư chỉ nằm server-side `api/_privateData.ts` (file `_` không thành route). Frontend không import file này.
@@ -113,6 +113,7 @@
     │   ├── HeroSection.*
     │   ├── MessageCard.*
     │   ├── MessageDetailDialog.*
+    │   ├── PublicFlowerGarden.*     # Modal 6 hoa + thư công khai; không dùng dữ liệu journey
     │   ├── PlaceholderModal.*     # dead code
     │   ├── PrivateEnvelope.*
     │   ├── SendMessageDialog.*
@@ -126,6 +127,7 @@
     │           ├── JournalScene.tsx
     │           ├── AppreciationScene.tsx
     │           └── FinalLetterScene.tsx
+    ├── data/publicFlowerGarden.ts # 6 chủ đề/thư công khai, độc lập dữ liệu journey
     ├── data/publicMessages.ts     # [] production + 12 demo local
     ├── lib/supabaseClient.ts      # Realtime browser client
     ├── pages/GardenPage.tsx, AdminPage.*
@@ -248,6 +250,15 @@ Desktop `>= 861px`: vườn **không cuộn** (`height: 100dvh`). `<= 860px`: `.
 +------------------------------------------------------------------+
 ```
 
+### Modal — PublicFlowerGarden « Khu vườn dành cho bạn »
+
+- Sáu chủ đề công khai: Bình Yên, Can Đảm, Niềm Vui, Tự Hào, Dịu Dàng, Tự Do; mỗi hoa mở đúng thư trong `src/data/publicFlowerGarden.ts`.
+- Nội dung thư phổ quát, không lấy từ journey. Hình hoa là icon Lucide trên nền CSS theo màu riêng, không tham chiếu `hoa1.jpg`–`hoa4.jpg`.
+- Hover desktop nâng/scale nhẹ; nhấn hoa tạo hiệu ứng nở và vài hạt trang trí, sau khoảng 360ms thư hiện bằng fade + dịch lên. Chặn nhấn lặp để tránh nhiều lượt mở chồng nhau.
+- Dialog có tiêu đề, nội dung, nút đóng; Escape và nút đóng đều hoạt động, focus được đưa về hoa vừa chọn. Overlay có focus trap; nút hoa dùng ngữ nghĩa button, nhãn truy cập và hỗ trợ bàn phím/cảm ứng.
+- `prefers-reduced-motion` loại bỏ hiệu ứng trang trí và rút ngắn chuyển động mở thư; trên mobile grid chuyển một cột.
+- Bốn hoa riêng vẫn do `api/_privateData.ts` cấp qua luồng unlock; không import dữ liệu private vào frontend hay dùng làm nguồn cho khu vườn công khai.
+
 ---
 
 ### MÀN 2 — 12 thẻ chữ V
@@ -323,7 +334,7 @@ Stack:
 5. Main scroll.
 6. Bottombar kem 86% blur 14px.
 
-Vào shell: `journey-appear` 420ms fade+scale 0.985→1. Mỗi chapter: `chapterEntrance` 1s (blur 10px + translateY 24px) và `sceneLightSweep` 1.2s.
+Vào shell: `journey-appear` 420ms fade+scale 0.985→1. Chuyển chặng dùng View Transitions API khi trình duyệt hỗ trợ: cảnh cũ khép trong 480ms, cảnh mới hiện 850ms với opacity và dịch chuyển dọc nhẹ; fallback CSS `chapterEntrance` 850ms, kèm quầng sáng ấm thoáng qua. `prefers-reduced-motion` bỏ chuyển động chuyển chặng.
 
 ---
 
@@ -372,7 +383,7 @@ Grid 4 thẻ: tag pastel, title, description. Hover nảy + inset glow `::after`
 
 ### Chặng 5 — FinalLetterScene
 
-`.letter-parchment` giấy kem. Title chào. Mỗi đoạn class `letter-p-0…` `paragraphStaggerFade` (blur → rõ). Signoff: wax seal Mail `waxSealPulse` 3s + date + signature italic. Hai CTA: secondary « Đọc lại từ Chặng 1 », primary « Quay về Vườn lời chúc ».
+`.letter-parchment` giấy kem, xuất hiện trước trong 850ms; tiêu đề theo sau. Các đoạn `letter-p-0…` dùng `paragraphStaggerFade` 760ms, bắt đầu cách nhau 400ms và dịch lên nhẹ. Ngày/con dấu và chữ ký xuất hiện cuối (chữ ký bắt đầu ở 2960ms); con dấu không còn nhịp pulse lặp lại. `prefers-reduced-motion` hiển thị thư ngay. Hai CTA: secondary « Đọc lại từ Chặng 1 », primary « Quay về Vườn lời chúc ».
 
 ---
 
@@ -442,7 +453,7 @@ Cấm `#000000` trong journey.
 | 541–860 | grid, app cuộn | — |
 | ≤ 540 | 1 cột, hero max 400px, dock padding đáy an toàn | ẩn spacer topbar |
 
-`prefers-reduced-motion: reduce` — global + ambience + floating: tắt animation.
+`prefers-reduced-motion: reduce` — global + ambience + floating tắt/giảm animation; hiệu ứng mở thư công khai cũng gần như tức thời.
 
 ---
 
@@ -459,9 +470,11 @@ Cấm `#000000` trong journey.
 | Carousel | 18s / nút | fade canvas | `fieldFadeIn` |
 | Loading pill | loading | thở + hoa xoay | `loadingPillBreath`, `spinFlowerSlow` |
 | Modal | open | fade + scale up | `modal-fade-in`, `modal-scale-up` |
+| Hoa công khai | hover/focus | nâng nhẹ, scale 1.04, nghiêng icon | `PublicFlowerGarden.css` |
+| Mở thư công khai | click/tap/Enter | hoa nở + hạt nhỏ; thư fade-in và đi lên trong ~360–380ms | `public-flower-bloom`, `public-flower-seed`, `public-letter-reveal` |
 | Passcode burst | success path | hạt | `burstParticle` |
 | Journey enter | unlock | fade scale | `journey-appear` 420ms |
-| Chapter change | next/back | blur-in + light sweep | `chapterEntrance`, `sceneLightSweep` |
+| Chapter change | next/back/restart | view transition cũ 480ms + mới 850ms; fallback fade và dịch nhẹ | View Transitions API, `chapterEntrance`, `sceneLightBloom` |
 | Congchao | chặng 1 | Ken Burns nhẹ | `heroImgBreathe` 14s |
 | Gate sparkles | chặng 1 | 10 ✦ bay xoay 3.2s, cỡ 3.2–4.8rem | `floatArchSpeck` |
 | Sunset particles | chặng 2–5 shell | 20 hạt vàng 14–24px bay lên | `floatSunsetParticle`, `fireflyWander` |
@@ -473,8 +486,8 @@ Cấm `#000000` trong journey.
 | Journal | hover | 3D tilt | transform preserve-3d |
 | P.S. | toggle | lật giấy | `psPaperFlip` |
 | Apprec | hover | nảy + inset glow | `::after` |
-| Letter paras | mount | stagger blur fade | `paragraphStaggerFade` |
-| Wax seal | mount | nhịp | `waxSealPulse` 3s |
+| Final letter | mount | giấy trước; header/lời chào, 4 đoạn cách nhau 400ms, rồi signoff/chữ ký; tổng nhịp khoảng 3.6s | `letterPaperArrive`, `letterHeadingArrive`, `paragraphStaggerFade`, `letterSignoffArrive`, `letterSignatureArrive` |
+| Wax seal | mount | xuất hiện một lần cùng phần kết | `letterWaxSealArrive` 650ms |
 | Admin lock | hover | scale 1.1, opacity 1 | CSS |
 | Primary garden CTA | hover | -2px, sparkle rotate | CSS |
 
@@ -546,7 +559,8 @@ PublicMessage {
 | `nenpublic.jpg` | `global.css`, OG image | Sách mở, bướm, mây — mask feather desktop |
 | `cad.jpeg` | `JourneyShell.css` | Nền watercolor sunset toàn hành trình |
 | `Congchao.jpg` | `JourneyScenes.css` Welcome | Cổng hoa, mask đỉnh |
-| `hoa1.jpg`–`hoa4.jpg` | `FlowerGardenScene.tsx` | Tranh màu nước 2×2 |
+| `hoa1.jpg`–`hoa4.jpg` | `FlowerGardenScene.tsx` | Tranh màu nước 2×2, chỉ dùng trong chặng 2 riêng |
+| Icon Lucide + màu CSS | `PublicFlowerGarden.tsx` / `PublicFlowerGarden.css` | Hình hoa công khai; không dùng ảnh chặng 2 |
 | `coimay.png` | **chưa dùng** | Texture mây trong suốt |
 | Favicon SVG 🌸 | `index.html` | data URI |
 | Google Fonts | `index.html` | Cormorant + Jakarta |
@@ -604,7 +618,8 @@ Không commit `.env`.
 - `lang="vi"`
 - Focus visible 2px accent
 - Modal: ESC, focus trap, restore trigger, `body-locked`
-- `aria-expanded` hoa, `aria-live` reveal/egg/P.S.
+- Hoa công khai là button có nhãn truy cập; dialog có ESC, focus trap và trả focus về hoa đã chọn
+- `aria-expanded` hoa journey, `aria-live` reveal/egg/P.S.
 - `prefers-reduced-motion`
 - Admin lock `aria-label`
 
@@ -746,7 +761,7 @@ Chỉ ghi **nguyên tắc và tiến độ** — không chép nguyên văn nội
 
 Hoãn: chuyển cảnh và animation — giao diện hiện đã đủ chất thơ, không thêm hiệu ứng chỉ vì có thể thêm.
 
-**Lưu ý kỹ thuật:** chỉ nội dung chữ trong `api/_privateData.ts` thay đổi; interface `PrivateJourneyData` và hợp đồng `/api/unlock-journey` giữ nguyên. Với chặng 2, nhãn `title`/`subtitle` của hoa vẫn là chủ đề (Bình yên, Niềm vui, Can đảm, Khởi đầu mới); ảnh `hoa1–hoa4.jpg` map theo `id` nên không bị ảnh hưởng.
+**Ranh giới dữ liệu hoa (đã xác minh):** `src/data/publicFlowerGarden.ts` là nguồn độc lập của sáu hoa và thư công khai. `hoa1.jpg`–`hoa4.jpg` chỉ được map theo id trong `FlowerGardenScene.tsx` của journey; nội dung riêng vẫn ở `api/_privateData.ts` và chỉ được gửi qua API unlock. Không import hoặc sao chép dữ liệu riêng sang component/data public. Thay đổi hiệu ứng khu vườn công khai không chỉnh sửa nội dung hay logic hành trình riêng.
 
 ### Checklist trước khi kết luận một thay đổi UI
 
@@ -755,9 +770,10 @@ Hoãn: chuyển cảnh và animation — giao diện hiện đã đủ chất th
 3. Empty + 12 demo + >12 carousel?
 4. Gửi lời chúc còn seed bloom?
 5. Unlock → chặng 1 còn Congchao + crystal card?
-6. Chặng 2 còn 4 tranh + easter egg?
-7. `prefers-reduced-motion` chưa bị phá?
-8. `dist/` sau build vẫn sạch thư riêng?
+6. Khu vườn công khai có đủ sáu thư độc lập, mở đúng thư và không dùng ảnh/dữ liệu hoa chặng 2?
+7. Chặng 2 còn 4 tranh + easter egg, nội dung riêng không đổi?
+8. `prefers-reduced-motion` chưa bị phá?
+9. `dist/` sau build vẫn sạch thư riêng?
 
 ### Giọng điệu khi thêm UI copy
 

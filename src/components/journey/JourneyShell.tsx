@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { flushSync } from 'react-dom';
 import { PrivateJourneyData } from '../../types/journey';
 import { WelcomeScene } from './scenes/WelcomeScene';
 import { FlowerGardenScene } from './scenes/FlowerGardenScene';
@@ -96,16 +97,30 @@ export const JourneyShell: React.FC<JourneyShellProps> = ({ data, onExit, isMusi
 
   const handleNext = () => {
     if (currentChapter < 5) {
-      setCurrentChapter((prev) => prev + 1);
+      transitionToChapter(currentChapter + 1);
     }
   };
 
   const handleBack = () => {
     if (currentChapter > 1) {
-      setCurrentChapter((prev) => prev - 1);
+      transitionToChapter(currentChapter - 1);
     } else {
       onExit();
     }
+  };
+
+  const transitionToChapter = (chapter: number) => {
+    if (
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+      typeof document.startViewTransition !== 'function'
+    ) {
+      setCurrentChapter(chapter);
+      return;
+    }
+
+    document.startViewTransition(() => {
+      flushSync(() => setCurrentChapter(chapter));
+    });
   };
 
   return (
@@ -239,7 +254,7 @@ export const JourneyShell: React.FC<JourneyShellProps> = ({ data, onExit, isMusi
           {currentChapter === 5 && (
             <FinalLetterScene
               letter={data.finalLetter}
-              onRestart={() => setCurrentChapter(1)}
+              onRestart={() => transitionToChapter(1)}
               onReturnToGarden={onExit}
             />
           )}

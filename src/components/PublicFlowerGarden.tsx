@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { X, Flower2, Shield, Sun, Sparkles, Feather, Wind, ArrowLeft } from 'lucide-react';
+import { X, Flower2, ArrowLeft } from 'lucide-react';
 import { publicGardenFlowers, PublicGardenFlower } from '../data/publicFlowerGarden';
 import './PublicFlowerGarden.css';
 
@@ -9,23 +9,8 @@ interface PublicFlowerGardenProps {
   triggerElement: HTMLElement | null;
 }
 
-function FlowerFallbackIcon({ id, size = 22 }: { id: string; size?: number }) {
-  switch (id) {
-    case 'binh-yen':
-      return <Flower2 size={size} />;
-    case 'can-dam':
-      return <Shield size={size} />;
-    case 'niem-vui':
-      return <Sun size={size} />;
-    case 'tu-hao':
-      return <Sparkles size={size} />;
-    case 'diu-dang':
-      return <Feather size={size} />;
-    case 'tu-do':
-      return <Wind size={size} />;
-    default:
-      return <Flower2 size={size} />;
-  }
+function PublicFlowerIcon({ size = 26 }: { size?: number }) {
+  return <Flower2 size={size} aria-hidden="true" />;
 }
 
 export const PublicFlowerGarden: React.FC<PublicFlowerGardenProps> = ({
@@ -34,22 +19,59 @@ export const PublicFlowerGarden: React.FC<PublicFlowerGardenProps> = ({
   triggerElement,
 }) => {
   const [selectedFlower, setSelectedFlower] = useState<PublicGardenFlower | null>(null);
+  const [openingFlower, setOpeningFlower] = useState<PublicGardenFlower | null>(null);
   const selectedFlowerRef = useRef<PublicGardenFlower | null>(null);
+  const openingFlowerRef = useRef(false);
+  const openingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const returnFocusFlowerIdRef = useRef<string | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const letterCloseRef = useRef<HTMLButtonElement | null>(null);
 
   selectedFlowerRef.current = selectedFlower;
 
-  const closeLetter = () => setSelectedFlower(null);
+  const cancelOpening = () => {
+    if (openingTimerRef.current) {
+      clearTimeout(openingTimerRef.current);
+      openingTimerRef.current = null;
+    }
+    openingFlowerRef.current = false;
+    setOpeningFlower(null);
+  };
+
+  const handleSelectFlower = (flower: PublicGardenFlower) => {
+    if (openingFlowerRef.current || selectedFlowerRef.current) return;
+
+    openingFlowerRef.current = true;
+    setOpeningFlower(flower);
+    openingTimerRef.current = setTimeout(() => {
+      openingTimerRef.current = null;
+      openingFlowerRef.current = false;
+      selectedFlowerRef.current = flower;
+      setOpeningFlower(null);
+      setSelectedFlower(flower);
+    }, 360);
+  };
+
+  const closeLetter = () => {
+    if (selectedFlowerRef.current) {
+      returnFocusFlowerIdRef.current = `public-flower-${selectedFlowerRef.current.id}`;
+    }
+    selectedFlowerRef.current = null;
+    setSelectedFlower(null);
+  };
 
   const closeExperience = () => {
+    cancelOpening();
+    selectedFlowerRef.current = null;
     setSelectedFlower(null);
     onClose();
   };
 
   useEffect(() => {
     if (!isOpen) {
+      cancelOpening();
+      selectedFlowerRef.current = null;
       setSelectedFlower(null);
     }
   }, [isOpen]);
@@ -63,7 +85,9 @@ export const PublicFlowerGarden: React.FC<PublicFlowerGardenProps> = ({
       if (e.key === 'Escape') {
         e.preventDefault();
         if (selectedFlowerRef.current) {
-          setSelectedFlower(null);
+          closeLetter();
+        } else if (openingFlowerRef.current) {
+          cancelOpening();
         } else {
           onClose();
         }
@@ -109,6 +133,9 @@ export const PublicFlowerGarden: React.FC<PublicFlowerGardenProps> = ({
     const timer = setTimeout(() => {
       if (selectedFlower) {
         letterCloseRef.current?.focus();
+      } else if (returnFocusFlowerIdRef.current) {
+        document.getElementById(returnFocusFlowerIdRef.current)?.focus();
+        returnFocusFlowerIdRef.current = null;
       } else {
         closeButtonRef.current?.focus();
       }
@@ -176,20 +203,19 @@ export const PublicFlowerGarden: React.FC<PublicFlowerGardenProps> = ({
                   <li key={flower.id}>
                     <button
                       type="button"
-                      className="public-garden-flower-btn"
+                      className={`public-garden-flower-btn ${
+                        openingFlower?.id === flower.id ? 'is-opening' : ''
+                      }`}
                       id={`public-flower-${flower.id}`}
-                      onClick={() => setSelectedFlower(flower)}
+                      onClick={() => handleSelectFlower(flower)}
                       aria-label={`Chọn hoa ${flower.name}: ${flower.meaning}`}
+                      aria-disabled={Boolean(openingFlower)}
                       style={{ '--flower-accent': flower.accent } as React.CSSProperties}
                     >
                       <span className="public-garden-flower-art" aria-hidden="true">
-                        {flower.imageSrc ? (
-                          <img src={flower.imageSrc} alt="" className="public-garden-flower-img" />
-                        ) : (
-                          <span className="public-garden-flower-icon">
-                            <FlowerFallbackIcon id={flower.id} size={26} />
-                          </span>
-                        )}
+                        <span className="public-garden-flower-icon">
+                          <PublicFlowerIcon />
+                        </span>
                       </span>
                       <span className="public-garden-flower-copy">
                         <span className="public-garden-flower-name">{flower.name}</span>

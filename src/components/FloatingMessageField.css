@@ -390,6 +390,20 @@
   .slot-10, .slot-11 { display: none; }
 }
 
+/* Keep floating slots inside the flex space above the action area. If that
+   space is shorter than the canvas, scroll the field rather than clipping cards. */
+@media (min-width: 861px) {
+  .floating-field-container {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .floating-canvas {
+    height: auto;
+    flex: 1 0 440px;
+  }
+}
+
 /* Subtle Floating Keyframes */
 @keyframes float-subtle-1 {
   0% { transform: translate3d(0, 0, 0) rotate(0deg); }
@@ -478,66 +492,10 @@
   }
 }
 
-/* Reduced Motion Mode */
+/* Reduced motion stops floating without changing the desktop slot layout. */
 @media (prefers-reduced-motion: reduce) {
-  .floating-field-container {
-    overflow-y: auto !important;
-    max-height: calc(100dvh - 210px) !important;
-    padding: 0.75rem 1.5rem 2.5rem !important;
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-border-card) transparent;
-  }
-
-  .floating-field-container::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  .floating-field-container::-webkit-scrollbar-thumb {
-    background-color: var(--color-border-card);
-    border-radius: 9999px;
-  }
-
-  .floating-canvas {
-    display: grid !important;
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    gap: 1rem !important;
-    height: auto !important;
-    min-height: auto !important;
-    max-width: 980px !important;
-    margin: 0 auto !important;
-    padding: 0.5rem 0 2rem !important;
-  }
-
   .floating-slot {
-    position: static !important;
-    top: auto !important;
-    left: auto !important;
-    right: auto !important;
-    bottom: auto !important;
     animation: none !important;
     transform: none !important;
-    display: block !important;
-    width: 100% !important;
-  }
-
-  .floating-slot.slot-desktop-overflow,
-  .slot-desktop-overflow {
-    display: block !important;
-  }
-
-  .floating-slot .message-card {
-    max-width: 100% !important;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) and (max-width: 768px) {
-  .floating-canvas {
-    grid-template-columns: 1fr !important;
-    gap: 0.85rem !important;
-  }
-
-  .floating-field-container {
-    max-height: none !important;
-    overflow-y: visible !important;
   }
 }
