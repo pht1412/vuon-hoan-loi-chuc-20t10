@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { prependMessageIfMissing, PublicMessage } from '../types/message';
+import {
+  prependMessageIfMissing,
+  PublicMessage,
+} from '../types/message';
 import { PrivateJourneyData } from '../types/journey';
 import { initialPublicMessages, devDemoMessages } from '../data/publicMessages';
 import { fetchPublicMessages } from '../services/messageApi';
@@ -19,6 +22,7 @@ import { Lock, Volume2, VolumeX } from 'lucide-react';
 const MUSIC_PREF_KEY = 'garden_music_pref';
 
 const CACHE_KEY = 'vuon_public_messages_cache';
+const NEW_MESSAGE_HIGHLIGHT_MS = 3000;
 
 // Sắp xếp lời chúc: Tin ghim lên trước, sau đó sắp xếp theo thời gian mới nhất
 function sortMessages(list: PublicMessage[]): PublicMessage[] {
@@ -64,8 +68,34 @@ export const GardenPage: React.FC<GardenPageProps> = ({ onNavigateToAdmin }) => 
 
   // Hiệu ứng hạt mầm phát sáng khi gửi lời chúc thành công
   const [isSeedFlaring, setIsSeedFlaring] = useState(false);
+  const [temporarilyHighlightedIds, setTemporarilyHighlightedIds] = useState<string[]>([]);
+  const highlightTimersRef = useRef(new Map<string, ReturnType<typeof setTimeout>>());
   // Chế độ xem trước bố cục 12 lời chúc (Local/Dev only - không lưu vào CSDL)
   const [isDevDemoActive, setIsDevDemoActive] = useState(false);
+
+  useEffect(
+    () => () => {
+      highlightTimersRef.current.forEach((timer) => clearTimeout(timer));
+      highlightTimersRef.current.clear();
+    },
+    []
+  );
+
+  const temporarilyHighlightMessage = useCallback((messageId: string) => {
+    const existingTimer = highlightTimersRef.current.get(messageId);
+    if (existingTimer) clearTimeout(existingTimer);
+
+    setTemporarilyHighlightedIds((current) => [
+      messageId,
+      ...current.filter((id) => id !== messageId),
+    ]);
+
+    const timer = setTimeout(() => {
+      highlightTimersRef.current.delete(messageId);
+      setTemporarilyHighlightedIds((current) => current.filter((id) => id !== messageId));
+    }, NEW_MESSAGE_HIGHLIGHT_MS);
+    highlightTimersRef.current.set(messageId, timer);
+  }, []);
 
   // ── Nhạc vườn công khai ──
   const gardenAudioRef = useRef<HTMLAudioElement | null>(null);
@@ -408,6 +438,7 @@ export const GardenPage: React.FC<GardenPageProps> = ({ onNavigateToAdmin }) => 
                 isAnonymous: Boolean(newRow.is_anonymous),
                 createdAt: newRow.created_at,
               };
+              temporarilyHighlightMessage(newMsg.id);
 
               setMessages((prev) => {
                 if (prev.some((m) => m.id === newMsg.id)) return prev;
@@ -433,7 +464,7 @@ export const GardenPage: React.FC<GardenPageProps> = ({ onNavigateToAdmin }) => 
       isMounted = false;
       supabase.removeChannel(channel);
     };
-  }, [isDevDemoActive]);
+  }, [isDevDemoActive, temporarilyHighlightMessage]);
 
   // Bật/tắt chế độ xem thử nghiệm 12 lời chúc
   const handleToggleDevDemo = () => {
@@ -491,6 +522,7 @@ export const GardenPage: React.FC<GardenPageProps> = ({ onNavigateToAdmin }) => 
 
   // Callback khi gửi lời chúc thành công -> Thêm vào đầu danh sách, lưu cache & phát sáng hạt mầm
   const handleMessageSent = (newMessage: PublicMessage) => {
+    temporarilyHighlightMessage(newMessage.id);
     setMessages((prev) => {
       const updated = prependMessageIfMissing(prev, newMessage);
       if (updated === prev) return prev;
@@ -551,6 +583,7 @@ export const GardenPage: React.FC<GardenPageProps> = ({ onNavigateToAdmin }) => 
       <main id="main-content" style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
         <FloatingMessageField
           messages={messages}
+          temporarilyHighlightedIds={temporarilyHighlightedIds}
           isLoading={isLoading}
           onSelectMessage={handleSelectMessage}
           onToggleDevDemo={handleToggleDevDemo}

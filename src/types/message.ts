@@ -18,6 +18,18 @@ export function prependMessageIfMissing(
   return [newMessage, ...messages];
 }
 
+export function prioritizeTemporaryMessages(
+  messages: PublicMessage[],
+  temporaryIds: string[]
+): PublicMessage[] {
+  const temporaryIdSet = new Set(temporaryIds);
+  const temporaryMessages = temporaryIds
+    .map((id) => messages.find((message) => message.id === id))
+    .filter((message): message is PublicMessage => Boolean(message));
+
+  return [...temporaryMessages, ...messages.filter((message) => !temporaryIdSet.has(message.id))];
+}
+
 /**
  * Trả về tên hiển thị của người gửi theo quy tắc:
  * Nếu isAnonymous === true hoặc !displayName?.trim() -> hiển thị "Một người bạn"

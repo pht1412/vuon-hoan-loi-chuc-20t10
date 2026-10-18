@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { prependMessageIfMissing, PublicMessage } from '../src/types/message';
+import {
+  prependMessageIfMissing,
+  prioritizeTemporaryMessages,
+  PublicMessage,
+} from '../src/types/message';
 
 const existingMessage: PublicMessage = {
   id: 'existing',
@@ -38,6 +42,35 @@ describe('prependMessageIfMissing', () => {
     expect(prependMessageIfMissing([existingMessage], sentMessage)).toEqual([
       sentMessage,
       existingMessage,
+    ]);
+  });
+});
+
+describe('temporary new-message priority', () => {
+  const pinnedMessage: PublicMessage = {
+    id: 'pinned-message',
+    content: 'A pinned message',
+    displayName: 'A sender',
+    isAnonymous: false,
+    isPinned: true,
+    createdAt: '2026-10-17T10:00:00.000Z',
+  };
+
+  it('briefly shows a newly received message before pinned messages', () => {
+    const normallySortedMessages = [pinnedMessage, sentMessage];
+
+    expect(prioritizeTemporaryMessages(normallySortedMessages, [sentMessage.id])).toEqual([
+      sentMessage,
+      pinnedMessage,
+    ]);
+  });
+
+  it('restores pinned messages to the top after the temporary highlight expires', () => {
+    const normallySortedMessages = [pinnedMessage, sentMessage];
+
+    expect(prioritizeTemporaryMessages(normallySortedMessages, [])).toEqual([
+      pinnedMessage,
+      sentMessage,
     ]);
   });
 });

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { PublicMessage } from '../types/message';
+import { prioritizeTemporaryMessages, PublicMessage } from '../types/message';
 import { MessageCard } from './MessageCard';
 import { Sparkles, RefreshCw, Pause, Play } from 'lucide-react';
 import './FloatingMessageField.css';
@@ -10,6 +10,7 @@ interface FloatingMessageFieldProps {
   onToggleDevDemo?: () => void;
   isDevDemoActive?: boolean;
   isLoading?: boolean;
+  temporarilyHighlightedIds?: string[];
 }
 
 const DISPLAY_SLOTS_COUNT = 12;
@@ -21,6 +22,7 @@ export const FloatingMessageField: React.FC<FloatingMessageFieldProps> = ({
   onToggleDevDemo,
   isDevDemoActive = false,
   isLoading = false,
+  temporarilyHighlightedIds = [],
 }) => {
   const [unpinnedOffset, setUnpinnedOffset] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -29,30 +31,38 @@ export const FloatingMessageField: React.FC<FloatingMessageFieldProps> = ({
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Phân tách lời chúc ghim và lời chúc thường
-  const { pinnedMessages, unpinnedMessages } = useMemo(() => {
+  const { temporaryMessages, pinnedMessages, unpinnedMessages } = useMemo(() => {
+    const temporaryIdSet = new Set(temporarilyHighlightedIds);
     const pinned: PublicMessage[] = [];
     const unpinned: PublicMessage[] = [];
     messages.forEach((msg) => {
+      if (temporaryIdSet.has(msg.id)) return;
       if (msg.isPinned) {
         pinned.push(msg);
       } else {
         unpinned.push(msg);
       }
     });
-    return { pinnedMessages: pinned, unpinnedMessages: unpinned };
-  }, [messages]);
+    const temporary = prioritizeTemporaryMessages(messages, temporarilyHighlightedIds);
+    return {
+      temporaryMessages: temporary.slice(0, temporarilyHighlightedIds.length),
+      pinnedMessages: pinned,
+      unpinnedMessages: unpinned,
+    };
+  }, [messages, temporarilyHighlightedIds]);
 
   // Tính toán 12 thẻ hiển thị trên màn hình
   const displayedMessages = useMemo(() => {
+    const priorityMessages = [...temporaryMessages, ...pinnedMessages];
     if (messages.length <= DISPLAY_SLOTS_COUNT) {
-      return messages.slice(0, DISPLAY_SLOTS_COUNT);
+      return [...priorityMessages, ...unpinnedMessages].slice(0, DISPLAY_SLOTS_COUNT);
     }
 
-    const pinnedCount = Math.min(pinnedMessages.length, DISPLAY_SLOTS_COUNT);
-    const neededUnpinned = DISPLAY_SLOTS_COUNT - pinnedCount;
+    const priorityCount = Math.min(priorityMessages.length, DISPLAY_SLOTS_COUNT);
+    const neededUnpinned = DISPLAY_SLOTS_COUNT - priorityCount;
 
     if (unpinnedMessages.length === 0) {
-      return pinnedMessages.slice(0, DISPLAY_SLOTS_COUNT);
+      return priorityMessages.slice(0, DISPLAY_SLOTS_COUNT);
     }
 
     // Lấy tập hợp unpinned theo vòng tròn (circular slice)
@@ -62,8 +72,8 @@ export const FloatingMessageField: React.FC<FloatingMessageFieldProps> = ({
       selectedUnpinned.push(unpinnedMessages[idx]);
     }
 
-    return [...pinnedMessages.slice(0, pinnedCount), ...selectedUnpinned];
-  }, [messages, pinnedMessages, unpinnedMessages, unpinnedOffset]);
+    return [...priorityMessages.slice(0, priorityCount), ...selectedUnpinned];
+  }, [messages, pinnedMessages, temporaryMessages, unpinnedMessages, unpinnedOffset]);
 
   // Bộ hẹn giờ xoay vòng tự động 18s (khi có nhiều hơn 12 lời chúc)
   useEffect(() => {
@@ -72,8 +82,11 @@ export const FloatingMessageField: React.FC<FloatingMessageFieldProps> = ({
       return;
     }
 
-    const pinnedCount = Math.min(pinnedMessages.length, DISPLAY_SLOTS_COUNT);
-    const neededUnpinned = DISPLAY_SLOTS_COUNT - pinnedCount;
+    const priorityCount = Math.min(
+      temporaryMessages.length + pinnedMessages.length,
+      DISPLAY_SLOTS_COUNT
+    );
+    const neededUnpinned = DISPLAY_SLOTS_COUNT - priorityCount;
     if (unpinnedMessages.length <= neededUnpinned) return;
 
     timerRef.current = setInterval(() => {
@@ -84,11 +97,21 @@ export const FloatingMessageField: React.FC<FloatingMessageFieldProps> = ({
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [messages.length, isPaused, isHovered, pinnedMessages.length, unpinnedMessages.length]);
+  }, [
+    messages.length,
+    isPaused,
+    isHovered,
+    pinnedMessages.length,
+    temporaryMessages.length,
+    unpinnedMessages.length,
+  ]);
 
   const handleManualNext = () => {
-    const pinnedCount = Math.min(pinnedMessages.length, DISPLAY_SLOTS_COUNT);
-    const neededUnpinned = DISPLAY_SLOTS_COUNT - pinnedCount;
+    const priorityCount = Math.min(
+      temporaryMessages.length + pinnedMessages.length,
+      DISPLAY_SLOTS_COUNT
+    );
+    const neededUnpinned = DISPLAY_SLOTS_COUNT - priorityCount;
     if (unpinnedMessages.length > neededUnpinned) {
       setUnpinnedOffset((prev) => (prev + neededUnpinned) % unpinnedMessages.length);
       setFadeKey((prev) => prev + 1);
