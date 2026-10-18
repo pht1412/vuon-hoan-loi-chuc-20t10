@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { flushSync } from 'react-dom';
 import { PrivateJourneyData } from '../../types/journey';
 import { WelcomeScene } from './scenes/WelcomeScene';
@@ -9,84 +9,23 @@ import { FinalLetterScene } from './scenes/FinalLetterScene';
 import { ArrowLeft, ArrowRight, Volume2, VolumeX } from 'lucide-react';
 import './JourneyShell.css';
 
-// Tên file nhạc riêng (obfuscate)
-const JOURNEY_MUSIC_SRC = '/m_7f3a9c.mp3';
-
 interface JourneyShellProps {
   data: PrivateJourneyData;
   onExit: () => void;
-  isMusicPrefOn: boolean; // preference nhạc của người dùng từ khu vườn
+  isMusicPlaying: boolean;
+  isMusicBlocked: boolean;
+  onToggleMusic: () => void;
 }
 
-export const JourneyShell: React.FC<JourneyShellProps> = ({ data, onExit, isMusicPrefOn }) => {
+export const JourneyShell: React.FC<JourneyShellProps> = ({
+  data,
+  onExit,
+  isMusicPlaying,
+  isMusicBlocked,
+  onToggleMusic,
+}) => {
   const [currentChapter, setCurrentChapter] = useState<number>(1);
   const contentRef = useRef<HTMLDivElement | null>(null);
-
-  // ── Nhạc hành trình riêng ──
-  const journeyAudioRef = useRef<HTMLAudioElement | null>(null);
-  // 'idle' = chưa thử | 'playing' = đang phát | 'paused' = user tắt | 'blocked' = trình duyệt chặn
-  const [musicState, setMusicState] = useState<'idle' | 'playing' | 'paused' | 'blocked'>('idle');
-  const autoplayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const isMountedRef = useRef(true);
-
-  // Khởi tạo audio một lần duy nhất khi JourneyShell mount
-  useEffect(() => {
-    isMountedRef.current = true;
-    const audio = new Audio(JOURNEY_MUSIC_SRC);
-    audio.loop = true;
-    audio.volume = 0.55;
-    journeyAudioRef.current = audio;
-
-    const onPlay  = () => { if (isMountedRef.current) setMusicState('playing'); };
-    const onPause = () => {
-      if (isMountedRef.current) {
-        setMusicState((prev) => prev === 'playing' ? 'paused' : prev);
-      }
-    };
-    audio.addEventListener('play', onPlay);
-    audio.addEventListener('pause', onPause);
-
-    // Thử autoplay sau 1.5s — CHỈ khi preference nhạc là 'on'
-    if (isMusicPrefOn) {
-      autoplayTimerRef.current = setTimeout(() => {
-        if (!isMountedRef.current) return;
-        audio.play().catch((err: Error) => {
-          if (!isMountedRef.current) return;
-          if (err.name === 'NotAllowedError') {
-            setMusicState('blocked');
-          } else {
-            console.warn('[Journey Music] play() failed:', err.name, err.message);
-            setMusicState('blocked');
-          }
-        });
-      }, 1500);
-    }
-    // Nếu preference tắt, để trạng thái 'idle' — nút nhạc vẫn có thể bật thủ công
-
-    return () => {
-      isMountedRef.current = false;
-      // Hủy timer nếu user thoát trước 1.5s
-      if (autoplayTimerRef.current) clearTimeout(autoplayTimerRef.current);
-      audio.removeEventListener('play', onPlay);
-      audio.removeEventListener('pause', onPause);
-      audio.pause();
-      audio.src = '';
-      journeyAudioRef.current = null;
-    };
-  }, []); // chỉ chạy một lần
-
-  const handleToggleJourneyMusic = useCallback(() => {
-    const audio = journeyAudioRef.current;
-    if (!audio) return;
-    if (musicState === 'playing') {
-      audio.pause();
-      setMusicState('paused');
-    } else {
-      audio.play()
-        .then(() => setMusicState('playing'))
-        .catch(() => setMusicState('blocked'));
-    }
-  }, [musicState]);
 
   // Cuộn mượt về đầu trang mỗi khi chuyển chặng
   useEffect(() => {
@@ -209,19 +148,18 @@ export const JourneyShell: React.FC<JourneyShellProps> = ({ data, onExit, isMusi
       <button
         type="button"
         className="journey-music-toggle"
-        onClick={handleToggleJourneyMusic}
-        aria-label={musicState === 'playing' ? 'Tắt nhạc' : 'Bật nhạc'}
-        title={musicState === 'playing' ? 'Tắt nhạc' : 'Bật nhạc'}
+        onClick={onToggleMusic}
+        aria-label={isMusicPlaying ? 'Tắt nhạc' : 'Bật nhạc'}
+        title={isMusicPlaying ? 'Tắt nhạc' : 'Bật nhạc'}
       >
-        {musicState === 'playing' ? <Volume2 size={13} /> : <VolumeX size={13} />}
+        {isMusicPlaying ? <Volume2 size={13} /> : <VolumeX size={13} />}
       </button>
 
-      {/* Fallback banner khi autoplay bị trình duyệt chặn */}
-      {musicState === 'blocked' && (
+      {isMusicBlocked && (
         <button
           type="button"
           className="journey-music-fallback-banner"
-          onClick={handleToggleJourneyMusic}
+          onClick={onToggleMusic}
           aria-live="polite"
         >
           🎵 Bấm để bật nhạc
