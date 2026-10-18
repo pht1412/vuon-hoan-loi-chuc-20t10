@@ -13,6 +13,7 @@ import { PasscodeDialog } from '../components/journey/PasscodeDialog';
 import { JourneyShell } from '../components/journey/JourneyShell';
 import { GardenAmbience } from '../components/GardenAmbience';
 import { MusicChoiceDialog } from '../components/MusicChoiceDialog';
+import { PublicFlowerGarden } from '../components/PublicFlowerGarden';
 import { Lock, Volume2, VolumeX } from 'lucide-react';
 
 const MUSIC_PREF_KEY = 'garden_music_pref';
@@ -57,6 +58,7 @@ export const GardenPage: React.FC<GardenPageProps> = ({ onNavigateToAdmin }) => 
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isSendDialogOpen, setIsSendDialogOpen] = useState(false);
   const [isPasscodeOpen, setIsPasscodeOpen] = useState(false);
+  const [isPublicGardenOpen, setIsPublicGardenOpen] = useState(false);
   const [journeyData, setJourneyData] = useState<PrivateJourneyData | null>(null);
   const [activeTriggerEl, setActiveTriggerEl] = useState<HTMLElement | null>(null);
 
@@ -478,6 +480,15 @@ export const GardenPage: React.FC<GardenPageProps> = ({ onNavigateToAdmin }) => 
     setIsSendDialogOpen(false);
   };
 
+  const handlePublicGardenClick = (triggerEl: HTMLElement) => {
+    setActiveTriggerEl(triggerEl);
+    setIsPublicGardenOpen(true);
+  };
+
+  const handleClosePublicGarden = () => {
+    setIsPublicGardenOpen(false);
+  };
+
   // Callback khi gửi lời chúc thành công -> Thêm vào đầu danh sách, lưu cache & phát sáng hạt mầm
   const handleMessageSent = (newMessage: PublicMessage) => {
     setMessages((prev) => {
@@ -548,6 +559,7 @@ export const GardenPage: React.FC<GardenPageProps> = ({ onNavigateToAdmin }) => 
 
       <ActionArea
         onSendWishClick={handleSendWishClick}
+        onPublicGardenClick={handlePublicGardenClick}
         onPrivateEnvelopeClick={handlePrivateEnvelopeClick}
       />
 
@@ -565,6 +577,12 @@ export const GardenPage: React.FC<GardenPageProps> = ({ onNavigateToAdmin }) => 
         isOpen={isSendDialogOpen}
         onClose={handleCloseSendDialog}
         onMessageSent={handleMessageSent}
+        triggerElement={activeTriggerEl}
+      />
+
+      <PublicFlowerGarden
+        isOpen={isPublicGardenOpen}
+        onClose={handleClosePublicGarden}
         triggerElement={activeTriggerEl}
       />
 
