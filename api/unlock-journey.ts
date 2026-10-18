@@ -1,4 +1,4 @@
-import { privateJourneyContent } from '../server/privateData';
+import { privateJourneyContent } from '../server/privateData.js';
 
 interface RateLimitState {
   failedAttempts: number;

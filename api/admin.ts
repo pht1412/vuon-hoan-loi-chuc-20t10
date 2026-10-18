@@ -1,6 +1,10 @@
 import { timingSafeEqual } from 'node:crypto';
-import { createAdminToken, isAdminAuthConfigured, verifyAdminToken } from '../server/adminAuth';
-import { getAdminSupabaseClient, sendResponse } from './public-messages';
+import {
+  createAdminToken,
+  isAdminAuthConfigured,
+  verifyAdminToken,
+} from '../server/adminAuth.js';
+import { getAdminSupabaseClient, sendResponse } from './public-messages.js';
 
 function hasValidAdminToken(req: any): boolean {
   const authHeader = req.headers?.authorization || req.headers?.Authorization;
