@@ -2,7 +2,7 @@
 
 > **Mục đích:** Đây là nguồn sự thật duy nhất (single source of truth) để một AI khác hiểu **toàn bộ** giao diện, hiệu ứng, luồng người dùng, kiến trúc kỹ thuật và ranh giới không được phá. Đọc file này trước khi mở code.
 >
-> **Ngày cập nhật:** 18/10/2026 (tách dữ liệu và hình hoa của vườn công khai khỏi chặng 2 riêng; bổ sung hiệu ứng tương tác và hỗ trợ reduced-motion cho sáu thư công khai. Nội dung bốn hoa riêng của Cad không thay đổi).
+> **Ngày cập nhật:** 18/10/2026 (tách dữ liệu và hình hoa của vườn công khai khỏi chặng 2 riêng; bổ sung hiệu ứng tương tác và hỗ trợ reduced-motion cho sáu thư công khai; siết RLS và xác thực API. Nội dung bốn hoa riêng của Cad không thay đổi).
 > **Cách xác minh:** Đối chiếu trực tiếp mã nguồn hiện tại (không phải bản mô tả cũ). Các mục đánh `[VERIFIED]` khớp với code tại thời điểm này.
 
 ---
@@ -12,7 +12,7 @@
 1. Đọc mục **1 → 4** để nắm sản phẩm, route, cây file.
 2. Đọc mục **5 → 7** trước khi đụng CSS: có **hai hệ thẩm mỹ** (Vườn công khai vs Hành trình riêng). Không trộn palette hồng đất của vườn vào hành trình, và ngược lại.
 3. Đọc mục **10 + 15** trước khi sửa API / bảo mật / nội dung riêng tư.
-4. **Không copy** nội dung lá thư từ `api/_privateData.ts` vào tài liệu công khai, commit message, hay UI công khai.
+4. **Không copy** nội dung lá thư từ `server/privateData.ts` vào tài liệu công khai, commit message, hay UI công khai.
 5. Không refactor ồ ạt. Đề xuất theo giai đoạn, giữ nguyên hợp đồng API và state machine đã ổn định.
 
 ---
@@ -52,7 +52,7 @@
   - CSS thuần + design tokens (`src/styles/tokens.css`, `global.css`)
   - `lucide-react` ^1.16.0
   - Vercel Serverless Functions trong `api/`
-  - Supabase (`@supabase/supabase-js` ^2.118.0) + fallback in-memory khi thiếu env
+  - Supabase (`@supabase/supabase-js` ^2.118.0); API từ chối thao tác đọc/ghi nếu thiếu cấu hình hoặc Supabase lỗi
 - **Routing:** client-side nhẹ trong `App.tsx` (`/` ↔ `/admin` hoặc hash `#/admin`). Không dùng React Router.
 - **Ngôn ngữ UI:** tiếng Việt, xưng hô thân mật « cậu / tớ » trong hành trình riêng.
 
@@ -65,12 +65,13 @@
 1. Vườn công khai: empty state, loading, 12 slot chữ V trên desktop, 8 slot tablet, grid nhỏ hơn trên mobile; modal khu vườn có sáu hoa và sáu thư phổ quát, dữ liệu độc lập với hành trình riêng.
 2. Carousel 18s khi > 12 lời chúc; pause khi hover; nút pause/play + chuyển thủ công.
 3. Gửi lời chúc: state machine 6 bước, chuẩn hóa `\n`, giới hạn 3–300 ký tự, tên ≤ 40, `idempotencyKey`.
-4. Passcode + rate limit 5 lần sai / khóa 30s (server IP + client lock).
+4. Passcode server-side + rate limit 5 lần sai / khóa 30s (server IP + client lock; best-effort in-memory).
 5. Hành trình riêng 5 chặng: Welcome (ảnh cổng), 4 tranh hoa + easter egg, sổ tay + P.S., 4 thẻ trân trọng, lá thư cuối. Bốn hoa và nội dung riêng ở chặng 2 không dùng trong vườn công khai.
 6. Nền hành trình: `cad.jpeg` + kính mờ kem + tia nắng + hạt hoàng hôn.
 7. Admin dashboard + Realtime (postgres_changes + broadcast hide/pin/delete).
-8. Nội dung riêng tư chỉ nằm server-side `api/_privateData.ts` (file `_` không thành route). Frontend không import file này.
-9. Ambience vườn: hào quang sách 7s, 7 hạt stardust, 24 hạt rơi SVG, vòng `seedBloom` khi gửi thành công.
+8. Nội dung riêng tư nằm trong `server/privateData.ts`, ngoài `api/`; chỉ API unlock import và chỉ trả nội dung sau xác thực. Frontend không import file này.
+9. Admin API dùng token HMAC-SHA-256 ký bằng `ADMIN_TOKEN_SECRET`; quyền ghi Supabase chỉ qua service-role key server-side. RLS chỉ cấp SELECT/INSERT cho anon/authenticated và lọc SELECT theo `is_hidden = false`.
+10. Ambience vườn: hào quang sách 7s, 7 hạt stardust, 24 hạt rơi SVG, vòng `seedBloom` khi gửi thành công.
 
 ### Còn mở (không phải bug chặn ship)
 
@@ -92,10 +93,12 @@
 ├── vercel.json                # /api/(.*) + SPA fallback
 ├── vite.config.ts             # React + apiDevMiddleware
 ├── api/
-│   ├── _privateData.ts        # [BẢO MẬT] payload 5 chặng — KHÔNG lộ ra frontend
 │   ├── admin.ts
 │   ├── public-messages.ts
 │   └── unlock-journey.ts
+├── server/
+│   ├── adminAuth.ts           # HMAC-signed Admin tokens
+│   └── privateData.ts         # [BẢO MẬT] payload 5 chặng — KHÔNG lộ ra frontend
 ├── public/
 │   ├── nenpublic.jpg          # Nền vườn: sách phát sáng
 │   ├── cad.jpeg               # Nền toàn hành trình riêng
@@ -146,7 +149,7 @@
 | 4 | `src/components/GardenAmbience.tsx` + `.css` | Hạt rơi / seed bloom |
 | 5 | `src/components/journey/JourneyShell.tsx` + `.css` | Palette + lớp nền hành trình |
 | 6 | `src/components/journey/JourneyScenes.css` | Chi tiết 5 chặng |
-| 7 | `api/_privateData.ts` | Copy chữ — **chỉ đọc, không đưa vào bundle client** |
+| 7 | `server/privateData.ts` | Copy chữ — **chỉ đọc, không đưa vào bundle client** |
 | 8 | `api/public-messages.ts`, `unlock-journey.ts`, `admin.ts` | Hợp đồng API |
 
 ---
@@ -257,7 +260,7 @@ Desktop `>= 861px`: vườn **không cuộn** (`height: 100dvh`). `<= 860px`: `.
 - Hover desktop nâng/scale nhẹ; nhấn hoa tạo hiệu ứng nở và vài hạt trang trí, sau khoảng 360ms thư hiện bằng fade + dịch lên. Chặn nhấn lặp để tránh nhiều lượt mở chồng nhau.
 - Dialog có tiêu đề, nội dung, nút đóng; Escape và nút đóng đều hoạt động, focus được đưa về hoa vừa chọn. Overlay có focus trap; nút hoa dùng ngữ nghĩa button, nhãn truy cập và hỗ trợ bàn phím/cảm ứng.
 - `prefers-reduced-motion` loại bỏ hiệu ứng trang trí và rút ngắn chuyển động mở thư; trên mobile grid chuyển một cột.
-- Bốn hoa riêng vẫn do `api/_privateData.ts` cấp qua luồng unlock; không import dữ liệu private vào frontend hay dùng làm nguồn cho khu vườn công khai.
+- Bốn hoa riêng vẫn do `server/privateData.ts` cấp qua luồng unlock; không import dữ liệu private vào frontend hay dùng làm nguồn cho khu vườn công khai.
 
 ---
 
@@ -299,8 +302,6 @@ Overlay: `rgba(60,50,42,0.45)` blur 8px. Panel trắng radius 20px, max ~480px. 
 | `error` | Retry giữ nguyên `idempotencyKey` |
 | `uncertain` | Timeout 10s / 504 |
 
-Hook test server: nội dung chứa `[test:error]` → 500; `[test:timeout]` → 504 lần đầu.
-
 ---
 
 ### MÀN 4 — MessageDetailDialog
@@ -313,7 +314,7 @@ Cùng overlay language. Hiện full `content` (giữ newline), tên theo `getSen
 
 Phong bì cổ điển, con dấu sáp 60×60. Tiêu đề « Góc nhỏ riêng tư ». Input `letter-spacing: 0.15em`, Eye/EyeOff. Sai: viền ửng, câu tulip. 5 lần: 429 + countdown. Đúng: state `isUnlocking` rồi mount `JourneyShell`.
 
-Passcode **không hardcode trên frontend**. Server: `PRIVATE_JOURNEY_PASSCODE` (fallback code `'2010'` nếu thiếu env) **hoặc** chuỗi `'tu-do'`. `.env.example` ghi `1412` — giá trị thật là env production, đừng giả định một số duy nhất khi review.
+Passcode **không hardcode trên frontend**. Server chỉ chấp nhận `PRIVATE_JOURNEY_PASSCODE` đã cấu hình; thiếu biến môi trường thì từ chối mở khóa, không trả nội dung. Không còn mã bypass. Rate limit 5 lần sai / khóa 30 giây lưu bằng `Map` trong tiến trình: có thể reset khi serverless cold start hoặc khác nhau giữa instances, không phải chống brute-force hoàn chỉnh.
 
 ---
 
@@ -586,20 +587,21 @@ Dev: `vite.config.ts` middleware parse JSON body và gọi thẳng handler.
 
 Production: `vercel.json` rewrite `/api/(.*)` rồi SPA.
 
-### 10.2 Hybrid DB
+### 10.2 Supabase DB
 
-`getSupabaseClient()` dùng `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` hoặc `SUPABASE_ANON_KEY`. Thiếu / lỗi → `inMemoryMessages` + `inMemoryIdempotencyStore`. App không crash.
+Public API dùng `SUPABASE_URL` + `SUPABASE_ANON_KEY`; thiếu cấu hình hoặc lỗi Supabase trả lỗi HTTP, không báo thành công giả bằng in-memory storage. Admin API dùng riêng `SUPABASE_SERVICE_ROLE_KEY`, chỉ phía server.
 
-Bảng `public_messages`: uuid, content 3–300, display_name ≤ 40, flags, unique `idempotency_key`, RLS SELECT/INSERT/UPDATE/DELETE (policy rộng — **bảo vệ thật nằm ở service role trên API admin**, không phải RLS chặt). Realtime publication bật trong `schema.sql`.
+Bảng `public_messages`: uuid, content 3–300, display_name ≤ 40, flags, unique `idempotency_key`. RLS cấp anon/authenticated SELECT (chỉ hàng `is_hidden = false`) và INSERT; không cấp UPDATE/DELETE. Admin ghi qua service role. Realtime DELETE chỉ phát primary key (`REPLICA IDENTITY DEFAULT`); thay đổi ẩn/ghim/xóa cho vườn công khai dùng broadcast từ Admin UI.
 
 Frontend `supabase` client: `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` (có fallback trong `supabaseClient.ts`).
 
-### 10.3 Bảo mật hành trình
+### 10.3 Bảo mật API và hành trình
 
-- `api/_privateData.ts` prefix `_` → Vercel không tạo HTTP route.
-- `src/` không import `_privateData`.
-- Passcode so khớp server, lowercase trim.
-- Rate limit **in-memory theo IP** (reset khi cold start serverless — hạn chế đã biết).
+- Dữ liệu riêng nằm trong `server/privateData.ts`, ngoài thư mục `api/`; chỉ `api/unlock-journey.ts` import, không phải endpoint riêng.
+- `src/` không import `server/privateData.ts`.
+- Admin token ký HMAC-SHA-256, kiểm tra chữ ký/thời hạn; cần `ADMIN_PASSWORD` và `ADMIN_TOKEN_SECRET` (ít nhất 32 bytes), không có giá trị mặc định.
+- Passcode so khớp server, lowercase trim; thiếu `PRIVATE_JOURNEY_PASSCODE` thì trả 503, không trả dữ liệu riêng.
+- Rate limit **in-memory theo IP** (reset khi cold start serverless hoặc khác nhau giữa instances — không phải chống brute-force hoàn chỉnh).
 - Client timeout 8s GET list, 10s POST/unlock.
 
 ### 10.4 Env (`.env.example`)
@@ -609,9 +611,10 @@ SUPABASE_URL, SUPABASE_ANON_KEY, VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY
 SUPABASE_SERVICE_ROLE_KEY
 PRIVATE_JOURNEY_PASSCODE
 ADMIN_PASSWORD
+ADMIN_TOKEN_SECRET
 ```
 
-Không commit `.env`.
+`SUPABASE_SERVICE_ROLE_KEY`, `ADMIN_PASSWORD`, `ADMIN_TOKEN_SECRET` và `PRIVATE_JOURNEY_PASSCODE` chỉ cấu hình server-side, tuyệt đối không đặt tiền tố `VITE_`. `VITE_SUPABASE_*` là cấu hình publishable dùng ở browser. Không commit `.env`.
 
 ### 10.5 A11y (đã làm)
 
@@ -639,7 +642,7 @@ Không commit `.env`.
 - Slot tọa độ cứng (px) — màn siêu rộng / siêu thấp có thể lệch.
 - Frosted overlay hành trình: `backdrop-filter` vs `-webkit-backdrop-filter` **không cùng số blur** (5px vs 20px) — Safari/Chrome khác nhau.
 - `background-attachment: fixed` trên `.journey-bg-cad` có thể giật iOS.
-- RLS UPDATE/DELETE `USING (true)` — dựa vào việc client không gọi thẳng Supabase mutate (admin đi qua API + service role). Đừng đưa service role ra frontend.
+- Admin login chưa có giới hạn số lần thử; dùng mật khẩu mạnh, riêng và chỉ cấu hình phía server.
 
 ---
 
@@ -650,7 +653,6 @@ Không commit `.env`.
 | `coimay.png` | Chưa mount | visual tùy chọn |
 | BGM/SFX | Không có | cảm xúc |
 | PlaceholderModal | Dead code | dọn được |
-| Passcode fallback kép | env + `'2010'` + `'tu-do'` | nhớ khi đổi mật mã |
 | Rate limit serverless | Map RAM theo instance | không chặt như Redis |
 | Phablet dock | padding đáy đã có media 540px — vẫn canh safe-area nếu cần | UX điện thoại |
 | Hardcoded supabase fallback | `supabaseClient.ts` | nên env-first |
@@ -675,7 +677,7 @@ Chỉ làm khi được yêu cầu, theo thứ tự gợi ý:
 
 - Đổi state machine 6 bước.
 - Khóa nút « Tiếp tục » theo việc đã chọn hoa.
-- Import `_privateData` vào `src/`.
+- Import `server/privateData.ts` vào `src/`.
 - Thay 12-slot V bằng masonry che sách.
 - Đổi CTA hành trình sang hồng đất (phá palette sunset).
 
@@ -709,14 +711,14 @@ Bạn đang tiếp quản website 20/10 **đã đủ logic + backend + hành tr�
 
 - Hợp đồng `/api/public-messages`, `/api/unlock-journey`, `/api/admin`
 - `src/services/*` timeout + error mapping
-- `_privateData.ts` chỉ server
+- `server/privateData.ts` chỉ server
 - Nút tiến hành trình luôn sẵn
 - 12-slot cánh + khe sách
 - Hai palette: Garden tokens vs Journey sunset tokens
 
 ### Copywriting riêng tư
 
-Nội dung chào, hoa, journal, P.S., appreciation, thư nằm trong `api/_privateData.ts`. Sửa chữ thì sửa file đó. **Không** nhúng vào component. **Không** dán nguyên văn vào README/PR.
+Nội dung chào, hoa, journal, P.S., appreciation, thư nằm trong `server/privateData.ts`. Sửa chữ thì sửa file đó. **Không** nhúng vào component. **Không** dán nguyên văn vào README/PR.
 
 ### Hướng viết lại nội dung riêng tư (kim chỉ nam, cập nhật 17/10/2026)
 
@@ -735,7 +737,7 @@ Chỉ ghi **nguyên tắc và tiến độ** — không chép nguyên văn nội
 - Viết từ vị trí người tặng, không viết như lời khuyên sống (tránh biến thành self-help thu nhỏ).
 - Chất liệu công khai, đã thực sự để tâm: podcast cô ấy chia sẻ, cách kể chuyện đời thường, khoảnh khắc livestream, cách nói về tình yêu và cuộc sống.
 - **Nguồn dữ kiện (đã xác nhận):** livestream game (ZingSpeed PC, đôi khi Audition), người tặng hay ghé xem và có vài tương tác nhỏ; có chia sẻ bài đăng và podcast — **podcast dùng giọng đọc AI**, không gọi là giọng của cô ấy và không nói cô ấy tự thu âm; có kể vài chuyện thường ngày trong livestream; từng công khai chia sẻ góc nhìn về tình yêu và cuộc sống (trên livestream rất ít). Không suy diễn tổn thương, cô đơn, tự ti, cần chữa lành, tìm kiếm tình yêu, mệt mỏi hay khó khăn; không gán phẩm chất (tinh tế, sâu sắc, dịu dàng, can đảm…) khi chưa có bằng chứng cụ thể.
-- **Chi tiết thêm:** nếu muốn thêm một chi tiết về cô ấy, phải đánh dấu để người tặng xác nhận trước (comment `CẦN PHÁT XÁC NHẬN` trong `_privateData.ts`). Chưa có chi tiết chắc thì giữ câu chữ khái quát, trung thực.
+- **Chi tiết thêm:** nếu muốn thêm một chi tiết về cô ấy, phải đánh dấu để người tặng xác nhận trước (comment `CẦN PHÁT XÁC NHẬN` trong `server/privateData.ts`). Chưa có chi tiết chắc thì giữ câu chữ khái quát, trung thực.
 - **Nhịp điệu:** mỗi đóa một trọng tâm và một kiểu kết riêng (lời chúc / điều muốn nói / cảm giác đọng lại / lời cảm ơn); không cho cả bốn kết bằng « Mong rằng… ». Tránh lặp « khoảng lặng », « dịu lại », « bình yên », « theo nhịp riêng », « những điều nhỏ bé » và ý gần nghĩa.
 - **Sắc thái:** « cậu – tớ » nhất quán; dịu dàng, có tình cảm nhưng không phải lời tỏ tình, không giả vờ đã rất thân, không gây áp lực phải đáp lại. Dấu ấn cá nhân đến từ điều đã quan sát và cảm nhận, không từ việc khẳng định hiểu cô ấy đến đâu. Không khen tính cách chung chung.
 
@@ -757,11 +759,11 @@ Chỉ ghi **nguyên tắc và tiến độ** — không chép nguyên văn nội
 | 4 | Ghi nhận cá nhân | Đã thực sự quan sát, ghi nhớ và trân trọng điều gì? |
 | 5 | Khép lại + dấu ấn | Vì sao làm món quà này, và sau cùng muốn gửi điều gì? |
 
-Đã chuyển quan sát podcast/chuyện thường ngày/góc nhìn/livestream từ chặng 2 sang chặng 4 để tránh trùng. File `_privateData.ts` có khối ghi chú đầu file nêu dữ kiện đã xác nhận và dòng nhãn `[CẦN XÁC NHẬN]`.
+Đã chuyển quan sát podcast/chuyện thường ngày/góc nhìn/livestream từ chặng 2 sang chặng 4 để tránh trùng. File `server/privateData.ts` có khối ghi chú đầu file nêu dữ kiện đã xác nhận và dòng nhãn `[CẦN XÁC NHẬN]`.
 
 Hoãn: chuyển cảnh và animation — giao diện hiện đã đủ chất thơ, không thêm hiệu ứng chỉ vì có thể thêm.
 
-**Ranh giới dữ liệu hoa (đã xác minh):** `src/data/publicFlowerGarden.ts` là nguồn độc lập của sáu hoa và thư công khai. `hoa1.jpg`–`hoa4.jpg` chỉ được map theo id trong `FlowerGardenScene.tsx` của journey; nội dung riêng vẫn ở `api/_privateData.ts` và chỉ được gửi qua API unlock. Không import hoặc sao chép dữ liệu riêng sang component/data public. Thay đổi hiệu ứng khu vườn công khai không chỉnh sửa nội dung hay logic hành trình riêng.
+**Ranh giới dữ liệu hoa (đã xác minh):** `src/data/publicFlowerGarden.ts` là nguồn độc lập của sáu hoa và thư công khai. `hoa1.jpg`–`hoa4.jpg` chỉ được map theo id trong `FlowerGardenScene.tsx` của journey; nội dung riêng vẫn ở `server/privateData.ts` và chỉ được gửi qua API unlock. Không import hoặc sao chép dữ liệu riêng sang component/data public. Thay đổi hiệu ứng khu vườn công khai không chỉnh sửa nội dung hay logic hành trình riêng.
 
 ### Checklist trước khi kết luận một thay đổi UI
 

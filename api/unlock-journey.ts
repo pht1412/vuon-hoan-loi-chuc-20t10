@@ -1,4 +1,4 @@
-import { privateJourneyContent } from './_privateData';
+import { privateJourneyContent } from '../server/privateData';
 
 interface RateLimitState {
   failedAttempts: number;
@@ -58,8 +58,15 @@ export default async function handler(req: any, res: any) {
   const body = req.body || {};
   const submittedPasscode = typeof body.passcode === 'string' ? body.passcode.trim().toLowerCase() : '';
 
-  const configuredPasscode = (process.env.PRIVATE_JOURNEY_PASSCODE || '2010').trim().toLowerCase();
-  const isMatch = submittedPasscode === configuredPasscode || submittedPasscode === 'tu-do';
+  const configuredPasscode = process.env.PRIVATE_JOURNEY_PASSCODE?.trim().toLowerCase();
+  if (!configuredPasscode) {
+    return sendResponse(res, 503, {
+      success: false,
+      error: 'Hành trình riêng hiện chưa được cấu hình.',
+    });
+  }
+
+  const isMatch = submittedPasscode === configuredPasscode;
 
   if (isMatch) {
     // Mở khóa thành công: Reset bộ đếm lỗi

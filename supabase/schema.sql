@@ -34,41 +34,48 @@ CREATE INDEX IF NOT EXISTS idx_public_messages_display
 CREATE INDEX IF NOT EXISTS idx_public_messages_admin
   ON public.public_messages (created_at DESC);
 
--- 3. Cấu hình Row Level Security (RLS)
+-- 3. Cấu hình Row Level Security (RLS) và quyền SQL
 ALTER TABLE public.public_messages ENABLE ROW LEVEL SECURITY;
 
--- Cho phép đọc lời chúc để Realtime phát sóng được cả sự kiện ẨN (is_hidden = true)
--- Lưu ý: API GET /api/public-messages vẫn luôn lọc chặt chẽ .eq('is_hidden', false)
-DROP POLICY IF EXISTS "Cho phép đọc lời chúc công khai" ON public.public_messages;
+-- Chuẩn hóa policy trên riêng bảng này để không giữ lại policy cũ có quyền rộng hơn.
+DO $$
+DECLARE
+  existing_policy RECORD;
+BEGIN
+  FOR existing_policy IN
+    SELECT policyname
+    FROM pg_policies
+    WHERE schemaname = 'public' AND tablename = 'public_messages'
+  LOOP
+    EXECUTE format(
+      'DROP POLICY %I ON public.public_messages',
+      existing_policy.policyname
+    );
+  END LOOP;
+END $$;
+
+-- Khách chỉ được đọc lời chúc đang hiển thị và gửi lời chúc mới.
+REVOKE ALL PRIVILEGES ON TABLE public.public_messages FROM PUBLIC, anon, authenticated;
+GRANT SELECT ON TABLE public.public_messages TO anon, authenticated;
+GRANT INSERT (content, display_name, is_anonymous, idempotency_key)
+  ON TABLE public.public_messages TO anon, authenticated;
+GRANT ALL PRIVILEGES ON TABLE public.public_messages TO service_role;
+
 CREATE POLICY "Cho phép đọc lời chúc công khai"
   ON public.public_messages
   FOR SELECT
-  USING (true);
+  USING (is_hidden = false);
 
 -- Cho phép gửi lời chúc công khai
-DROP POLICY IF EXISTS "Cho phép gửi lời chúc công khai" ON public.public_messages;
 CREATE POLICY "Cho phép gửi lời chúc công khai"
   ON public.public_messages
   FOR INSERT
   WITH CHECK (
     char_length(btrim(content)) BETWEEN 3 AND 300
     AND (display_name IS NULL OR char_length(btrim(display_name)) <= 40)
+    AND is_hidden = false
+    AND is_pinned = false
   );
-
--- Cho phép quản trị viên cập nhật lời chúc (Ghim, Ẩn)
-DROP POLICY IF EXISTS "Cho phép quản trị viên cập nhật lời chúc" ON public.public_messages;
-CREATE POLICY "Cho phép quản trị viên cập nhật lời chúc"
-  ON public.public_messages
-  FOR UPDATE
-  USING (true)
-  WITH CHECK (true);
-
--- Cho phép quản trị viên xóa lời chúc
-DROP POLICY IF EXISTS "Cho phép quản trị viên xóa lời chúc" ON public.public_messages;
-CREATE POLICY "Cho phép quản trị viên xóa lời chúc"
-  ON public.public_messages
-  FOR DELETE
-  USING (true);
 
 -- 4. Kích hoạt tính năng Supabase Realtime cho bảng public_messages
 -- Đảm bảo sự kiện XÓA / GHIM / ẨN / THÊM MỚI phát sóng tức thì (0ms) đến mọi thiết bị người dùng
@@ -83,14 +90,8 @@ BEGIN
   END IF;
 END $$;
 
--- Đặt REPLICA IDENTITY FULL để khi xóa hoặc ẩn, Supabase Realtime gửi đầy đủ ID và dữ liệu cũ
-ALTER TABLE public.public_messages REPLICA IDENTITY FULL;
+-- Realtime DELETE không áp dụng lọc RLS; chỉ phát primary key, không phát nội dung bản ghi.
+ALTER TABLE public.public_messages REPLICA IDENTITY DEFAULT;
 
--- ==============================================================================
--- LƯU Ý DÀNH CHO MÔI TRƯỜNG THỰC TẾ (PRODUCTION):
--- Bảng hiện đang để trống 100% sẵn sàng đón nhận các lời chúc thật của người dùng.
--- Nếu trước đó bạn đã từng chạy lệnh INSERT dữ liệu mẫu, bạn có thể chạy lệnh:
--- TRUNCATE TABLE public.public_messages;
--- để xóa sạch hoàn toàn các bản ghi thử nghiệm cũ trên Supabase nhé.
--- ==============================================================================
-
+-- Các thao tác ghim/ẩn/xóa chỉ được thực hiện qua Admin API dùng
+-- SUPABASE_SERVICE_ROLE_KEY phía server; không cấp quyền ghi cho anon/authenticated.

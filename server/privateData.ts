@@ -1,6 +1,6 @@
 // ==============================================================================
 // DỮ LIỆU BẢO MẬT PHÍA SERVER - HÀNH TRÌNH RIÊNG 5 CHẶNG
-// Lưu ý: File này nằm ở /api/_privateData.ts (tiền tố '_' ngăn Vercel publish thành route)
+// Module server-only, nằm ngoài thư mục api để Vercel không tạo endpoint cho dữ liệu riêng.
 // Tuyệt đối không import file này vào bất kỳ file nào trong thư mục src/ (Frontend)
 // ==============================================================================
 //
