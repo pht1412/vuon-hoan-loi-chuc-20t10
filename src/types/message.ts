@@ -8,6 +8,16 @@ export interface PublicMessage {
   createdAt: string;
 }
 
+export function prependMessageIfMissing(
+  messages: PublicMessage[],
+  newMessage: PublicMessage
+): PublicMessage[] {
+  if (messages.some((message) => message.id === newMessage.id)) {
+    return messages;
+  }
+  return [newMessage, ...messages];
+}
+
 /**
  * Trả về tên hiển thị của người gửi theo quy tắc:
  * Nếu isAnonymous === true hoặc !displayName?.trim() -> hiển thị "Một người bạn"

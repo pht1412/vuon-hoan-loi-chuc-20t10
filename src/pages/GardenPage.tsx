@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { PublicMessage } from '../types/message';
+import { prependMessageIfMissing, PublicMessage } from '../types/message';
 import { PrivateJourneyData } from '../types/journey';
 import { initialPublicMessages, devDemoMessages } from '../data/publicMessages';
 import { fetchPublicMessages } from '../services/messageApi';
@@ -492,7 +492,8 @@ export const GardenPage: React.FC<GardenPageProps> = ({ onNavigateToAdmin }) => 
   // Callback khi gửi lời chúc thành công -> Thêm vào đầu danh sách, lưu cache & phát sáng hạt mầm
   const handleMessageSent = (newMessage: PublicMessage) => {
     setMessages((prev) => {
-      const updated = [newMessage, ...prev];
+      const updated = prependMessageIfMissing(prev, newMessage);
+      if (updated === prev) return prev;
       try {
         sessionStorage.setItem(CACHE_KEY, JSON.stringify(updated));
       } catch {
