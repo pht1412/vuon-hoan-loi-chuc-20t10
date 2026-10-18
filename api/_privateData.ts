@@ -144,7 +144,7 @@ export const privateJourneyContent: PrivateJourneyData = {
     iconName: 'clover',
     color: '#88B2A6',
     message:
-      'Ồ, cậu tìm ra nụ mầm nhỏ này rồi! Tớ giấu nó khá kỹ đấy. Coi như phần thưởng cho người chịu khám phá nhé.',
+      'Ồ, cậu tìm thấy tớ rồi! 🤭 Vậy thì phần thưởng cho người khám phá được bí mật là… \n\nTớ chúc cậu luôn gặp thật nhiều may mắn, để những điều cậu mong đợi có thể đến vào lúc thích hợp, những dự định cậu ấp ủ dần thành hiện thực, và trên hành trình ấy, cậu sẽ luôn có những niềm vui nho nhỏ để mỉm cười. 🍀',
   },
   // ---------------------------------------------------------------------------
   // CHẶNG 3 — NHỮNG ĐIỀU NHỎ TỚ VẪN NHỚ: Hai mảnh ghép kỷ niệm + đoạn kết khép lại chặng
@@ -157,7 +157,7 @@ export const privateJourneyContent: PrivateJourneyData = {
       title: 'Một góc quen thuộc',
       image: '/coimay.png',
       content:
-        'Có những điều thoạt nhìn rất đỗi bình thường, nhưng vì gắn với một khoảng thời gian nào đó nên lại trở nên đáng nhớ.\n\nVới tớ, Cõi Mây là một góc quen thuộc như thế. Và đôi khi, chính những điều nhỏ bé trong một buổi live lại khiến tớ cảm thấy vui hơn mình nghĩ.',
+        'Có những điều thoạt nhìn rất đỗi bình thường, nhưng vì gắn với một khoảng thời gian nào đó nên lại trở nên đáng nhớ.\n\nVới tớ, điều đáng quý không nằm ở việc khoảnh khắc ấy đặc biệt đến đâu, mà ở niềm vui nho nhỏ nó mang lại. Đôi khi, chỉ một điều giản dị như thế cũng đủ khiến tớ nhớ về một buổi live bằng cảm giác dễ chịu.',
     },
     {
       id: 'journal-2',
@@ -166,7 +166,7 @@ export const privateJourneyContent: PrivateJourneyData = {
       title: 'Một giai điệu thân quen',
       image: '/tinhkhongmau.png',
       content:
-        'Có những niềm vui chẳng cần điều gì lớn lao. Đôi khi chỉ là một giai điệu mình thích vang lên đúng lúc, hay một điều nho nhỏ khiến ngày hôm ấy dễ chịu hơn.\n\nCó lẽ người làm ra điều ấy không nghĩ nhiều, nhưng người nhận được vẫn có thể vui và nhớ đến nó. Tớ nghĩ những khoảnh khắc như vậy cũng rất đáng quý.',
+        'Những niềm vui chẳng cần điều gì lớn lao. Đôi khi chỉ là một giai điệu mình thích vang lên đúng lúc, hay một điều nho nhỏ khiến ngày hôm ấy dễ chịu hơn.\n\nNgười tạo nên khoảnh khắc ấy có lẽ không nghĩ nhiều, nhưng người nhận được vẫn có thể vui và nhớ đến nó. Tớ nghĩ những khoảnh khắc như vậy cũng rất đáng quý.',
     },
   ],
   stage3Ending: {
@@ -179,7 +179,7 @@ export const privateJourneyContent: PrivateJourneyData = {
   psNote: {
     title: 'Một ghi chú nhỏ (P.S.)',
     content:
-      'Tớ chọn đúng ngày 20/10 để gửi, nhưng cậu mở vào lúc nào cũng được.',
+      'Tớ chọn ngày 20/10 để gửi cậu món quà nhỏ này. Mong rằng khi ghé qua, cậu sẽ tìm thấy đôi chút niềm vui nhé.',
   },
   // ---------------------------------------------------------------------------
   // CHẶNG 4 — TRÂN TRỌNG: chỉ điều thật sự đã quan sát/nghe/trải nghiệm + cảm nhận của người gửi.
@@ -191,7 +191,7 @@ export const privateJourneyContent: PrivateJourneyData = {
       category: 'Podcast',
       title: 'Những tập podcast cậu chia sẻ',
       description:
-        'Những tập podcast cậu chia sẻ cho tớ thêm những chủ đề để nghe và suy nghĩ. Có lúc nghe xong, tớ thấy lòng mình dịu hơn. Tớ trân trọng việc cậu chia sẻ chúng.',
+        'Những tập podcast cậu chia sẻ đã mang đến cho tớ những câu chuyện và góc nhìn để lắng nghe, suy ngẫm. Có những lúc, tớ chỉ đơn giản muốn nghe một chút gì đó để lòng mình dịu lại. Tớ trân trọng những nội dung ấy, cũng như việc cậu đã chia sẻ chúng.',
       tag: 'Để nghe và nghĩ',
     },
     {
@@ -199,23 +199,23 @@ export const privateJourneyContent: PrivateJourneyData = {
       category: 'Chuyện thường ngày',
       title: 'Những chuyện cậu kể trong live',
       description:
-        'Trong các buổi livestream, cậu có kể vài chuyện thường ngày. Có những mẩu khiến tớ mỉm cười, và đến giờ tớ vẫn nhớ. Với tớ, đó là một phần dễ nhớ của những buổi live.',
+        'Ngoài những ván game, đôi khi cậu còn kể vài chuyện rất đỗi thường ngày. Có những mẩu chuyện chẳng có gì lớn lao, nhưng lại khiến buổi live trở nên gần gũi hơn và làm tớ bật cười đôi chút. Tớ nghĩ chính những điều giản dị ấy cũng góp phần tạo nên nét riêng của những buổi live.',
       tag: 'Chuyện thường ngày',
     },
     {
       id: 'apprec-3',
       category: 'Góc nhìn công khai',
-      title: 'Góc nhìn của cậu về tình yêu và cuộc sống',
+      title: 'Cách cậu nhìn cuộc sống',
       description:
-        'Cậu từng công khai chia sẻ góc nhìn của mình về tình yêu và cuộc sống. Sau khi biết đến nó, tớ nhận ra mình đã nghĩ thêm về chuyện đó.',
+      'Có những điều cậu chia sẻ khiến tớ muốn dừng lại để lắng nghe và suy ngẫm thêm. Tớ nghĩ mỗi người đều có cách nhìn riêng về cuộc sống, và việc được biết thêm một góc nhìn khác cũng là một điều đáng quý. Tớ trân trọng những điều cậu đã chia sẻ, cũng như sự chân thành trong việc cậu cho mọi người biết thêm một chút về suy nghĩ của mình',
       tag: 'Góc nhìn riêng',
     },
     {
       id: 'apprec-4',
       category: 'Livestream',
-      title: 'Những buổi livestream của cậu',
+      title: 'Một khoảng thời gian để tận hưởng',
       description:
-        'Tớ hay ghé xem livestream của cậu, từ những buổi chơi ZingSpeed đến những lần có Audition. Đôi lần tớ có tương tác nhỏ với cậu trong live. Ghé qua đó, tớ thấy dễ chịu.',
+        'Tớ thường ghé xem những buổi live của cậu. Có hôm tớ chỉ vào một chút, có hôm lại ở lâu hơn, nghe nhạc, theo dõi những ván game và tận hưởng không khí của buổi live. Với tớ, đôi khi chỉ cần có một khoảng thời gian như thế là đủ — Tớ có thể đơn giản ngồi xem, nghe nhạc và tận hưởng những gì đang diễn ra. Dần dần, những buổi live ấy trở thành một khoảng thời gian quen thuộc mà tớ luôn thấy cảm thấy dễ chịu.',
       tag: 'Những buổi live',
     },
   ],
@@ -230,10 +230,12 @@ export const privateJourneyContent: PrivateJourneyData = {
     title: 'Gửi cậu,',
     date: 'Ngày 20 tháng 10 năm 2026',
     paragraphs: [
-      'Cảm ơn cậu đã dành thời gian đi hết hành trình nhỏ này.',
-      'Tớ muốn làm một điều gì đó khác cho ngày 20/10, nên đã tự lên ý tưởng, viết nội dung, thiết kế và lập trình trang web này. Tớ làm nó vì muốn gửi đến cậu một thứ được chuẩn bị riêng.',
-      'Chúc cậu có một ngày 20/10 vui vẻ và một thời gian sắp tới nhiều điều dễ chịu.',
-      'Tớ vẫn là người hay ghé xem live của cậu như mọi khi, chỉ là hôm nay có thêm món quà này.',
+      'Vậy là cậu đã đi đến chặng cuối của khu vườn nhỏ này rồi.',
+      'Thật ra, tớ cũng không biết phải viết điều gì thật đặc biệt vào những dòng cuối cùng. Tớ chỉ muốn nhân ngày 20/10, gửi đến cậu một món quà nhỏ do chính tay tớ lên ý tưởng, viết từng dòng chữ và tự mình hoàn thiện. Có thể nó chẳng phải điều gì quá lớn lao, nhưng tớ đã dành thời gian để chăm chút cho từng góc nhỏ, với mong muốn mang đến cho cậu một chút niềm vui.',
+      'Cảm ơn cậu vì những tập podcast cậu chia sẻ, những câu chuyện thường ngày và những buổi live mà tớ có dịp ghé qua. Có những lúc, tớ tìm thấy một góc nhìn đáng để suy ngẫm từ những nội dung ấy; cũng có những lúc, tớ chỉ đơn giản tận hưởng không khí của một buổi live và mỉm cười vì một chuyện nhỏ nào đó. Tất cả đã góp lại thành những khoảnh khắc dễ chịu mà tớ trân trọng. Tớ vui vì đã có cơ hội biết đến cậu theo cách giản dị như thế.',
+      'Nhân ngày 20/10, tớ mong cậu luôn khỏe mạnh, bình an, có nhiều niềm vui trong cuộc sống và đủ tự tin để bước tiếp trên con đường mà cậu lựa chọn. Mong rằng giữa những ngày bận rộn, cậu vẫn có thời gian cho bản thân, cho những điều cậu thích và cho cả những phút giây chẳng cần phải làm gì cả.',
+      'Còn về khu vườn nhỏ này, tớ hy vọng cậu đã tìm thấy một điều gì đó khiến mình mỉm cười. Thế là đủ vui với tớ rồi.',
+      'Chúc cậu có một ngày 20/10 thật dịu dàng, và cả những ngày bình thường sau đó cũng có nhiều điều đáng mong đợi nhé. 🌷',
     ],
     signature: 'Người ghé qua từ phía bên kia màn hình 🌷',
   },

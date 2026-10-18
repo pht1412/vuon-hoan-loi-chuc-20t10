@@ -14,12 +14,17 @@ export const WelcomeScene: React.FC<WelcomeSceneProps> = ({ data }) => {
         <div className="welcome-hero-image" />
         <div className="welcome-hero-sunlight-vignette" />
         <div className="welcome-hero-sunburst" />
-        {/* 5 Hạt bụi tiên lấp lánh quanh cổng */}
+        {/* 10 Hạt bụi tiên lấp lánh quanh cổng */}
         <span className="welcome-gate-sparkle sp-1">✦</span>
         <span className="welcome-gate-sparkle sp-2">✦</span>
         <span className="welcome-gate-sparkle sp-3">✦</span>
         <span className="welcome-gate-sparkle sp-4">✦</span>
         <span className="welcome-gate-sparkle sp-5">✦</span>
+        <span className="welcome-gate-sparkle sp-6">✦</span>
+        <span className="welcome-gate-sparkle sp-7">✦</span>
+        <span className="welcome-gate-sparkle sp-8">✦</span>
+        <span className="welcome-gate-sparkle sp-9">✦</span>
+        <span className="welcome-gate-sparkle sp-10">✦</span>
       </div>
 
       {/* Tiêu đề thanh thoát phía trên vòm cổng hoa (Không có badge Chặng 1/5 bị lặp) */}

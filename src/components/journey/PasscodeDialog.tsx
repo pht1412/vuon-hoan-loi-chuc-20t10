@@ -179,6 +179,11 @@ export const PasscodeDialog: React.FC<PasscodeDialogProps> = ({
           Nhập mã mở thư để bước vào không gian nhỏ dành riêng cho cậu nhé.
         </p>
 
+        {/* Gợi ý trải nghiệm nhạc — không ảnh hưởng đến xác thực */}
+        <p className="passcode-music-hint">
+          🎵 Nhớ bật nhạc ở góc trái trên màn hình trước khi nhập mật khẩu nhé.
+        </p>
+
         <div className="passcode-input-wrapper">
           <input
             ref={inputRef}

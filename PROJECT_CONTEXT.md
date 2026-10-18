@@ -2,7 +2,7 @@
 
 > **Mục đích:** Đây là nguồn sự thật duy nhất (single source of truth) để một AI khác hiểu **toàn bộ** giao diện, hiệu ứng, luồng người dùng, kiến trúc kỹ thuật và ranh giới không được phá. Đọc file này trước khi mở code.
 >
-> **Ngày cập nhật:** 17/10/2026.
+> **Ngày cập nhật:** 18/10/2026 (tăng hạt sáng hành trình: chặng 1 lên 10 sao ✦ cỡ 3.2–4.8rem; chặng 2–5 lên 20 hạt vàng cỡ 14–24px; nội dung chặng 2–5 đã biên tập lần 5; còn F3 (câu chữ) và chặng 3 mục 2 chờ xác nhận).
 > **Cách xác minh:** Đối chiếu trực tiếp mã nguồn hiện tại (không phải bản mô tả cũ). Các mục đánh `[VERIFIED]` khớp với code tại thời điểm này.
 
 ---
@@ -317,7 +317,7 @@ Stack:
 3. `.journey-sky-backdrop`:
    - sunbeams repeating-linear 128°, pulse 10s
    - sunburst radial đáy, pulse 8s
-   - 12 hạt `.journey-sunset-particle` màu `#FFF6E0` / `#F5DFD3` / `#F7D8B5`
+   - 20 hạt `.journey-sunset-particle` màu `#FFF6E0` / `#F5DFD3` / `#F7D8B5`, cỡ 14–24px (base 18px)
    - `.journey-paper-texture` noise ~3.5%
 4. Topbar kính: nút « ← Về vườn lời chúc », 5 dots (upcoming peri / active scale 1.35 glow apricot / completed sage), chữ « Chặng n/5 ».
 5. Main scroll.
@@ -332,7 +332,7 @@ Vào shell: `journey-appear` 420ms fade+scale 0.985→1. Mỗi chapter: `chapter
 - Full-bleed `/Congchao.jpg`, mask fade đỉnh 0–15% để hòa vào `cad.jpeg`.
 - `heroImgBreathe` 14s scale 1 → 1.035.
 - Vignette hoàng hôn + sunburst blur 28px pulse 6s.
-- 5 sparkle `✦` `#FFF6E0` `floatArchSpeck` 4s.
+- 10 sparkle `✦` `#FFF6E0` `floatArchSpeck` 3.2s, cỡ 3.2–4.8rem (base 4.0rem), rải đều quanh cổng hoa.
 - Title serif có text-shadow nắng. Subtitle pill kính (data.subtitle từ server).
 - `.welcome-crystal-card` đáy: greeting / message / invitation — stagger `slideUpFade` 0.2s / 0.5s / 0.8s.
 - **Không** còn icon sen Lucide; **không** badge « Chặng 1/5 » trong scene (đã nằm ở shell).
@@ -347,7 +347,7 @@ Grid 2×2. Map ảnh:
 | :--- | :--- | :--- |
 | `flower-1` | `/hoa1.jpg` | Sen — Bình yên |
 | `flower-2` | `/hoa2.jpg` | Hướng dương — Niềm vui |
-| `flower-3` | `/hoa3.jpg` | Hoa chuông — Can đảm |
+| `flower-3` | `/hoa3.jpg` | Hoa chuông — Khỏe mạnh (đổi nhãn từ « Can đảm » ngày 17/10/2026) |
 | `flower-4` | `/hoa4.jpg` | Lavender — Khởi đầu mới |
 
 Title/subtitle/message/color lấy từ `PrivateJourneyData.flowers` (server). Fallback icon Lucide nếu thiếu file.
@@ -463,9 +463,10 @@ Cấm `#000000` trong journey.
 | Journey enter | unlock | fade scale | `journey-appear` 420ms |
 | Chapter change | next/back | blur-in + light sweep | `chapterEntrance`, `sceneLightSweep` |
 | Congchao | chặng 1 | Ken Burns nhẹ | `heroImgBreathe` 14s |
-| Gate sparkles | chặng 1 | ✦ bay xoay | `floatArchSpeck` |
+| Gate sparkles | chặng 1 | 10 ✦ bay xoay 3.2s, cỡ 3.2–4.8rem | `floatArchSpeck` |
+| Sunset particles | chặng 2–5 shell | 20 hạt vàng 14–24px bay lên | `floatSunsetParticle`, `fireflyWander` |
 | Crystal text | chặng 1 | stagger slide up | `slideUpFade` |
-| Sunbeams / sunburst / particles | shell | pulse + float | 10s / 8s / 8–13s |
+| Sunbeams / sunburst / particles | shell | pulse + float | 10s / 8s / 6.5–13s (20 hạt) |
 | Flower cards | chặng 2 | float 6s, burst 8 sparkles | `cardFloat`, `flSparkleBurst` |
 | Reveal | chọn hoa | pop + halo breathe + art float | `flowerRevealPop`, `haloBreathe`, `subtleArtFloat` |
 | Egg | chặng 2 | pulse / bounce | `eggPulse`, `eggBounce` |
@@ -702,6 +703,51 @@ Bạn đang tiếp quản website 20/10 **đã đủ logic + backend + hành tr�
 
 Nội dung chào, hoa, journal, P.S., appreciation, thư nằm trong `api/_privateData.ts`. Sửa chữ thì sửa file đó. **Không** nhúng vào component. **Không** dán nguyên văn vào README/PR.
 
+### Hướng viết lại nội dung riêng tư (kim chỉ nam, cập nhật 17/10/2026)
+
+Chỉ ghi **nguyên tắc và tiến độ** — không chép nguyên văn nội dung riêng tư vào đây.
+
+**Kim chỉ nam:** đừng chỉ viết những điều tốt đẹp mà người nhận có thể muốn nghe; hãy viết để cô ấy hiểu vì sao người tặng muốn dành món quà này cho cô ấy.
+
+**Hai lớp nội dung:**
+- Lớp lời chúc: những điều bất kỳ người phụ nữ nào cũng xứng đáng nhận được trong ngày 20/10.
+- Lớp riêng: lý do chọn cô ấy, chi tiết cụ thể đã khiến người tặng muốn làm món quà, cảm xúc của người tặng khi làm. Không cần nhồi chi tiết riêng vào mọi câu hay mọi chặng.
+
+**Quy tắc viết:**
+- Bắt đầu từ một quan sát hoặc cảm nhận **thật**, rồi mới đến lời chúc. Không bịa chi tiết để nghe sâu sắc; chỗ nào chưa có chất liệu thì viết giản dị.
+- Phân biệt rõ sự kiện (điều có thật đã quan sát được) với cảm nhận của người tặng.
+- Một điều cô ấy từng nói không đồng nghĩa đã hiểu hết con người cô ấy. Không biến nó thành kết luận về tính cách hay tổn thương bên trong.
+- Viết từ vị trí người tặng, không viết như lời khuyên sống (tránh biến thành self-help thu nhỏ).
+- Chất liệu công khai, đã thực sự để tâm: podcast cô ấy chia sẻ, cách kể chuyện đời thường, khoảnh khắc livestream, cách nói về tình yêu và cuộc sống.
+- **Nguồn dữ kiện (đã xác nhận):** livestream game (ZingSpeed PC, đôi khi Audition), người tặng hay ghé xem và có vài tương tác nhỏ; có chia sẻ bài đăng và podcast — **podcast dùng giọng đọc AI**, không gọi là giọng của cô ấy và không nói cô ấy tự thu âm; có kể vài chuyện thường ngày trong livestream; từng công khai chia sẻ góc nhìn về tình yêu và cuộc sống (trên livestream rất ít). Không suy diễn tổn thương, cô đơn, tự ti, cần chữa lành, tìm kiếm tình yêu, mệt mỏi hay khó khăn; không gán phẩm chất (tinh tế, sâu sắc, dịu dàng, can đảm…) khi chưa có bằng chứng cụ thể.
+- **Chi tiết thêm:** nếu muốn thêm một chi tiết về cô ấy, phải đánh dấu để người tặng xác nhận trước (comment `CẦN PHÁT XÁC NHẬN` trong `_privateData.ts`). Chưa có chi tiết chắc thì giữ câu chữ khái quát, trung thực.
+- **Nhịp điệu:** mỗi đóa một trọng tâm và một kiểu kết riêng (lời chúc / điều muốn nói / cảm giác đọng lại / lời cảm ơn); không cho cả bốn kết bằng « Mong rằng… ». Tránh lặp « khoảng lặng », « dịu lại », « bình yên », « theo nhịp riêng », « những điều nhỏ bé » và ý gần nghĩa.
+- **Sắc thái:** « cậu – tớ » nhất quán; dịu dàng, có tình cảm nhưng không phải lời tỏ tình, không giả vờ đã rất thân, không gây áp lực phải đáp lại. Dấu ấn cá nhân đến từ điều đã quan sát và cảm nhận, không từ việc khẳng định hiểu cô ấy đến đâu. Không khen tính cách chung chung.
+
+**Thứ tự ưu tiên và tiến độ:**
+
+| Ưu tiên | Hạng mục | Hướng | Trạng thái |
+| ---: | :--- | :--- | :--- |
+| 1 | Chặng 2 — bốn đóa hoa + hạt mầm bí mật | **Vai trò: lời chúc**, không phải quan sát (quan sát chuyển sang chặng 4). F1 chúc có lúc bình yên; F2 chúc niềm vui giản dị; F4 chúc, không giả định dự định, không áp lực. Hạt mầm: vui, tinh nghịch, không khen vô căn cứ | **Đã biên tập lần 5** — F3: nhãn « Khỏe mạnh » do người tặng chọn (thay « Can đảm »); câu chữ là đề xuất, **chờ xác nhận**, tránh giọng dặn dò; F1, F2, F4, hạt mầm đã xong |
+| 2 | Chặng 3 — nhật ký + P.S. | Bốn suy ngẫm mở, mỗi mục một ý riêng, không giả định người nhận mệt/tự ti/cầu toàn. Mục 1 gom ba ý người tặng xác nhận (nghe podcast vì muốn nghe, xem live bình thường vẫn vui, quý một điều chưa vội gọi tên) thành một suy ngẫm « không cần mục đích » (kết bằng câu người tặng chọn). Mục 2 = « ở lại đến hết » (mới, chờ xác nhận). P.S. = « chọn đúng ngày 20/10 nhưng mở lúc nào cũng được » | **Đã biên tập lần 6** — mục 2 chờ xác nhận. Lưu ý: người tặng ở lại trọn phiên live và nghe đủ podcast, **không** viết kiểu « ghé qua rồi đi » |
+| 3 | Chặng 4 — bốn thẻ trân trọng | Chỉ điều thật sự đã quan sát/nghe/trải nghiệm + cảm nhận của người tặng; category/tag nêu chủ đề, không gán phẩm chất | **Đã biên tập lần 4** — thẻ 3: đã cắt câu phòng thủ, không nêu thẳng quan điểm « không nhất thiết phải có tình yêu », dùng « biết đến » vì chưa rõ nguồn (người tặng đồng ý) |
+| 4 | Chặng 5 — lá thư cuối | Bốn nhịp: cảm ơn đã đi hết hành trình → lý do tự làm món quà → lời chúc không cần phản hồi → dấu ấn người gửi | **Đã biên tập lần 5** — signature do người tặng chọn (« Người ghé qua từ phía bên kia màn hình » + 🌷); đoạn 4 đã xác nhận giữ; đã bỏ câu « không cần phản hồi » ở đoạn 3 |
+
+**Phân vai giữa các chặng (chuẩn kiểm tra khi viết):**
+
+| Chặng | Chức năng | Câu hỏi chính |
+| :--- | :--- | :--- |
+| 2 | Gửi lời chúc | Mong cô ấy có điều gì trong 20/10 và thời gian sắp tới? |
+| 3 | Suy ngẫm có thể giữ lại | Có suy ngẫm dịu dàng nào cô ấy có thể mang theo cho riêng mình? |
+| 4 | Ghi nhận cá nhân | Đã thực sự quan sát, ghi nhớ và trân trọng điều gì? |
+| 5 | Khép lại + dấu ấn | Vì sao làm món quà này, và sau cùng muốn gửi điều gì? |
+
+Đã chuyển quan sát podcast/chuyện thường ngày/góc nhìn/livestream từ chặng 2 sang chặng 4 để tránh trùng. File `_privateData.ts` có khối ghi chú đầu file nêu dữ kiện đã xác nhận và dòng nhãn `[CẦN XÁC NHẬN]`.
+
+Hoãn: chuyển cảnh và animation — giao diện hiện đã đủ chất thơ, không thêm hiệu ứng chỉ vì có thể thêm.
+
+**Lưu ý kỹ thuật:** chỉ nội dung chữ trong `api/_privateData.ts` thay đổi; interface `PrivateJourneyData` và hợp đồng `/api/unlock-journey` giữ nguyên. Với chặng 2, nhãn `title`/`subtitle` của hoa vẫn là chủ đề (Bình yên, Niềm vui, Can đảm, Khởi đầu mới); ảnh `hoa1–hoa4.jpg` map theo `id` nên không bị ảnh hưởng.
+
 ### Checklist trước khi kết luận một thay đổi UI
 
 1. Desktop 1440: sách còn thấy rõ?
@@ -719,4 +765,4 @@ Nhẹ, cụ thể, không sến, không quá nhiều emoji. Vườn: « cậu »
 
 ---
 
-*Hết tài liệu bàn giao. Mọi mô tả UI/hiệu ứng ở trên khớp mã nguồn ngày 17/10/2026.*
+*Hết tài liệu bàn giao. Mọi mô tả UI/hiệu ứng ở trên khớp mã nguồn ngày 18/10/2026.*

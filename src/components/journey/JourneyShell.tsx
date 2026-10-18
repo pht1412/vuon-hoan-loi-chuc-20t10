@@ -1,21 +1,91 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { PrivateJourneyData } from '../../types/journey';
 import { WelcomeScene } from './scenes/WelcomeScene';
 import { FlowerGardenScene } from './scenes/FlowerGardenScene';
 import { JournalScene } from './scenes/JournalScene';
 import { AppreciationScene } from './scenes/AppreciationScene';
 import { FinalLetterScene } from './scenes/FinalLetterScene';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Volume2, VolumeX } from 'lucide-react';
 import './JourneyShell.css';
+
+// Tên file nhạc riêng (obfuscate)
+const JOURNEY_MUSIC_SRC = '/m_7f3a9c.mp3';
 
 interface JourneyShellProps {
   data: PrivateJourneyData;
   onExit: () => void;
+  isMusicPrefOn: boolean; // preference nhạc của người dùng từ khu vườn
 }
 
-export const JourneyShell: React.FC<JourneyShellProps> = ({ data, onExit }) => {
+export const JourneyShell: React.FC<JourneyShellProps> = ({ data, onExit, isMusicPrefOn }) => {
   const [currentChapter, setCurrentChapter] = useState<number>(1);
   const contentRef = useRef<HTMLDivElement | null>(null);
+
+  // ── Nhạc hành trình riêng ──
+  const journeyAudioRef = useRef<HTMLAudioElement | null>(null);
+  // 'idle' = chưa thử | 'playing' = đang phát | 'paused' = user tắt | 'blocked' = trình duyệt chặn
+  const [musicState, setMusicState] = useState<'idle' | 'playing' | 'paused' | 'blocked'>('idle');
+  const autoplayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isMountedRef = useRef(true);
+
+  // Khởi tạo audio một lần duy nhất khi JourneyShell mount
+  useEffect(() => {
+    isMountedRef.current = true;
+    const audio = new Audio(JOURNEY_MUSIC_SRC);
+    audio.loop = true;
+    audio.volume = 0.55;
+    journeyAudioRef.current = audio;
+
+    const onPlay  = () => { if (isMountedRef.current) setMusicState('playing'); };
+    const onPause = () => {
+      if (isMountedRef.current) {
+        setMusicState((prev) => prev === 'playing' ? 'paused' : prev);
+      }
+    };
+    audio.addEventListener('play', onPlay);
+    audio.addEventListener('pause', onPause);
+
+    // Thử autoplay sau 1.5s — CHỈ khi preference nhạc là 'on'
+    if (isMusicPrefOn) {
+      autoplayTimerRef.current = setTimeout(() => {
+        if (!isMountedRef.current) return;
+        audio.play().catch((err: Error) => {
+          if (!isMountedRef.current) return;
+          if (err.name === 'NotAllowedError') {
+            setMusicState('blocked');
+          } else {
+            console.warn('[Journey Music] play() failed:', err.name, err.message);
+            setMusicState('blocked');
+          }
+        });
+      }, 1500);
+    }
+    // Nếu preference tắt, để trạng thái 'idle' — nút nhạc vẫn có thể bật thủ công
+
+    return () => {
+      isMountedRef.current = false;
+      // Hủy timer nếu user thoát trước 1.5s
+      if (autoplayTimerRef.current) clearTimeout(autoplayTimerRef.current);
+      audio.removeEventListener('play', onPlay);
+      audio.removeEventListener('pause', onPause);
+      audio.pause();
+      audio.src = '';
+      journeyAudioRef.current = null;
+    };
+  }, []); // chỉ chạy một lần
+
+  const handleToggleJourneyMusic = useCallback(() => {
+    const audio = journeyAudioRef.current;
+    if (!audio) return;
+    if (musicState === 'playing') {
+      audio.pause();
+      setMusicState('paused');
+    } else {
+      audio.play()
+        .then(() => setMusicState('playing'))
+        .catch(() => setMusicState('blocked'));
+    }
+  }, [musicState]);
 
   // Cuộn mượt về đầu trang mỗi khi chuyển chặng
   useEffect(() => {
@@ -59,7 +129,7 @@ export const JourneyShell: React.FC<JourneyShellProps> = ({ data, onExit }) => {
         {/* Quầng sáng mặt trời đường chân trời */}
         <div className="journey-sunburst-glow" />
 
-        {/* Hạt nắng & Bụi sao hoàng hôn lơ lửng */}
+        {/* Hạt nắng & Bụi sao hoàng hôn lơ lửng — 20 hạt */}
         <div className="journey-particles-container">
           <span className="journey-sunset-particle p-1" />
           <span className="journey-sunset-particle p-2" />
@@ -73,6 +143,14 @@ export const JourneyShell: React.FC<JourneyShellProps> = ({ data, onExit }) => {
           <span className="journey-sunset-particle p-10" />
           <span className="journey-sunset-particle p-11" />
           <span className="journey-sunset-particle p-12" />
+          <span className="journey-sunset-particle p-13" />
+          <span className="journey-sunset-particle p-14" />
+          <span className="journey-sunset-particle p-15" />
+          <span className="journey-sunset-particle p-16" />
+          <span className="journey-sunset-particle p-17" />
+          <span className="journey-sunset-particle p-18" />
+          <span className="journey-sunset-particle p-19" />
+          <span className="journey-sunset-particle p-20" />
         </div>
 
         {/* Lớp vân giấy màu nước (3.5% noise) */}
@@ -111,6 +189,29 @@ export const JourneyShell: React.FC<JourneyShellProps> = ({ data, onExit }) => {
         {/* Khoảng trống cân đối đối xứng ở góc trên phải */}
         <div className="journey-topbar-spacer" aria-hidden="true" />
       </header>
+
+      {/* Nút bật/tắt nhạc riêng — fixed, góc trên trái, tồn tại xuyên suốt 5 chặng */}
+      <button
+        type="button"
+        className="journey-music-toggle"
+        onClick={handleToggleJourneyMusic}
+        aria-label={musicState === 'playing' ? 'Tắt nhạc' : 'Bật nhạc'}
+        title={musicState === 'playing' ? 'Tắt nhạc' : 'Bật nhạc'}
+      >
+        {musicState === 'playing' ? <Volume2 size={13} /> : <VolumeX size={13} />}
+      </button>
+
+      {/* Fallback banner khi autoplay bị trình duyệt chặn */}
+      {musicState === 'blocked' && (
+        <button
+          type="button"
+          className="journey-music-fallback-banner"
+          onClick={handleToggleJourneyMusic}
+          aria-live="polite"
+        >
+          🎵 Bấm để bật nhạc
+        </button>
+      )}
 
       {/* Khu vực nội dung từng Chặng */}
       <main ref={contentRef} className="journey-shell-content" id="journey-scene-content">

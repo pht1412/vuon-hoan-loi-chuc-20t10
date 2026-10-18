@@ -236,3 +236,34 @@ button {
   transform: scale(1.1);
   box-shadow: 0 4px 14px rgba(212, 140, 148, 0.25);
 }
+
+/* Nút bật/tắt nhạc vườn — góc trên trái, style đồng bộ với admin quick link */
+.garden-music-toggle {
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 40;
+  transition: all 0.2s ease;
+  opacity: 0.55;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.garden-music-toggle:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--color-accent-primary);
+  transform: scale(1.1);
+  box-shadow: 0 4px 14px rgba(212, 140, 148, 0.25);
+}

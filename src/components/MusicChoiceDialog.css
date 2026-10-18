@@ -1,0 +1,133 @@
+/* ==========================================================================
+   MUSIC CHOICE DIALOG — phong cách pastel đồng bộ với Vườn lời chúc
+   ========================================================================== */
+
+.music-choice-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 95; /* dưới modal passcode (100) nhưng trên garden content */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  background: rgba(250, 240, 228, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: music-dialog-fade-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes music-dialog-fade-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.music-choice-card {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5px solid var(--color-border-card, #F2E3DF);
+  border-radius: var(--radius-lg, 20px);
+  box-shadow: var(--shadow-modal, 0 24px 60px rgba(74, 66, 56, 0.18));
+  padding: 2rem 1.8rem 1.8rem;
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+  animation: music-card-scale-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes music-card-scale-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.music-choice-icon {
+  font-size: 2rem;
+  line-height: 1;
+  margin-bottom: 0.75rem;
+}
+
+.music-choice-title {
+  font-family: var(--font-serif, 'Cormorant Garamond', Georgia, serif);
+  font-size: 1.45rem;
+  font-weight: 600;
+  color: var(--color-text-main, #4A4238);
+  margin-bottom: 0.55rem;
+  line-height: 1.25;
+}
+
+.music-choice-desc {
+  font-size: 0.88rem;
+  color: var(--color-text-muted, #7D7468);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  max-width: 280px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.music-choice-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.music-choice-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.62rem 1.25rem;
+  border-radius: var(--radius-full, 9999px);
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition-fast, 180ms cubic-bezier(0.16, 1, 0.3, 1));
+  white-space: nowrap;
+}
+
+.music-choice-btn.primary {
+  background: var(--color-accent-primary, #D48C94);
+  color: #fff;
+  box-shadow: var(--shadow-button, 0 6px 18px rgba(212, 140, 148, 0.35));
+}
+
+.music-choice-btn.primary:hover {
+  background: var(--color-accent-hover, #C57780);
+  box-shadow: var(--shadow-button-hover, 0 8px 24px rgba(212, 140, 148, 0.5));
+  transform: translateY(-1px);
+}
+
+.music-choice-btn.secondary {
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--color-text-muted, #7D7468);
+  border: 1.5px solid var(--color-border-card, #F2E3DF);
+}
+
+.music-choice-btn.secondary:hover {
+  background: #fff;
+  color: var(--color-text-main, #4A4238);
+  border-color: var(--color-accent-soft, #E8B4B8);
+  transform: translateY(-1px);
+}
+
+/* Focus visible cho accessibility */
+.music-choice-btn:focus-visible {
+  outline: 2px solid var(--color-accent-primary, #D48C94);
+  outline-offset: 3px;
+}
+
+@media (max-width: 400px) {
+  .music-choice-card {
+    padding: 1.6rem 1.3rem 1.5rem;
+  }
+
+  .music-choice-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .music-choice-btn {
+    justify-content: center;
+  }
+}

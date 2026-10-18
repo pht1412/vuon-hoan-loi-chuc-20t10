@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { PublicMessage } from '../types/message';
 import { PrivateJourneyData } from '../types/journey';
 import { initialPublicMessages, devDemoMessages } from '../data/publicMessages';
@@ -12,7 +12,10 @@ import { SendMessageDialog } from '../components/SendMessageDialog';
 import { PasscodeDialog } from '../components/journey/PasscodeDialog';
 import { JourneyShell } from '../components/journey/JourneyShell';
 import { GardenAmbience } from '../components/GardenAmbience';
-import { Lock } from 'lucide-react';
+import { MusicChoiceDialog } from '../components/MusicChoiceDialog';
+import { Lock, Volume2, VolumeX } from 'lucide-react';
+
+const MUSIC_PREF_KEY = 'garden_music_pref';
 
 const CACHE_KEY = 'vuon_public_messages_cache';
 
@@ -61,6 +64,122 @@ export const GardenPage: React.FC<GardenPageProps> = ({ onNavigateToAdmin }) => 
   const [isSeedFlaring, setIsSeedFlaring] = useState(false);
   // Chế độ xem trước bố cục 12 lời chúc (Local/Dev only - không lưu vào CSDL)
   const [isDevDemoActive, setIsDevDemoActive] = useState(false);
+
+  // ── Nhạc vườn công khai ──
+  const gardenAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Preference người dùng: 'on' | 'off' | null (null = chưa chọn lần nào)
+  const savedPref = (() => { try { return localStorage.getItem(MUSIC_PREF_KEY); } catch { return null; } })();
+
+  // Hiện dialog lựa chọn nếu chưa có preference
+  const [showMusicDialog, setShowMusicDialog] = useState<boolean>(savedPref === null);
+  // isMusicOn = ý định của người dùng (preference), KHÔNG đồng nghĩa nhạc đang phát
+  const [isMusicOn, setIsMusicOn] = useState<boolean>(savedPref === 'on');
+  // isActuallyPlaying = trạng thái phát thực tế từ audio element
+  const [isActuallyPlaying, setIsActuallyPlaying] = useState(false);
+
+  // Khởi tạo Audio một lần duy nhất.
+  // Nếu preference là 'on' lúc tải trang, thử phát ngay sau khi instance sẵn sàng.
+  useEffect(() => {
+    const audio = new Audio('/public.mp3');
+    audio.loop = true;
+    audio.volume = 0.55;
+    gardenAudioRef.current = audio;
+
+    const onPlay  = () => setIsActuallyPlaying(true);
+    const onPause = () => setIsActuallyPlaying(false);
+    const onError = (e: Event) => {
+      const mediaErr = (e.target as HTMLAudioElement)?.error;
+      console.warn('[Garden Music] Audio load error:', mediaErr?.code, mediaErr?.message ?? e.type);
+      setIsActuallyPlaying(false);
+    };
+    audio.addEventListener('play', onPlay);
+    audio.addEventListener('pause', onPause);
+    audio.addEventListener('error', onError);
+
+    // Thử autoplay một lần nếu preference đã lưu là 'on'.
+    // savedPref được đọc từ localStorage khi render — đọc lại để chắc chắn đúng giá trị tại thời điểm này.
+    const prefAtMount = (() => { try { return localStorage.getItem(MUSIC_PREF_KEY); } catch { return null; } })();
+    if (prefAtMount === 'on') {
+      audio.play().catch((err: Error) => {
+        if (err.name === 'NotAllowedError') {
+          // Trình duyệt chặn autoplay — bình thường, không retry, không xóa preference
+          // isActuallyPlaying vẫn false → icon VolumeX → user bấm nút là phát được ngay
+        } else {
+          // Lỗi thực sự khác (file không tồn tại, codec không hỗ trợ, v.v.)
+          console.warn('[Garden Music] Autoplay on reload failed:', err.name, err.message);
+        }
+      });
+    }
+
+    return () => {
+      audio.removeEventListener('play', onPlay);
+      audio.removeEventListener('pause', onPause);
+      audio.removeEventListener('error', onError);
+      audio.pause();
+      gardenAudioRef.current = null;
+    };
+  }, []); // chỉ chạy một lần khi mount
+
+  // Gọi play() trực tiếp trong click handler — đảm bảo có user activation
+  const playGardenAudio = useCallback(() => {
+    const audio = gardenAudioRef.current;
+    if (!audio) return;
+    audio.play().catch((err: Error) => {
+      if (err.name === 'NotAllowedError') {
+        // Trình duyệt chặn — không log liên tục, giữ trạng thái tắt để user thử lại
+        setIsActuallyPlaying(false);
+      } else {
+        console.warn('[Garden Music] play() failed:', err.name, err.message);
+      }
+    });
+  }, []);
+
+  // Xử lý khi người dùng chọn từ dialog lựa chọn nhạc
+  const handleMusicDialogChoice = (wantMusic: boolean) => {
+    try { localStorage.setItem(MUSIC_PREF_KEY, wantMusic ? 'on' : 'off'); } catch { /* ignore */ }
+    setIsMusicOn(wantMusic);
+    setShowMusicDialog(false);
+    if (wantMusic) {
+      // play() trực tiếp từ click event — user activation còn hiệu lực
+      playGardenAudio();
+    }
+  };
+
+  // Xử lý khi người dùng bấm nút nhạc cố định
+  const handleToggleGardenMusic = () => {
+    const audio = gardenAudioRef.current;
+    if (!audio) return;
+
+    if (isActuallyPlaying) {
+      // Đang phát → dừng
+      audio.pause();
+      setIsMusicOn(false);
+      try { localStorage.setItem(MUSIC_PREF_KEY, 'off'); } catch { /* ignore */ }
+    } else {
+      // Đang tắt → thử phát (có user activation từ click)
+      setIsMusicOn(true);
+      try { localStorage.setItem(MUSIC_PREF_KEY, 'on'); } catch { /* ignore */ }
+      playGardenAudio();
+    }
+  };
+
+  // Dừng nhạc vườn (khi vào hành trình riêng)
+  const pauseGardenMusic = useCallback(() => {
+    gardenAudioRef.current?.pause();
+  }, []);
+
+  // Tiếp tục nhạc vườn nếu preference là 'on' (khi thoát hành trình riêng)
+  // Không gọi play() tự động — để user bấm nút nếu trình duyệt chặn
+  const resumeGardenMusicIfNeeded = useCallback(() => {
+    if (!isMusicOn) return;
+    const audio = gardenAudioRef.current;
+    if (!audio) return;
+    audio.play().catch(() => {
+      // Bị chặn khi resume — giữ icon tắt, user có thể bấm nút để bật lại
+      setIsActuallyPlaying(false);
+    });
+  }, [isMusicOn]);
 
   // Nạp danh sách lời chúc từ máy chủ VÀ kích hoạt Supabase Realtime Channel
   // Khi Quản trị viên XÓA, ẨN, GHIM hoặc người dùng gửi lời chúc -> Mọi màn hình cập nhật ngay lập tức (0ms)
@@ -389,12 +508,16 @@ export const GardenPage: React.FC<GardenPageProps> = ({ onNavigateToAdmin }) => 
 
   // Khi xác thực mật mã thành công -> Chuyển vào Hành trình riêng
   const handlePasscodeSuccess = (data: PrivateJourneyData) => {
+    pauseGardenMusic();   // Dừng nhạc vườn TRƯỚC khi mở hành trình
     setIsPasscodeOpen(false);
     setJourneyData(data);
   };
 
   const handleExitJourney = () => {
     setJourneyData(null);
+    // resumeGardenMusicIfNeeded sẽ được gọi sau khi JourneyShell unmount
+    // dùng setTimeout nhỏ để đảm bảo nhạc riêng đã dừng
+    setTimeout(() => resumeGardenMusicIfNeeded(), 100);
   };
 
   return (
@@ -458,6 +581,7 @@ export const GardenPage: React.FC<GardenPageProps> = ({ onNavigateToAdmin }) => 
         <JourneyShell
           data={journeyData}
           onExit={handleExitJourney}
+          isMusicPrefOn={isMusicOn}
         />
       )}
 
@@ -472,6 +596,22 @@ export const GardenPage: React.FC<GardenPageProps> = ({ onNavigateToAdmin }) => 
         >
           <Lock size={13} />
         </button>
+      )}
+
+      {/* 6. Nút bật/tắt nhạc vườn — góc trên trái */}
+      <button
+        type="button"
+        onClick={handleToggleGardenMusic}
+        className="garden-music-toggle"
+        aria-label={isActuallyPlaying ? 'Tắt nhạc nền' : 'Bật nhạc nền'}
+        title={isActuallyPlaying ? 'Tắt nhạc nền' : 'Bật nhạc nền'}
+      >
+        {isActuallyPlaying ? <Volume2 size={13} /> : <VolumeX size={13} />}
+      </button>
+
+      {/* 7. Hộp thoại lựa chọn nhạc — chỉ hiện khi chưa có preference */}
+      {showMusicDialog && (
+        <MusicChoiceDialog onChoose={handleMusicDialogChoice} />
       )}
     </div>
   );

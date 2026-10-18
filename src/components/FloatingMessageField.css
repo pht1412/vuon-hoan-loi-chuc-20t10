@@ -270,7 +270,7 @@
     animation-delay: -3.2s;
   }
   .slot-4 {
-    top: 68%;
+    top: 62%;
     left: 16px;
     animation-name: float-subtle-2;
     animation-duration: 6.5s;
@@ -293,7 +293,7 @@
     animation-delay: -2.4s;
   }
   .slot-5 {
-    top: 78%;
+    top: 71%;
     left: 246px;
     animation-name: float-subtle-3;
     animation-duration: 7.1s;
@@ -316,7 +316,7 @@
     animation-delay: -1.6s;
   }
   .slot-11 {
-    top: 78%;
+    top: 71%;
     right: 246px;
     animation-name: float-subtle-2;
     animation-duration: 6.7s;
@@ -339,7 +339,7 @@
     animation-delay: -3.6s;
   }
   .slot-10 {
-    top: 68%;
+    top: 62%;
     right: 16px;
     animation-name: float-subtle-1;
     animation-duration: 7.5s;

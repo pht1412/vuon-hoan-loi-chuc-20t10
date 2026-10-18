@@ -14,7 +14,7 @@ export const AppreciationScene: React.FC<AppreciationSceneProps> = ({
       <header className="scene-header">
         <h2 className="scene-title">Điều tớ trân trọng ở cậu</h2>
         <p className="scene-subtitle">
-          Những điều đáng mến được gom nhặt từ những khoảnh khắc cậu chia sẻ công khai.
+          Những điều tớ ghi nhớ từ những gì cậu chia sẻ và những buổi live tớ từng ghé qua.
         </p>
       </header>
 

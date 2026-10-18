@@ -151,26 +151,33 @@
   100% { opacity: 1; transform: translateX(-50%) scale(1.05); }
 }
 
-/* 5 HẠT BỤI TIÊN LUNG LINH */
+/* 10 HẠT BỤI TIÊN LUNG LINH */
 .welcome-gate-sparkle {
   position: absolute;
   color: #FFF6E0;
-  text-shadow: 0 0 10px #F7D8B5, 0 0 4px #FFFFFF;
+  text-shadow: 0 0 12px #F7D8B5, 0 0 5px #FFFFFF;
   pointer-events: none;
-  font-size: 1.15rem;
-  animation: floatArchSpeck 4s ease-in-out infinite alternate;
+  font-size: 4.0rem;
+  animation: floatArchSpeck 3.2s ease-in-out infinite alternate;
 }
 
-.welcome-gate-sparkle.sp-1 { top: 12%; right: 15%; animation-delay: 0s; }
-.welcome-gate-sparkle.sp-2 { top: 38%; left: 12%; animation-delay: 1.4s; font-size: 0.95rem; }
-.welcome-gate-sparkle.sp-3 { top: 8%; left: 28%; animation-delay: 2.2s; font-size: 1.25rem; }
-.welcome-gate-sparkle.sp-4 { top: 45%; right: 10%; animation-delay: 0.8s; font-size: 0.85rem; }
-.welcome-gate-sparkle.sp-5 { top: 22%; left: 18%; animation-delay: 3.1s; font-size: 1.1rem; }
+/* Chuẩn 4.0rem — xen kẽ nhỏ (3.2rem) / lớn (4.8rem) để có chiều sâu */
+.welcome-gate-sparkle.sp-1  { top: 12%; right: 15%; animation-delay: 0s;   }
+.welcome-gate-sparkle.sp-2  { top: 38%; left: 12%;  animation-delay: 1.4s; font-size: 3.2rem; }
+.welcome-gate-sparkle.sp-3  { top: 8%;  left: 28%;  animation-delay: 2.2s; font-size: 4.8rem; }
+.welcome-gate-sparkle.sp-4  { top: 45%; right: 10%; animation-delay: 0.8s; font-size: 3.2rem; }
+.welcome-gate-sparkle.sp-5  { top: 22%; left: 18%;  animation-delay: 3.1s; font-size: 4.0rem; }
+.welcome-gate-sparkle.sp-6  { top: 30%; right: 22%; animation-delay: 1.0s; font-size: 3.5rem; }
+.welcome-gate-sparkle.sp-7  { top: 55%; left: 22%;  animation-delay: 2.6s; font-size: 4.5rem; }
+.welcome-gate-sparkle.sp-8  { top: 18%; right: 32%; animation-delay: 0.4s; font-size: 3.2rem; }
+.welcome-gate-sparkle.sp-9  { top: 62%; right: 18%; animation-delay: 1.8s; font-size: 3.8rem; }
+.welcome-gate-sparkle.sp-10 { top: 5%;  left: 42%;  animation-delay: 3.5s; font-size: 4.2rem; }
 
 @keyframes floatArchSpeck {
-  0% { transform: translateY(0) scale(0.8) rotate(0deg); opacity: 0.4; }
-  50% { transform: translateY(-10px) scale(1.3) rotate(90deg); opacity: 1; }
-  100% { transform: translateY(-20px) scale(0.9) rotate(180deg); opacity: 0.4; }
+  0%   { transform: translateY(0) scale(0.85) rotate(0deg);   opacity: 0.45; }
+  40%  { transform: translateY(-8px)  scale(1.4) rotate(72deg);  opacity: 1;    }
+  70%  { transform: translateY(-16px) scale(1.1) rotate(135deg); opacity: 0.85; }
+  100% { transform: translateY(-24px) scale(0.95) rotate(200deg); opacity: 0.4; }
 }
 
 /* Header thanh thoát phía trên */
