@@ -3,14 +3,19 @@ import { X, Flower2, ArrowLeft } from 'lucide-react';
 import { publicGardenFlowers, PublicGardenFlower } from '../data/publicFlowerGarden';
 import './PublicFlowerGarden.css';
 
+const PUBLIC_FLOWER_ART: Record<string, string> = {
+  'binh-yen': '/public1.jpg',
+  'can-dam': '/public2.jpg',
+  'niem-vui': '/public3.jpg',
+  'tu-hao': '/public4.jpg',
+  'diu-dang': '/public5.jpg',
+  'tu-do': '/public6.jpg',
+};
+
 interface PublicFlowerGardenProps {
   isOpen: boolean;
   onClose: () => void;
   triggerElement: HTMLElement | null;
-}
-
-function PublicFlowerIcon({ size = 26 }: { size?: number }) {
-  return <Flower2 size={size} aria-hidden="true" />;
 }
 
 export const PublicFlowerGarden: React.FC<PublicFlowerGardenProps> = ({
@@ -213,9 +218,11 @@ export const PublicFlowerGarden: React.FC<PublicFlowerGardenProps> = ({
                       style={{ '--flower-accent': flower.accent } as React.CSSProperties}
                     >
                       <span className="public-garden-flower-art" aria-hidden="true">
-                        <span className="public-garden-flower-icon">
-                          <PublicFlowerIcon />
-                        </span>
+                        <img
+                          src={PUBLIC_FLOWER_ART[flower.id]}
+                          alt=""
+                          className="public-garden-flower-image"
+                        />
                       </span>
                       <span className="public-garden-flower-copy">
                         <span className="public-garden-flower-name">{flower.name}</span>
