@@ -73,6 +73,7 @@ describe('production security boundaries', () => {
       /GRANT INSERT \(content, display_name, is_anonymous, idempotency_key\)[\s\S]*TO anon, authenticated;/i
     );
     expect(schema).toMatch(/FOR SELECT\s+USING \(is_hidden = false\)/i);
+    expect(schema).toMatch(/CHECK \(char_length\(btrim\(content\)\) BETWEEN 3 AND 500\)/i);
     expect(schema).toMatch(/AND is_hidden = false\s+AND is_pinned = false/i);
     expect(schema).toMatch(/REPLICA IDENTITY DEFAULT/i);
     expect(schema).not.toMatch(/FOR UPDATE|FOR DELETE|REPLICA IDENTITY FULL/i);
@@ -274,6 +275,64 @@ describe('production security boundaries', () => {
     ]);
     expect(builder.insert.mock.calls[0][0][0]).not.toHaveProperty('is_hidden');
     expect(builder.insert.mock.calls[0][0][0]).not.toHaveProperty('is_pinned');
+  });
+
+  it('accepts messages up to 500 characters and rejects messages over the limit', async () => {
+    vi.stubEnv('SUPABASE_URL', 'https://example.supabase.co');
+    vi.stubEnv('SUPABASE_ANON_KEY', 'test-public-anon-key');
+    const builder = createDatabaseBuilder();
+    builder.single.mockResolvedValue({
+      data: {
+        id: 'message-id',
+        content: 'a'.repeat(500),
+        display_name: null,
+        is_anonymous: true,
+        is_pinned: false,
+        is_hidden: false,
+        created_at: '2026-10-19T00:00:00.000Z',
+      },
+      error: null,
+    });
+    mockFrom.mockReturnValue(builder);
+    const response = createResponse();
+
+    await publicMessagesHandler(
+      {
+        method: 'POST',
+        url: '/api/public-messages',
+        body: {
+          content: 'a'.repeat(500),
+          isAnonymous: true,
+          idempotencyKey: '00000000-0000-4000-8000-000000000002',
+        },
+      },
+      response
+    );
+
+    expect(response.statusCode).toBe(201);
+    expect(builder.insert).toHaveBeenCalledWith([
+      expect.objectContaining({ content: 'a'.repeat(500) }),
+    ]);
+
+    const overLimitBuilder = createDatabaseBuilder();
+    mockFrom.mockReturnValue(overLimitBuilder);
+    const overLimitResponse = createResponse();
+
+    await publicMessagesHandler(
+      {
+        method: 'POST',
+        url: '/api/public-messages',
+        body: {
+          content: 'a'.repeat(501),
+          isAnonymous: true,
+          idempotencyKey: '00000000-0000-4000-8000-000000000003',
+        },
+      },
+      overLimitResponse
+    );
+
+    expect(overLimitResponse.statusCode).toBe(400);
+    expect(overLimitBuilder.insert).not.toHaveBeenCalled();
   });
 
   it('returns an error rather than an empty success when public database settings are missing', async () => {

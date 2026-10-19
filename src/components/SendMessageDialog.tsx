@@ -171,8 +171,8 @@ export const SendMessageDialog: React.FC<SendMessageDialogProps> = ({
     if (!trimmedContent || trimmedContent.length < 3) {
       setContentError('Lời chúc cần tối thiểu 3 ký tự (không tính khoảng trắng thừa).');
       isValid = false;
-    } else if (trimmedContent.length > 300) {
-      setContentError('Lời chúc tối đa 300 ký tự.');
+    } else if (trimmedContent.length > 500) {
+      setContentError('Lời chúc tối đa 500 ký tự.');
       isValid = false;
     } else {
       setContentError(null);
@@ -240,8 +240,8 @@ export const SendMessageDialog: React.FC<SendMessageDialogProps> = ({
 
   // Helper cho bộ đếm ký tự
   const charLength = content.length;
-  const isCharWarning = charLength >= 260 && charLength <= 300;
-  const isCharOver = charLength > 300;
+  const isCharWarning = charLength >= 460 && charLength <= 500;
+  const isCharOver = charLength > 500;
 
   return (
     <div
@@ -389,7 +389,7 @@ export const SendMessageDialog: React.FC<SendMessageDialogProps> = ({
                   }`}
                   aria-live="polite"
                 >
-                  {charLength}/300 ký tự
+                  {charLength}/500 ký tự
                 </span>
               </div>
 

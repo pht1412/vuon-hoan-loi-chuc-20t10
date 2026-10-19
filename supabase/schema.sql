@@ -6,7 +6,7 @@
 -- 1. Tạo bảng public.public_messages
 CREATE TABLE IF NOT EXISTS public.public_messages (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  content TEXT NOT NULL CHECK (char_length(btrim(content)) BETWEEN 3 AND 300),
+  content TEXT NOT NULL CHECK (char_length(btrim(content)) BETWEEN 3 AND 500),
   display_name TEXT CHECK (display_name IS NULL OR char_length(btrim(display_name)) <= 40),
   is_anonymous BOOLEAN NOT NULL DEFAULT false,
   is_hidden BOOLEAN NOT NULL DEFAULT false,
@@ -14,6 +14,13 @@ CREATE TABLE IF NOT EXISTS public.public_messages (
   idempotency_key UUID NOT NULL UNIQUE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+ALTER TABLE public.public_messages
+  DROP CONSTRAINT IF EXISTS public_messages_content_check;
+
+ALTER TABLE public.public_messages
+  ADD CONSTRAINT public_messages_content_check
+  CHECK (char_length(btrim(content)) BETWEEN 3 AND 500);
 
 -- Nếu bảng đã tồn tại từ trước, bổ sung các cột cần thiết
 DO $$
@@ -71,7 +78,7 @@ CREATE POLICY "Cho phép gửi lời chúc công khai"
   ON public.public_messages
   FOR INSERT
   WITH CHECK (
-    char_length(btrim(content)) BETWEEN 3 AND 300
+    char_length(btrim(content)) BETWEEN 3 AND 500
     AND (display_name IS NULL OR char_length(btrim(display_name)) <= 40)
     AND is_hidden = false
     AND is_pinned = false

@@ -130,9 +130,9 @@ export default async function handler(req: any, res: any) {
         code: 'VALIDATION_ERROR',
       });
     }
-    if (normalizedContent.length > 300) {
+    if (normalizedContent.length > 500) {
       return sendResponse(res, 400, {
-        error: 'Nội dung lời chúc không được vượt quá 300 ký tự.',
+        error: 'Nội dung lời chúc không được vượt quá 500 ký tự.',
         code: 'VALIDATION_ERROR',
       });
     }
