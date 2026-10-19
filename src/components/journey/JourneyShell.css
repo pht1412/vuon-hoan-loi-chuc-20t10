@@ -561,6 +561,11 @@
 }
 
 @media (max-width: 540px) {
+  .journey-frosted-overlay {
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+  }
+
   .journey-shell-topbar {
     padding: 0.5rem 0.75rem;
   }
